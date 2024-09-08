@@ -6,7 +6,7 @@ import { createPayment } from '../../services/Payment';
 import { useRouter } from 'next/router';
 
 const stripePromise = loadStripe(
-  'pk_test_51O79acCO47pkDdZVK9jDfdy0djVL0gYNNwwH9257UA7eYB1yG94hqTpuFzvaFPvnb0FRcGk2uHPxwmyNKiQUYFsf00NLEk17nI',
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 );
 
 export default function PayPage() {
