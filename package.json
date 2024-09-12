@@ -88,8 +88,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "jsdom": "^19.0.0",
     "lint-staged": ">=10",
-    "prettier": "^2.5.1",
-    "sass-lint": "^1.13.1"
+    "prettier": "^2.5.1"
   },
   "eslintConfig": {
     "extends": [
