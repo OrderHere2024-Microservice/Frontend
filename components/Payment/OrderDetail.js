@@ -131,7 +131,7 @@ export const OrderDetail = ({ orderId }) => {
     return <Typography>Error loading restaurant info</Typography>;
 
   const restaurantAddress =
-  restaurantAddressData?.getRestaurantById?.address || 'No address found';
+    restaurantAddressData?.getRestaurantById?.address || 'No address found';
 
   return (
     <Box maxWidth="md" sx={{ margin: 'auto' }}>

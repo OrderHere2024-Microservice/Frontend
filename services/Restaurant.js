@@ -20,3 +20,27 @@ export const GET_RESTAURANT_ADDRESS = gql`
     }
   }
 `;
+
+export const GET_RESTAURANT_INFO = gql`
+  query GetRestaurantInfo($restaurantId: Int!) {
+    getRestaurantById(restaurantId: $restaurantId) {
+      restaurantId
+      name
+      description
+      address
+      contactNumber
+      abn
+      ownerName
+      ownerMobile
+      ownerAddress
+      ownerEmail
+      ownerCrn
+      openingHours {
+        dayOfWeek
+        openingTime
+        closingTime
+      }
+    }
+  }
+`;
+
