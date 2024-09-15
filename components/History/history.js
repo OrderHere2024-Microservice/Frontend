@@ -1,39 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getUserOrder } from '../../services/orderService';
-import { getRestaurantInfo } from '../../services/Restaurant';
+import { useApolloClient } from '@apollo/client'; // Import the Apollo client
+import { GET_RESTAURANT_INFO } from '../../services/Restaurant';
 import { Grid, Box } from '@mui/material';
 
 const History = () => {
   const [orders, setOrders] = useState([]);
   const [restaurants, setRestaurants] = useState({});
   const active = useSelector((state) => state.history.active);
-  useEffect(() => {
-    // const userId = '1';
-    const restaurantInfo = {};
+  const client = useApolloClient();
 
+  useEffect(() => {
     getUserOrder()
       .then((response) => {
         setOrders(response.data);
         response.data.forEach((order) => {
-          getRestaurantInfo(order.restaurantId)
-            .then((restaurantResponse) => {
-              restaurantInfo[order.restaurantId] = restaurantResponse.data.name;
-              setRestaurants((prevRestaurants) => ({
-                ...prevRestaurants,
-                [order.restaurantId]: restaurantResponse.data.name,
-              }));
-            })
-            .catch((error) =>
-              console.error('Fetching restaurant info failed', error),
-            );
+          fetchRestaurantInfo(order.restaurantId);
         });
       })
       .catch((error) => console.error('Fetching orders failed', error));
   }, []);
 
-  // console.log('orders by id:', orders)
-  // console.log('restaurant name:', restaurants)
+  const fetchRestaurantInfo = async (restaurantId) => {
+    try {
+      const { data } = await client.query({
+        query: GET_RESTAURANT_INFO,
+        variables: { restaurantId },
+      });
+
+      setRestaurants((prevRestaurants) => ({
+        ...prevRestaurants,
+        [restaurantId]: data.getRestaurantById.name,
+      }));
+    } catch (error) {
+      console.error(`Error fetching restaurant ${restaurantId} info`, error);
+    }
+  };
+
   const filteredOrders = orders.filter((order) => {
     if (active === 'all') {
       return true;
@@ -44,7 +48,6 @@ const History = () => {
     }
     return order.orderType === formattedActive;
   });
-  console.log('orders with different type:', filteredOrders);
 
   const getStatusColor = (status) => {
     if (!status) return '#D1D5DB';
@@ -64,7 +67,7 @@ const History = () => {
 
   return (
     <>
-      {/* title */}
+      {/* Title */}
       <Grid
         container
         sx={{
@@ -76,24 +79,14 @@ const History = () => {
           fontWeight: 700,
         }}
       >
-        <Grid item xs={2.4}>
-          Restaurant Name
-        </Grid>
-        <Grid item xs={2.4}>
-          Order ID
-        </Grid>
-        <Grid item xs={2.4}>
-          Date
-        </Grid>
-        <Grid item xs={2.4}>
-          Cost
-        </Grid>
-        <Grid item xs={2.4}>
-          Status
-        </Grid>
+        <Grid item xs={2.4}>Restaurant Name</Grid>
+        <Grid item xs={2.4}>Order ID</Grid>
+        <Grid item xs={2.4}>Date</Grid>
+        <Grid item xs={2.4}>Cost</Grid>
+        <Grid item xs={2.4}>Status</Grid>
       </Grid>
 
-      {/* history data */}
+      {/* History Data */}
       <Grid
         container
         sx={{
@@ -109,7 +102,7 @@ const History = () => {
         {filteredOrders.map((order, index) => (
           <React.Fragment key={index}>
             <Grid item xs={2.4} sx={{ marginTop: '2em' }}>
-              {restaurants[order.restaurantId]}
+              {restaurants[order.restaurantId] || 'Loading...'}
             </Grid>
             <Grid item xs={2.4} sx={{ marginTop: '2em' }}>
               {order.orderId}
