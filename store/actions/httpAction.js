@@ -27,7 +27,6 @@ export const loginAction = (email, password, success, fail) => (dispatch) => {
   login(email, password)
     .then((response) => {
       dispatch(loginSuccess(response.data.token));
-      //asdasd
       success(response);
     })
     .catch((error) => {

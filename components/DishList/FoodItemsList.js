@@ -2,7 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 import FoodItem from '/components/DishList/FoodItem';
-import { Box, CircularProgress, Alert, Button, IconButton} from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+  Alert,
+  Button,
+  IconButton,
+} from '@mui/material';
 import AddDishModal from './AddDishModal';
 import { useDispatch } from 'react-redux';
 import { addDishStart, addDishSuccess, addDishError } from './AddDishModal';
@@ -37,8 +43,10 @@ const FoodItemsList = ({ dishes: initialDishes }) => {
   const handleRemoveDish = async (dishId) => {
     try {
       const response = await deleteDish(dishId);
-      if (response.status === 200 || response.status === 204) {   
-        setDishes(currentDishes => currentDishes.filter(dish => dish.dishId !== dishId));
+      if (response.status === 200 || response.status === 204) {
+        setDishes((currentDishes) =>
+          currentDishes.filter((dish) => dish.dishId !== dishId),
+        );
       }
     } catch (error) {
       console.error(error);
@@ -141,7 +149,7 @@ const FoodItemsList = ({ dishes: initialDishes }) => {
               display: 'flex',
               justifyContent: 'center',
             }}
-          > 
+          >
             {/* <IconButton
               onClick={() => onRemoveDish(dishId)}
               sx={{
@@ -183,4 +191,3 @@ const FoodItemsList = ({ dishes: initialDishes }) => {
 };
 
 export default FoodItemsList;
-

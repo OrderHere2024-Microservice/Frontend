@@ -66,14 +66,13 @@ const FoodItem = ({
   };
 
   // const handleRemoveDish = () => {
-    
+
   //   dispatch({ type: Action.REMOVE_DISH, payload: dishIdToRemove });
 
-
   // }
-  
+
   const handleRemoveDish = () => {
-    dispatch({ type: Action.REMOVE_DISH, payload: {dishId} });
+    dispatch({ type: Action.REMOVE_DISH, payload: { dishId } });
   };
 
   const decrementQuantity = () => {
@@ -101,18 +100,18 @@ const FoodItem = ({
           padding: '16px',
           height: '200px',
         }}
-      > 
+      >
         {userRole == 'ROLE_sys_admin' && (
-        <IconButton
+          <IconButton
             onClick={() => onRemoveDish(dishId)}
             sx={{
               position: 'absolute',
               top: 0,
               right: 0,
             }}
-        >
-          <DeleteIcon />
-        </IconButton>
+          >
+            <DeleteIcon />
+          </IconButton>
         )}
         <Box
           component="img"
@@ -243,4 +242,3 @@ const FoodItem = ({
 };
 
 export default FoodItem;
-

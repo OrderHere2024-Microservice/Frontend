@@ -22,8 +22,12 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import Footer from '../layout/Footer';
 import Script from 'next/script';
+import { ApolloProvider } from '@apollo/client';
+import { useApollo } from '../lib/apolloClient';
 
 const MyApp = ({ Component, pageProps: { session, ...pageProps } }) => {
+  const apolloClient = useApollo(pageProps.initialApolloState);
+
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -36,7 +40,7 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }) => {
   }, []);
 
   return (
-    <>
+    <ApolloProvider client={apolloClient}>
       <Script
         src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
         strategy="beforeInteractive"
@@ -68,7 +72,7 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }) => {
           </SessionProvider>
         </PersistGate>
       </ReduxProvider>
-    </>
+    </ApolloProvider>
   );
 };
 

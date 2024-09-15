@@ -20,7 +20,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { jwtInfo } from '../../../utils/jwtInfo';
 import dynamic from 'next/dynamic';
 
-const ContactMap = dynamic(() => import('../../restaurantInfo/components/ContactMap'), { ssr: false });
+const ContactMap = dynamic(
+  () => import('../../restaurantInfo/components/ContactMap'),
+  { ssr: false },
+);
 
 const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
   const dispatch = useDispatch();
@@ -256,7 +259,9 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
                   </Typography>
                 </Box>
                 <ContactMap
-                  address={order.orderType === 'delivery' ? order.address : address}
+                  address={
+                    order.orderType === 'delivery' ? order.address : address
+                  }
                 />
                 <Typography sx={{ color: 'text.secondary' }}>
                   Note:{' '}

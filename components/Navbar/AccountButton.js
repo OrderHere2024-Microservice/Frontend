@@ -34,8 +34,15 @@ const AccountButton = ({ isLogin }) => {
   };
 
   const fetchProfile = async () => {
-    const response = await getUserProfile();
-    setAvatarUrl(response.data.avatarUrl);
+    try {
+      if (!isLogin) {
+        return;
+      }
+      const response = await getUserProfile();
+      setAvatarUrl(response.data.avatarUrl);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {

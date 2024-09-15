@@ -42,15 +42,15 @@ const NavbarRoot = styled(AppBar)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   ...(theme.palette.mode === 'light'
     ? {
-      boxShadow: theme.shadows[3],
-    }
+        boxShadow: theme.shadows[3],
+      }
     : {
-      backgroundColor: theme.palette.background.paper,
-      borderBottomColor: theme.palette.divider,
-      borderBottomStyle: 'solid',
-      borderBottomWidth: 1,
-      boxShadow: 'none',
-    }),
+        backgroundColor: theme.palette.background.paper,
+        borderBottomColor: theme.palette.divider,
+        borderBottomStyle: 'solid',
+        borderBottomWidth: 1,
+        boxShadow: 'none',
+      }),
 }));
 
 const Navbar = () => {
@@ -187,7 +187,6 @@ const Navbar = () => {
                 </Button>
               </Link>
             ) : null}
-
           </Box>
 
           <Box sx={{ flexGrow: 1 }} />
