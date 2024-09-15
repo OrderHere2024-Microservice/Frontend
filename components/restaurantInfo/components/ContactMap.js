@@ -6,18 +6,22 @@ const ContactMap = ({ address }) => {
   const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
-    fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&sensor=false`)
-      .then(response => response.json())
-      .then(data => {
+    fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+        address,
+      )}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&sensor=false`,
+    )
+      .then((response) => response.json())
+      .then((data) => {
         console.log(data);
-        if (data.status === "OK") {
+        if (data.status === 'OK') {
           const location = data.results[0].geometry.location;
           setPosition({ lat: location.lat, lng: location.lng });
         } else {
-          console.error("Error from Google Maps API:", data.status);
+          console.error('Error from Google Maps API:', data.status);
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error in fetching coordinates:', error);
       });
   }, [address]);
@@ -27,14 +31,21 @@ const ContactMap = ({ address }) => {
   }
 
   return (
-    <LoadScriptNext googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}>
+    <LoadScriptNext
+      googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+    >
       <GoogleMap
         onLoad={() => setMapLoaded(true)}
         mapContainerStyle={{ height: '15rem', width: '100%' }}
         center={position}
         zoom={13}
       >
-        {mapLoaded && <MarkerF position={position} key={`${position.lat}-${position.lng}`} />}
+        {mapLoaded && (
+          <MarkerF
+            position={position}
+            key={`${position.lat}-${position.lng}`}
+          />
+        )}
       </GoogleMap>
     </LoadScriptNext>
   );

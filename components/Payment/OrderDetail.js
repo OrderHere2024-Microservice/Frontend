@@ -1,26 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { getRestaurantInfo } from '../../services/Restaurant';
+import { useQuery } from '@apollo/client';
+import { GET_RESTAURANT_ADDRESS } from '../../services/Restaurant';
 import { getOrderInfo } from '../../services/orderService';
 import { Box, Divider, Grid, Typography } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 
-const OrderDetail = ({ orderId }) => {
+export const OrderDetail = ({ orderId }) => {
   const [order, setOrder] = useState('');
-  const [address, setAddress] = useState('');
+  const [restaurantId, setRestaurantId] = useState(1);
+
+  const {
+    loading: loadingRestaurant,
+    error: restaurantError,
+    data: restaurantAddressData,
+  } = useQuery(GET_RESTAURANT_ADDRESS, {
+    variables: { restaurantId },
+  });
+
+  const fetchOrderDetail = async () => {
+    const res = await getOrderInfo(orderId);
+    console.log(res.data);
+    setOrder(res.data);
+  };
 
   useEffect(() => {
-    const fetchRestaurantAddress = async () => {
-      const response = await getRestaurantInfo(1);
-      setAddress(response.data.address);
-    };
-
-    const fetchOrderDetail = async () => {
-      const res = await getOrderInfo(orderId);
-      console.log(res.data);
-      setOrder(res.data);
-    };
-
-    fetchRestaurantAddress();
     fetchOrderDetail();
   }, []);
 
@@ -121,6 +124,15 @@ const OrderDetail = ({ orderId }) => {
     }
   };
 
+  // Handle loading and error states for restaurant data
+  if (loadingRestaurant)
+    return <Typography>Loading restaurant info...</Typography>;
+  if (restaurantError)
+    return <Typography>Error loading restaurant info</Typography>;
+
+  const restaurantAddress =
+    restaurantAddressData?.getRestaurantById?.address || 'No address found';
+
   return (
     <Box maxWidth="md" sx={{ margin: 'auto' }}>
       <Typography variant="h4" sx={{ textAlign: 'center', marginBottom: 2 }}>
@@ -183,7 +195,9 @@ const OrderDetail = ({ orderId }) => {
                 <Box display="flex" alignItems="center">
                   <LocationOnIcon />
                   <Typography>
-                    {order.orderType === 'delivery' ? order.address : address}
+                    {order.orderType === 'delivery'
+                      ? order.address
+                      : restaurantAddress}
                   </Typography>
                 </Box>
                 <Typography sx={{ color: 'text.secondary' }}>
@@ -259,5 +273,3 @@ const OrderDetail = ({ orderId }) => {
     </Box>
   );
 };
-
-export default OrderDetail;

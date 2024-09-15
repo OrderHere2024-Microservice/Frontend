@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { Box, Button } from '@mui/material';
 import { useRouter } from 'next/router';
 import RestaurantInfoHeader from '../../components/restaurantInfo/components/restaurantInfoHeader';
@@ -5,51 +6,31 @@ import RestaurantInfoContent from '../../components/restaurantInfo/components/re
 import Contact from '../../components/restaurantInfo/components/contact';
 import OpeningHours from '../../components/restaurantInfo/components/openingHours';
 import { EditRestaurantModal } from '../../components/restaurantInfo/EditRestaurantModal';
-import { useState } from 'react';
-import { getRestaurantInfo } from '../../services/Restaurant';
-import { useSelector } from 'react-redux';
+import { useQuery } from '@apollo/client';
+import { GET_RESTAURANT_INFO } from '../../services/Restaurant';
 import { jwtInfo } from '../../utils/jwtInfo';
+import { useSelector } from 'react-redux';
 
-export async function getStaticPaths() {
-  return {
-    paths: [{ params: { restaurantId: '1' } }],
-    fallback: false,
-  };
-}
-
-export async function getStaticProps({ params }) {
-  try {
-    const response = await getRestaurantInfo(params.restaurantId);
-    // console.log('restaurant-response:', response.data)
-    return {
-      props: {
-        restaurantData: response.data,
-      },
-      revalidate: 10,
-    };
-  } catch (error) {
-    console.error('Error fetching restaurant info:', error);
-    return { props: { restaurantData: null } };
-  }
-}
-
-const RestaurantInfoPage = ({ restaurantData: initialData }) => {
+const RestaurantInfoPage = () => {
   const router = useRouter();
   const { restaurantId } = router.query;
-  const [loading, setLoading] = useState(false);
-  // console.log('restaurant-info-data:', initialData)
-  const [restaurantData, setRestaurantData] = useState(initialData);
-  const [error, setError] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
   const { token } = useSelector((state) => state.sign);
   const { userRole } = jwtInfo(token);
+
+  const { loading, error, data, refetch } = useQuery(GET_RESTAURANT_INFO, {
+    variables: { restaurantId: parseInt(restaurantId) },
+    skip: !restaurantId, // Avoid querying before restaurantId is available
+    fetchPolicy: 'cache-and-network',
+  });
+
+  const restaurantData = data?.getRestaurantById;
 
   if (!restaurantId || loading) {
     return <div>Loading...</div>;
   }
 
-  if (!restaurantData) {
+  if (error || !restaurantData) {
     return <div>Restaurant not found</div>;
   }
 
@@ -58,32 +39,18 @@ const RestaurantInfoPage = ({ restaurantData: initialData }) => {
   };
 
   const refreshRestaurantData = async () => {
-    setLoading(true);
     try {
-      const response = await getRestaurantInfo(restaurantId);
-      setRestaurantData(response.data);
+      await refetch();
     } catch (err) {
       console.error('Error fetching updated data:', err);
-      setError(err);
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <Box
-      sx={{
-        width: '100%',
-      }}
-    >
+    <Box sx={{ width: '100%' }}>
       <RestaurantInfoHeader />
-      {userRole == 'ROLE_sys_admin' && (
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-around',
-          }}
-        >
+      {userRole === 'ROLE_sys_admin' && (
+        <Box sx={{ display: 'flex', justifyContent: 'space-around' }}>
           <Button
             variant="contained"
             onClick={handleEditButtonClick}
@@ -110,7 +77,6 @@ const RestaurantInfoPage = ({ restaurantData: initialData }) => {
           )}
         </Box>
       )}
-
       <RestaurantInfoContent data={restaurantData} />
       <Box
         sx={{

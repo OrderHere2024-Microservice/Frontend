@@ -19,11 +19,11 @@ import * as Action from '../../../store/actionTypes';
 
 const ListInfo = () => {
   const dispatch = useDispatch();
-//   const [checked, setChecked] = useState({
-//     delivery: true,
-//     dine_in: true,
-//     pickup: true,
-//   });
+  //   const [checked, setChecked] = useState({
+  //     delivery: true,
+  //     dine_in: true,
+  //     pickup: true,
+  //   });
 
   const [checkedStatus, setCheckedStatus] = useState({
     pending: true,
@@ -42,15 +42,15 @@ const ListInfo = () => {
     dispatch({ type: Action.SET_SEARCH_TEXT, payload: '' });
   }, []);
 
-//   const handleChangeOptions = (event) => {
-//     const newOptions = {
-//       ...checked,
-//       [event.target.name]: event.target.checked,
-//     };
-//     setChecked(newOptions);
-//     dispatch({ type: Action.SET_ORDER_OPTION, payload: newOptions });
-//     // setChecked({ ...checked, [event.target.name]: event.target.checked });
-//   };
+  //   const handleChangeOptions = (event) => {
+  //     const newOptions = {
+  //       ...checked,
+  //       [event.target.name]: event.target.checked,
+  //     };
+  //     setChecked(newOptions);
+  //     dispatch({ type: Action.SET_ORDER_OPTION, payload: newOptions });
+  //     // setChecked({ ...checked, [event.target.name]: event.target.checked });
+  //   };
 
   const handleChangeStatus = (event) => {
     const newStatus = {

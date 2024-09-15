@@ -5,7 +5,7 @@ import Category from '../components/Category/Category';
 import { getDishes } from '../services/Dish';
 import { getCategoriesByRestaurant } from '../services/Category';
 import { jwtInfo } from '../utils/jwtInfo';
-import OrderList from '../components/OrderList/index'
+import OrderList from '../components/OrderList/index';
 import { useDispatch, useSelector } from 'react-redux';
 
 export async function getStaticProps() {

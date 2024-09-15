@@ -3,7 +3,7 @@ import { Box, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import OrderDetail from '../../components/Payment/OrderDetail';
+import { OrderDetail } from '../../components/Payment/OrderDetail';
 
 const SuccessPage = () => {
   const router = useRouter();

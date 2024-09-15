@@ -13,35 +13,34 @@ import {
   MenuItem,
 } from '@mui/material';
 import { updateOrderStatus, deleteOrder } from '../../../services/orderService';
-import { getRestaurantInfo } from '../../../services/Restaurant';
+import { useQuery } from '@apollo/client';
+import { GET_RESTAURANT_ADDRESS } from '../../../services/Restaurant'; // Import GraphQL query
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import * as Action from '../../../store/actionTypes';
 import { useDispatch, useSelector } from 'react-redux';
 import { jwtInfo } from '../../../utils/jwtInfo';
 import dynamic from 'next/dynamic';
 
-const ContactMap = dynamic(() => import('../../restaurantInfo/components/ContactMap'), { ssr: false });
+const ContactMap = dynamic(
+  () => import('../../restaurantInfo/components/ContactMap'),
+  { ssr: false },
+);
 
 const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
   const dispatch = useDispatch();
   const { token } = useSelector((state) => state.sign);
   const { userRole } = jwtInfo(token);
 
-  const [address, setAddress] = useState('');
-  // const [originalStatus, setOriginalStatus] = useState(order.orderStatus);
   const [originalStatus, setOriginalStatus] = useState('');
   const [isEditMode, setEditMode] = useState(false);
-  // const [statusValue, setStatusValue] = useState(order.orderStatus);
-  const [statusValue, setStatusValue] = useState('');
+  const [statusValue, setStatusValue] = useState(order?.orderStatus || '');
 
-  useEffect(() => {
-    const fetchRestaurantAddress = async () => {
-      const response = await getRestaurantInfo(1);
-      setAddress(response.data.address);
-    };
+  const { data, loading, error } = useQuery(GET_RESTAURANT_ADDRESS, {
+    variables: { restaurantId: order?.restaurantId },
+    skip: !order?.restaurantId,
+  });
 
-    fetchRestaurantAddress();
-  }, []);
+  const address = data?.getRestaurantById?.address || order?.address;
 
   const handleClose = () => {
     if (isEditMode) {
@@ -59,13 +58,11 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
   };
 
   const handleStatusChange = (event) => {
-    console.log('status:', event.target.value);
     setStatusValue(event.target.value);
   };
 
   const handleEditStatusSubmit = async () => {
     try {
-      console.log('status value:', statusValue);
       const statusInfo = {
         orderId: parseInt(order.orderId),
         orderStatus: statusValue,
@@ -78,8 +75,8 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
         });
         setOriginalStatus(statusValue);
         setEditMode(false);
+        onOrderStatusUpdate(order.orderId, statusValue);
         onClose();
-        props.onOrderStatusUpdate(order.orderId, statusValue);
       }
     } catch (error) {
       console.error('Error updating status:', error.response);
@@ -87,53 +84,27 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
   };
 
   const handleRejectedOrder = async () => {
-    const orderId = parseInt(order.orderId);
     try {
-      const orderData = {
-        orderId: orderId,
-      };
-      await deleteOrder(orderData);
-      dispatch({ type: Action.DELETE_ORDER, payload: orderId });
+      await deleteOrder({ orderId: parseInt(order.orderId) });
+      dispatch({ type: Action.DELETE_ORDER, payload: order.orderId });
       onClose();
-      console.log('Success delete order #', order.orderId);
     } catch (error) {
-      console.error('Error updating status:', error.response);
+      console.error('Error deleting order:', error.response);
     }
   };
 
   const convertToMelbourneTime = (utcTimestamp) => {
-    if (!utcTimestamp) {
-      return 'Null';
-    }
-    const trimmedTimestamp = /(\.\d{3})\d*Z$/.test(utcTimestamp)
-      ? utcTimestamp.replace(/(\.\d{3})\d*Z$/, '$1Z')
-      : utcTimestamp;
-
-    const date = new Date(trimmedTimestamp);
-    if (isNaN(date)) {
-      return 'Null';
-    }
-
-    const dateOptions = {
+    if (!utcTimestamp) return 'Null';
+    const date = new Date(utcTimestamp);
+    return date.toLocaleString('en-AU', {
+      timeZone: 'Australia/Melbourne',
       year: 'numeric',
       month: 'numeric',
       day: 'numeric',
-      timeZone: 'Australia/Melbourne',
-    };
-    const timeOptions = {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
-      timeZone: 'Australia/Melbourne',
-    };
-
-    const formattedDate = new Intl.DateTimeFormat('en-AU', dateOptions).format(
-      date,
-    );
-    const formattedTime = new Intl.DateTimeFormat('en-AU', timeOptions).format(
-      date,
-    );
-    return `${formattedDate}\n${formattedTime}`;
+    });
   };
 
   const renderOrderTypeInfo = () => {
@@ -199,7 +170,7 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md">
+    <Dialog open={open} onClose={handleClose} maxWidth="md">
       <DialogTitle>Order Details</DialogTitle>
       <DialogContent>
         {order ? (
@@ -235,34 +206,19 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
                 mb: 2,
               }}
             >
-              <Box
-                sx={{
-                  maxWidth: '50%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                }}
-              >
+              <Box sx={{ maxWidth: '50%', display: 'flex', flexDirection: 'column' }}>
                 <Typography
                   sx={{ color: 'text.secondary', textTransform: 'capitalize' }}
                 >
-                  {order.orderType == 'dine_in' ? 'Dine in' : order.orderType}{' '}
-                  Address
+                  {order.orderType === 'dine_in' ? 'Dine in' : order.orderType} Address
                 </Typography>
                 <Box display="flex" alignItems="center">
                   <LocationOnIcon />
-                  <Typography>
-                    {order.orderType === 'delivery' ? order.address : address}
-                  </Typography>
+                  <Typography>{address}</Typography>
                 </Box>
-                <ContactMap
-                  address={order.orderType === 'delivery' ? order.address : address}
-                />
+                <ContactMap address={address} />
                 <Typography sx={{ color: 'text.secondary' }}>
-                  Note:{' '}
-                  {order.note === undefined || order.note === ''
-                    ? 'No special instructions'
-                    : order.note}
+                  Note: {order.note || 'No special instructions'}
                 </Typography>
               </Box>
               <Grid container spacing={2} sx={{ maxWidth: '50%' }}>
@@ -299,9 +255,7 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
                       <Typography
                         sx={{ fontWeight: 'bold', textTransform: 'capitalize' }}
                       >
-                        {order.orderStatus == 'in_transit'
-                          ? 'In transit'
-                          : order.orderStatus}
+                        {order.orderStatus === 'in_transit' ? 'In transit' : order.orderStatus}
                       </Typography>
                     )}
                   </Box>
@@ -348,22 +302,22 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
       <DialogActions>
         {userRole === 'ROLE_sys_admin' ? (
           isEditMode ? (
-            <React.Fragment>
+            <>
               <Button onClick={toggleEditMode}>Exit</Button>
               <Button onClick={handleEditStatusSubmit}>Save</Button>
-            </React.Fragment>
+            </>
           ) : (
-            <React.Fragment>
+            <>
               <Button onClick={handleClose}>Close</Button>
               <Button onClick={handleRejectedOrder}>Reject Order</Button>
               <Button onClick={toggleEditMode}>Modify Order</Button>
-            </React.Fragment>
+            </>
           )
         ) : (
-          <React.Fragment>
+          <>
             <Button onClick={handleClose}>Close</Button>
             <Button onClick={handleEditStatusSubmit}>Save</Button>
-          </React.Fragment>
+          </>
         )}
       </DialogActions>
     </Dialog>

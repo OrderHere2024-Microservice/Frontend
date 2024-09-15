@@ -126,7 +126,7 @@ const Address = () => {
         value={selectedAddress}
         onChange={(address) => {
           handleChange(address);
-          handleInputChange({ target: { name: "address", value: address } });
+          handleInputChange({ target: { name: 'address', value: address } });
         }}
         onSelect={handleSelect}
       >
@@ -136,9 +136,9 @@ const Address = () => {
               {...getInputProps({
                 fullWidth: true,
                 multiline: true,
-                margin: "normal",
-                name: "address",
-                label: "Address",
+                margin: 'normal',
+                name: 'address',
+                label: 'Address',
                 error: !!errors.address,
                 helperText: errors.address,
                 rows: 2,
@@ -157,7 +157,7 @@ const Address = () => {
             />
             <div>
               {loading && <div>Loading...</div>}
-              {suggestions.map(suggestion => {
+              {suggestions.map((suggestion) => {
                 const style = suggestion.active
                   ? { backgroundColor: '#a8d0e6', cursor: 'pointer' }
                   : { backgroundColor: '#ffffff', cursor: 'pointer' };

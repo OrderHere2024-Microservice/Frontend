@@ -2,7 +2,6 @@ import * as Action from '../actionTypes';
 import axios from 'axios';
 import { saveState, store } from '../store';
 import { login, loginByOathProvider } from '../../services/Public';
-import { getRestaurantInfo } from '../../services/Restaurant';
 
 export const loginSuccess = (token) => ({
   type: Action.LOGIN_SUCCESS,
@@ -27,7 +26,6 @@ export const loginAction = (email, password, success, fail) => (dispatch) => {
   login(email, password)
     .then((response) => {
       dispatch(loginSuccess(response.data.token));
-      //asdasd
       success(response);
     })
     .catch((error) => {
@@ -67,22 +65,5 @@ export const loginWithOauthProviderAction =
       })
       .then(() => saveState(store.getState()));
   };
-
-export const fetchRestaurant = (restaurantId) => async (dispatch) => {
-  dispatch({ type: Action.FETCH_RESTAURANT_START });
-
-  try {
-    const response = await getRestaurantInfo(restaurantId);
-    dispatch({
-      type: Action.FETCH_RESTAURANT_SUCCESS,
-      payload: response,
-    });
-  } catch (error) {
-    dispatch({
-      type: Action.FETCH_RESTAURANT_ERROR,
-      payload: error,
-    });
-  }
-};
 
 export default loginAction;

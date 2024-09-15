@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
   Modal,
   Box,
@@ -9,8 +10,8 @@ import {
   FormControl,
   InputLabel,
 } from '@mui/material';
-import { useState } from 'react';
-import { updateRestaurant } from '../../services/Restaurant';
+import { useMutation } from '@apollo/client';
+import { UPDATE_RESTAURANT } from '../../services/Restaurant';
 
 export const EditRestaurantModal = ({
   restaurantId,
@@ -22,6 +23,8 @@ export const EditRestaurantModal = ({
   const [selectedDay, setSelectedDay] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const [updateRestaurantMutation] = useMutation(UPDATE_RESTAURANT);
 
   const handleChange = (event) => {
     setFormData({
@@ -47,7 +50,28 @@ export const EditRestaurantModal = ({
     event.preventDefault();
     setLoading(true);
     try {
-      await updateRestaurant(restaurantId, formData);
+      await updateRestaurantMutation({
+        variables: {
+          restaurantId: restaurantId,
+          restaurantUpdateDTO: {
+            name: formData.name,
+            description: formData.description,
+            address: formData.address,
+            contactNumber: formData.contactNumber,
+            abn: formData.abn,
+            ownerName: formData.ownerName,
+            ownerMobile: formData.ownerMobile,
+            ownerAddress: formData.ownerAddress,
+            ownerEmail: formData.ownerEmail,
+            ownerCrn: formData.ownerCrn,
+            openingHours: formData.openingHours.map((hour) => ({
+              dayOfWeek: hour.dayOfWeek,
+              openingTime: hour.openingTime,
+              closingTime: hour.closingTime,
+            })),
+          },
+        },
+      });
       if (onUpdate) {
         onUpdate();
       }
@@ -134,7 +158,7 @@ export const EditRestaurantModal = ({
             margin="normal"
           />
           <TextField
-            label="ContactNumber"
+            label="Contact Number"
             name="contactNumber"
             value={formData.contactNumber}
             onChange={handleChange}
@@ -142,7 +166,7 @@ export const EditRestaurantModal = ({
             margin="normal"
           />
           <TextField
-            label="Abn"
+            label="ABN"
             name="abn"
             value={formData.abn}
             onChange={handleChange}
@@ -150,7 +174,7 @@ export const EditRestaurantModal = ({
             margin="normal"
           />
           <TextField
-            label="OwnerName"
+            label="Owner Name"
             name="ownerName"
             value={formData.ownerName}
             onChange={handleChange}
@@ -158,7 +182,7 @@ export const EditRestaurantModal = ({
             margin="normal"
           />
           <TextField
-            label="OwnerMobile"
+            label="Owner Mobile"
             name="ownerMobile"
             value={formData.ownerMobile}
             onChange={handleChange}
@@ -166,7 +190,7 @@ export const EditRestaurantModal = ({
             margin="normal"
           />
           <TextField
-            label="OwnerAddress"
+            label="Owner Address"
             name="ownerAddress"
             value={formData.ownerAddress}
             onChange={handleChange}
@@ -174,7 +198,7 @@ export const EditRestaurantModal = ({
             margin="normal"
           />
           <TextField
-            label="OwnerEmail"
+            label="Owner Email"
             name="ownerEmail"
             value={formData.ownerEmail}
             onChange={handleChange}
@@ -182,9 +206,9 @@ export const EditRestaurantModal = ({
             margin="normal"
           />
           <TextField
-            label="OwnerEmail"
-            name="ownerEmail"
-            value={formData.ownerEmail}
+            label="Owner CRN"
+            name="ownerCrn"
+            value={formData.ownerCrn}
             onChange={handleChange}
             fullWidth
             margin="normal"
@@ -213,13 +237,15 @@ export const EditRestaurantModal = ({
               variant="contained"
               color="primary"
               sx={{ marginRight: 3 }}
+              disabled={loading}
             >
-              Update
+              {loading ? 'Updating...' : 'Update'}
             </Button>
             <Button variant="contained" color="secondary" onClick={onClose}>
               Cancel
             </Button>
           </Box>
+          {error && <Typography color="error">{error.message}</Typography>}
         </form>
       </Box>
     </Modal>

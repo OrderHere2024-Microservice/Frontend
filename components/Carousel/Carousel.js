@@ -16,13 +16,11 @@ const Carousel = () => {
       (prevIndex) => (prevIndex - 1 + images.length) % images.length,
     );
   };
-  
+
   const handleSeeMoreClick = () => {
-    
-    const dishId = activeIndex ;
+    const dishId = activeIndex;
     const imageElement = document.getElementById(`food-item-${dishId}`);
     if (imageElement) {
-      
       imageElement.scrollIntoView({ behavior: 'smooth' });
     }
   };
@@ -100,7 +98,12 @@ const Carousel = () => {
           Our Special List
         </Typography>
 
-        <Button variant="contained" color="secondary" sx={seeMoreButtonStyle}  onClick={handleSeeMoreClick}>
+        <Button
+          variant="contained"
+          color="secondary"
+          sx={seeMoreButtonStyle}
+          onClick={handleSeeMoreClick}
+        >
           See More
         </Button>
       </Box>
