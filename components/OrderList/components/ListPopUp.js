@@ -13,11 +13,12 @@ import {
   MenuItem,
 } from '@mui/material';
 import { updateOrderStatus, deleteOrder } from '../../../services/orderService';
-import { getRestaurantInfo } from '../../../services/Restaurant';
+import { GET_RESTAURANT_ADDRESS } from '../../../services/Restaurant';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import * as Action from '../../../store/actionTypes';
 import { useDispatch, useSelector } from 'react-redux';
 import { jwtInfo } from '../../../utils/jwtInfo';
+import { useQuery } from '@apollo/client';
 import dynamic from 'next/dynamic';
 
 const ListMap = dynamic(() => import('./ListMap'), { ssr: false });
@@ -34,14 +35,19 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
   const [distance, setDistance] = useState('');
   const [duration, setDuration] = useState('');
 
-  useEffect(() => {
-    const fetchRestaurantAddress = async () => {
-      const response = await getRestaurantInfo(1);
-      setAddress(response.data.address);
-    };
+  const {
+    data: restaurantData,
+    loading: restaurantLoading,
+    error: restaurantError,
+  } = useQuery(GET_RESTAURANT_ADDRESS, {
+    variables: { restaurantId: 1 },
+  });
 
-    fetchRestaurantAddress();
-  }, []);
+  useEffect(() => {
+    if (restaurantData && restaurantData.getRestaurantById) {
+      setAddress(restaurantData.getRestaurantById.address);
+    }
+  }, [restaurantData]);
 
   const handleClose = () => {
     if (isEditMode) {
@@ -77,7 +83,7 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
         });
         setOriginalStatus('delivered');
         onClose();
-        props.onOrderStatusUpdate(order.orderId, 'delivered');
+        onOrderStatusUpdate(order.orderId, 'delivered');
         setEditMode(false);
       }
     } catch (error) {
@@ -102,22 +108,19 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
       onClose();
       console.log('Success delete order #', order.orderId);
     } catch (error) {
-      console.error('Error updating status:', error.response);
+      console.error('Error deleting order:', error.response);
     }
   };
 
   const convertToMelbourneTime = (utcTimestamp) => {
-    if (!utcTimestamp) {
-      return 'Null';
-    }
+    if (!utcTimestamp) return 'Null';
+
     const trimmedTimestamp = /(\.\d{3})\d*Z$/.test(utcTimestamp)
       ? utcTimestamp.replace(/(\.\d{3})\d*Z$/, '$1Z')
       : utcTimestamp;
 
     const date = new Date(trimmedTimestamp);
-    if (isNaN(date)) {
-      return 'Null';
-    }
+    if (isNaN(date)) return 'Null';
 
     const dateOptions = {
       year: 'numeric',
@@ -138,6 +141,7 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
     const formattedTime = new Intl.DateTimeFormat('en-AU', timeOptions).format(
       date,
     );
+
     return `${formattedDate}\n${formattedTime}`;
   };
 
@@ -185,7 +189,7 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
                 Number of People
               </Typography>
               <Typography sx={{ fontWeight: 'bold' }}>
-                {order.numberOfPeople ? order.numberOfPeople : 'Null'}
+                {order.numberOfPeople || 'Null'}
               </Typography>
             </Grid>
             <Grid item xs={6}>
@@ -193,7 +197,7 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
                 PickUp Time
               </Typography>
               <Typography sx={{ fontWeight: 'bold' }}>
-                {order.pickUpTime ? order.pickUpTime : 'Null'}
+                {order.pickUpTime || 'Null'}
               </Typography>
             </Grid>
           </>
@@ -251,26 +255,27 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
                 <Typography
                   sx={{ color: 'text.secondary', textTransform: 'capitalize' }}
                 >
-                  {order.orderType == 'dine_in' ? 'Dine in' : order.orderType}{' '}
+                  {order.orderType === 'dine_in' ? 'Dine in' : order.orderType}{' '}
                   Address
                 </Typography>
                 <Box display="flex" alignItems="center">
                   <LocationOnIcon />
                   <Typography>
-                    {order.orderType === 'delivery' ? order.address : address}
+                    {order.orderType === 'delivery'
+                      ? order.address
+                      : restaurantData?.getRestaurantById?.address}
                   </Typography>
                 </Box>
                 <ListMap
                   address={
-                    order.orderType === 'delivery' ? order.address : address
+                    order.orderType === 'delivery'
+                      ? order.address
+                      : restaurantData?.getRestaurantById?.address
                   }
                   onDistanceAndDuration={handleDistanceAndDuration}
                 />
                 <Typography sx={{ color: 'text.secondary' }}>
-                  Note:{' '}
-                  {order.note === undefined || order.note === ''
-                    ? 'No special instructions'
-                    : order.note}
+                  Note: {order.note || 'No special instructions'}
                 </Typography>
               </Box>
               <Grid container spacing={2} sx={{ maxWidth: '50%' }}>
@@ -291,7 +296,7 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
                     <Typography
                       sx={{ fontWeight: 'bold', textTransform: 'capitalize' }}
                     >
-                      {order.orderStatus == 'in_transit'
+                      {order.orderStatus === 'in_transit'
                         ? 'In transit'
                         : order.orderStatus}
                     </Typography>
@@ -339,21 +344,19 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
       <DialogActions>
         {userRole === 'ROLE_driver' ? (
           isEditMode ? (
-            <React.Fragment>
+            <>
               <Button onClick={handleClose}>Exit</Button>
               <Button onClick={handleRejectedOrder}>Reject Order</Button>
               <Button onClick={handleEditStatusSubmit}>Delivered</Button>
-            </React.Fragment>
+            </>
           ) : (
-            <React.Fragment>
-              <Button onClick={handleClose}>Close</Button>
-            </React.Fragment>
+            <Button onClick={handleClose}>Close</Button>
           )
         ) : (
-          <React.Fragment>
+          <>
             <Button onClick={handleClose}>Close</Button>
             <Button onClick={handleEditStatusSubmit}>Save</Button>
-          </React.Fragment>
+          </>
         )}
       </DialogActions>
     </Dialog>
