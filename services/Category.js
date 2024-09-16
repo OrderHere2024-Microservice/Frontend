@@ -1,7 +1,17 @@
 import http from '../utils/axios';
+import { gql } from '@apollo/client';
 
-export const getCategoriesByRestaurant = () =>
+const getCategoriesByRestaurant = () =>
   http(`/v1/public/category/1`, { method: 'GET' });
-//  {
-//   return http.get(`/v1/public/category/1`);
-// };
+
+export const GET_CATEGORIES_BY_RESTAURANT = gql`
+  query GetCategoriesByRestaurant($restaurantId: Int!) {
+    getCategories(restaurantId: $restaurantId) {
+      categoryId
+      restaurantId
+      categoryName
+      createdTime
+      updatedTime
+    }
+  }
+`;

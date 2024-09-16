@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -11,13 +11,15 @@ import {
   FormControl,
   Button,
 } from '@mui/material';
+import { useQuery } from '@apollo/client';
 import {
   ADD_DISH_START,
   ADD_DISH_SUCCESS,
   ADD_DISH_ERROR,
 } from '../../store/actionTypes';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { getCategoriesByRestaurant } from '../../services/Category';
+
+import { GET_CATEGORIES_BY_RESTAURANT } from '../../services/Category';
 
 const AddDishModal = ({ open, handleClose, handleSubmit }) => {
   const [newDish, setNewDish] = useState({
@@ -31,12 +33,11 @@ const AddDishModal = ({ open, handleClose, handleSubmit }) => {
   });
 
   const [imageName, setImageName] = useState('');
-  const [categories, setCategories] = useState([]);
 
-  const handleDeleteFile = () => {
-    setImageName('');
-    setNewDish({ ...newDish, imageFile: null });
-  };
+  const { loading, error, data } = useQuery(GET_CATEGORIES_BY_RESTAURANT, {
+    variables: { restaurantId: newDish.restaurantId },
+    skip: !open,
+  });
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -54,15 +55,16 @@ const AddDishModal = ({ open, handleClose, handleSubmit }) => {
     handleClose();
   };
 
-  const selectCategory = (categoryId) => {
-    return parseInt(categoryId);
+  const handleDeleteFile = () => {
+    setImageName('');
+    setNewDish({ ...newDish, imageFile: null });
   };
 
-  useEffect(() => {
-    getCategoriesByRestaurant().then((res) => {
-      setCategories(res.data);
-    });
-  }, [open]);
+  const selectCategory = (categoryId) => parseInt(categoryId);
+
+  // Render loading and error states
+  if (loading) return <p>Loading categories...</p>;
+  if (error) return <p>Error loading categories: {error.message}</p>;
 
   return (
     <Dialog open={open} onClose={handleClose}>
@@ -97,7 +99,7 @@ const AddDishModal = ({ open, handleClose, handleSubmit }) => {
             label="Category"
             onChange={handleChange}
           >
-            {categories.map((category) => (
+            {data?.getCategories.map((category) => (
               <MenuItem key={category.categoryId} value={category.categoryId}>
                 {category.categoryName}
               </MenuItem>
