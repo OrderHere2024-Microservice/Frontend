@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getUserOrder } from '../../services/orderService';
-import { useApolloClient } from '@apollo/client'; // Import the Apollo client
+import { useApolloClient } from '@apollo/client'; 
 import { GET_RESTAURANT_INFO } from '../../services/Restaurant';
 import { Grid, Box } from '@mui/material';
 

@@ -1,35 +1,38 @@
+import React, { useEffect, useState } from 'react';
+import { useQuery } from '@apollo/client';
 import ThreeColumnsLayout from '../layout/ThreeColumnsLayout';
 import FoodItemsList from '../components/DishList/FoodItemsList';
 import Carousel from '../components/Carousel/Carousel';
 import Category from '../components/Category/Category';
 import { getDishes } from '../services/Dish';
-import { getCategoriesByRestaurant } from '../services/Category';
+import { GET_CATEGORIES_BY_RESTAURANT } from '../services/Category';
 import { jwtInfo } from '../utils/jwtInfo';
 import OrderList from '../components/OrderList/index';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
-export async function getStaticProps() {
-  try {
-    const dishResponse = await getDishes();
-    // console.log('dish-response:', dishResponse.data.data)
-    const categoriesResponse = await getCategoriesByRestaurant();
-    // console.log('categories-response:', categoriesResponse.data)
-    return {
-      props: {
-        dishes: dishResponse.data.data,
-        categories: categoriesResponse.data,
-      },
-      revalidate: 10,
-    };
-  } catch (error) {
-    console.error('Error fetching dishes:', error);
-    return { props: { dishes: [], categories: [] } };
-  }
-}
-
-const Index = ({ dishes, categories }) => {
+const Index = () => {
+  const [dishes, setDishes] = useState([]);
   const { token } = useSelector((state) => state.sign);
   const { userRole } = jwtInfo(token);
+
+  useEffect(() => {
+    async function fetchDishes() {
+      try {
+        const dishResponse = await getDishes();
+        setDishes(dishResponse.data.data);
+      } catch (error) {
+        console.error('Error fetching dishes:', error);
+      }
+    }
+    fetchDishes();
+  }, []);
+
+  const { loading, error, data } = useQuery(GET_CATEGORIES_BY_RESTAURANT, {
+    variables: { restaurantId: 1 },
+  });
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error loading categories: {error.message}</p>;
 
   return (
     <>
@@ -38,7 +41,7 @@ const Index = ({ dishes, categories }) => {
       ) : (
         <ThreeColumnsLayout>
           <Carousel />
-          <Category categories={categories} />
+          <Category categories={data.getCategories} />
           <FoodItemsList dishes={dishes} />
         </ThreeColumnsLayout>
       )}
