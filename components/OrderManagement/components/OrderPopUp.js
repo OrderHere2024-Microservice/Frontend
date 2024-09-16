@@ -40,7 +40,7 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
     skip: !order?.restaurantId,
   });
 
-  const address = data?.getRestaurantById?.address || order?.address;
+  const address =  order?.address || data?.getRestaurantById?.address;
 
   const handleClose = () => {
     if (isEditMode) {
