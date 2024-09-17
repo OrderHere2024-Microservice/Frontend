@@ -27,10 +27,6 @@ const OrderDetail = () => {
   const status = useSelector((state) => state.order.status);
   const sorted = useSelector((state) => state.order.sortedOrder);
   const searchText = useSelector((state) => state.order.searchText);
-  console.log('options', options);
-  console.log('status', status);
-  console.log('sorted order:', sorted);
-  console.log('search text:', searchText);
   const { token } = useSelector((state) => state.sign);
   const { userRole } = jwtInfo(token);
 
