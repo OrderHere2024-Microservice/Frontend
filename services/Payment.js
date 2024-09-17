@@ -1,6 +1,7 @@
 import http from "../utils/axios";
+import { gql } from '@apollo/client';
 
-export const createPayment = (payCreateData) => http(`/v1/public/pay`, {
+const createPayment = (payCreateData) => http(`/v1/public/pay`, {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json',
@@ -8,10 +9,26 @@ export const createPayment = (payCreateData) => http(`/v1/public/pay`, {
     data: JSON.stringify(payCreateData)
 });
 
-export const sendPayResult = (payResultData) => http(`/v1/public/pay/result`, {
+const sendPayResult = (payResultData) => http(`/v1/public/pay/result`, {
     method: 'PUT',
     headers: {
         'Content-Type': 'application/json',
     },
     data: JSON.stringify(payResultData)
 });
+
+
+export const CREATE_PAYMENT = gql`
+  mutation CreatePayment($paymentPostDto: PaymentPostDtoInput!) {
+    createPayment(paymentPostDto: $paymentPostDto) {
+      paymentId
+      clientSecret
+    }
+  }
+`;
+
+export const SEND_PAYMENT_RESULT = gql`
+  mutation GetPaymentResult($paymentResultDto: PaymentResultDtoInput!) {
+    getPaymentResult(paymentResultDto: $paymentResultDto)
+  }
+`;
