@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   PaymentElement,
   useStripe,
@@ -9,7 +9,8 @@ import styles from './PaymentForm.module.css';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
 import * as Action from '../../store/actionTypes';
-import { sendPayResult } from '../../services/Payment';
+import { useMutation } from '@apollo/client';
+import { SEND_PAYMENT_RESULT } from '../../services/Payment'; 
 
 export default function PaymentForm({ paymentId, orderId }) {
   const stripe = useStripe();
@@ -19,6 +20,8 @@ export default function PaymentForm({ paymentId, orderId }) {
 
   const [message, setMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [sendPayResult] = useMutation(SEND_PAYMENT_RESULT);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,7 +45,11 @@ export default function PaymentForm({ paymentId, orderId }) {
         paymentId: paymentId,
         result: 'failure',
       };
-      sendPayResult(paymentResultDto);
+      await sendPayResult({
+        variables: {
+          paymentResultDto,
+        },
+      });
       router.push('/pay/failure');
     } else {
       dispatch({ type: Action.CLEAR_CART });
@@ -50,7 +57,11 @@ export default function PaymentForm({ paymentId, orderId }) {
         paymentId: paymentId,
         result: 'success',
       };
-      sendPayResult(paymentResultDto);
+      await sendPayResult({
+        variables: {
+          paymentResultDto,
+        },
+      });
       router.push(`/pay/success?orderId=${orderId}`);
     }
   };

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import PaymentForm from '../../components/Payment/PaymentForm';
-import { createPayment } from '../../services/Payment';
+import { useMutation } from '@apollo/client';
+import { CREATE_PAYMENT } from '../../services/Payment';
 import { useRouter } from 'next/router';
 
 const stripePromise = loadStripe(
@@ -18,20 +19,22 @@ export default function PayPage() {
   const amount = parseFloat(totalPrice);
   const currency = 'aud';
 
+  const [createPayment] = useMutation(CREATE_PAYMENT);
+
   useEffect(() => {
     const paymentPostDto = {
       orderId: orderId,
       amount: amount,
       currency: currency,
     };
-    console.log(paymentPostDto);
 
-    createPayment(paymentPostDto)
+    createPayment({
+      variables: {
+        paymentPostDto,
+      },
+    })
       .then((response) => {
-        if (response.status !== 201) {
-          throw new Error(`Server responded with status ${response.status}`);
-        }
-        const data = response.data;
+        const data = response.data.createPayment;
         if (data.clientSecret && data.paymentId) {
           setClientSecret(data.clientSecret);
           setPaymentId(data.paymentId);
@@ -45,7 +48,7 @@ export default function PayPage() {
       .catch((error) => {
         console.error('Error creating payment intent:', error);
       });
-  }, [orderId, amount, currency]);
+  }, [orderId, amount, currency, createPayment]);
 
   const appearance = {
     theme: 'stripe',
