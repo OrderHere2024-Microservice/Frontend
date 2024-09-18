@@ -9,7 +9,8 @@ import {
   Button,
 } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { getAllOrders } from '../../../services/orderService';
+import { useQuery } from '@apollo/client';
+import { GET_ALL_ORDERS } from '../../../services/orderService'; 
 import OrderPopUp from './ListPopUp';
 import * as Action from '../../../store/actionTypes';
 import { useDispatch, useSelector } from 'react-redux';
@@ -28,33 +29,22 @@ const ListDetail = () => {
   const searchText = useSelector((state) => state.order.searchText);
   const { token } = useSelector((state) => state.sign);
   const { userRole } = jwtInfo(token);
-  const [showDeliveredButton, setShowDeliveredButton] = useState(true);
-  const [showRejectButton, setShowRejectButton] = useState(true);
+
+  const { data, loading, error } = useQuery(GET_ALL_ORDERS, {
+    skip: userRole !== 'ROLE_driver',
+  });
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        let ordersData;
-        if (userRole === 'ROLE_driver') {
-          ordersData = await getAllOrders();
-        }
-        dispatch({ type: Action.FETCH_ORDERS, payload: ordersData.data });
-        console.log('all order:', ordersData.data);
-      } catch (error) {
-        console.error('Failed to fetch orders:', error);
-      }
-    };
-    fetchOrders();
-    dispatch({ type: Action.SET_SEARCH_TEXT, payload: '' });
-  }, [dispatch, userRole]);
+    if (data && data.getAllOrders) {
+      dispatch({ type: Action.FETCH_ORDERS, payload: data.getAllOrders });
+      console.log('All orders:', data.getAllOrders);
+    }
+  }, [data, dispatch]);
 
   useEffect(() => {
-    console.log('all orders', orders);
-
     let updatedOrders = orders.filter(
       (order) => order.orderType === 'delivery',
     );
-    console.log('order number', updatedOrders);
 
     if (status) {
       updatedOrders = updatedOrders.filter(
@@ -151,6 +141,9 @@ const ListDetail = () => {
     );
   };
 
+  if (loading) return <p>Loading orders...</p>;
+  if (error) return <p>Error fetching orders</p>;
+
   return (
     <Container>
       {displayOrders.map((order) => (
@@ -199,7 +192,7 @@ const ListDetail = () => {
         order={selectedOrder}
         time={selectedOrder ? convertTime(selectedOrder.updatedTime) : ''}
         onOrderStatusUpdate={handleOrderStatusUpdate}
-      ></OrderPopUp>
+      />
       <Box display="flex" justifyContent="center" my={2}>
         {Array.from({ length: pageCount }, (_, index) => (
           <Button key={index + 1} onClick={() => paginate(index + 1)}>

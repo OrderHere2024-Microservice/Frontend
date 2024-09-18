@@ -11,11 +11,10 @@ import {
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { useDispatch, useSelector } from 'react-redux';
 import { useQuery } from '@apollo/client';
-import { GET_USER_ORDERS } from '../../../services/orderService';
+import { GET_USER_ORDERS, GET_ALL_ORDERS } from '../../../services/orderService';
 import OrderPopUp from './OrderPopUp';
 import * as Action from '../../../store/actionTypes';
 import { jwtInfo } from '../../../utils/jwtInfo';
-import { getAllOrders } from '../../../services/orderService'; // Keep getAllOrders for system admin
 
 const OrderDetail = () => {
   const [displayOrders, setDisplayOrders] = useState([]);
@@ -31,26 +30,23 @@ const OrderDetail = () => {
   const searchText = useSelector((state) => state.order.searchText);
   const { token } = useSelector((state) => state.sign);
   const { userRole } = jwtInfo(token);
-  const { data, loading, error } = useQuery(GET_USER_ORDERS, {
+
+  const { data: userData, loading: userLoading, error: userError } = useQuery(GET_USER_ORDERS, {
     skip: userRole === 'ROLE_sys_admin',
   });
 
+  const { data: allOrdersData, loading: allOrdersLoading, error: allOrdersError } = useQuery(GET_ALL_ORDERS, {
+    skip: userRole !== 'ROLE_sys_admin',
+  });
+
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        if (userRole === 'ROLE_sys_admin') {
-          const ordersData = await getAllOrders();
-          dispatch({ type: Action.FETCH_ORDERS, payload: ordersData.data });
-        } else if (data && data.getUserOrders) {
-          dispatch({ type: Action.FETCH_ORDERS, payload: data.getUserOrders });
-        }
-      } catch (error) {
-        console.error('Failed to fetch orders:', error);
-      }
-    };
-    fetchOrders();
+    if (userRole === 'ROLE_sys_admin' && allOrdersData && allOrdersData.getAllOrders) {
+      dispatch({ type: Action.FETCH_ORDERS, payload: allOrdersData.getAllOrders });
+    } else if (userData && userData.getUserOrders) {
+      dispatch({ type: Action.FETCH_ORDERS, payload: userData.getUserOrders });
+    }
     dispatch({ type: Action.SET_SEARCH_TEXT, payload: '' });
-  }, [dispatch, userRole, data]);
+  }, [dispatch, userRole, allOrdersData, userData]);
 
   useEffect(() => {
     let updatedOrders = [...orders];
@@ -151,9 +147,9 @@ const OrderDetail = () => {
     );
   };
 
-  if (loading) return <p>Loading orders...</p>;
-  if (error && userRole !== 'ROLE_sys_admin')
-    return <p>Error fetching orders</p>;
+  if (userRole === 'ROLE_sys_admin' && allOrdersLoading) return <p>Loading all orders...</p>;
+  if (userRole !== 'ROLE_sys_admin' && userLoading) return <p>Loading user orders...</p>;
+  if (allOrdersError || userError) return <p>Error fetching orders</p>;
 
   return (
     <Container>

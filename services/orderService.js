@@ -7,10 +7,9 @@ const placeOrder = (orderData) =>
     data: orderData,
   });
 
-const getUserOrder = () =>
-  http(`/v1/public/orders/user`, { method: 'GET' });
+const getUserOrder = () => http(`/v1/public/orders/user`, { method: 'GET' });
 
-export const getAllOrders = () => http(`/v1/public/orders`, { method: 'GET' });
+const getAllOrders = () => http(`/v1/public/orders`, { method: 'GET' });
 
 export const getOrderInfo = (orderId) => {
   return http(`/v1/public/orders/${orderId}`, { method: 'GET' });
@@ -37,6 +36,33 @@ export const PLACE_ORDER = gql`
 export const GET_USER_ORDERS = gql`
   query GetUserOrders {
     getUserOrders {
+      orderId
+      restaurantId
+      userId
+      dishes {
+        dishId
+        dishName
+        dishQuantity
+        dishPrice
+      }
+      username
+      orderStatus
+      orderType
+      tableNumber
+      pickupTime
+      address
+      totalPrice
+      note
+      updatedTime
+      phone
+      numberOfPeople
+    }
+  }
+`;
+
+export const GET_ALL_ORDERS = gql`
+  query GetAllOrders {
+    getAllOrders {
       orderId
       restaurantId
       userId
