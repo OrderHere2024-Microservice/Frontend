@@ -3,11 +3,12 @@ import { Box, Typography, Divider, ButtonBase } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import CheckListItems from './components/CheckListItems/ChecklistItems';
 import * as Action from '../../../../../store/actionTypes';
-import { placeOrder } from '../../../../../services/orderService';
 import { useRouter } from 'next/router';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import { useMutation } from '@apollo/client';
+import { PLACE_ORDER } from '../../../../../services/orderService';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -36,15 +37,8 @@ const CheckList = () => {
   const PickUpDate = useSelector((state) => state.pickup.selectedDate);
   const combinedPickUpDateTime = dayjs(`${PickUpDate} ${PickUpTime}`);
   const PickUpzonedDateTime = combinedPickUpDateTime.utc().format();
+  const [placeOrderMutation] = useMutation(PLACE_ORDER);
 
-  // console.log('dinein phone:', dineInPhone);
-  // console.log('dinein personCount:', personCount);
-  // console.log('dinein dineInDate:', dineInDate);
-  // console.log('dinein dineInTime:', dineInTime);
-  // console.log('ZonedDateTime in Melbourne:', dineInZonedDateTime);
-  // console.log('dinein name:', dineInName);
-  // console.log('dinein note:', note);
-  // console.log('pick up time:', PickUpzonedDateTime);
   const unselectedIngredients = useSelector(
     (state) => state.ingredient.unselectedIngredients,
   );
@@ -68,7 +62,6 @@ const CheckList = () => {
     dispatch({ type: Action.CALCULATE_TOTAL_PRICE });
   };
   const handleCheckout = async () => {
-    // router.push('/pay');
     let orderData = {
       restaurantId: 1,
       orderStatus: 'pending',
@@ -93,9 +86,6 @@ const CheckList = () => {
         phone: address.phone,
       };
 
-      // console.log('check for data:', orderData)
-      // console.log('check for ordertype:', orderType)
-
       if (
         orderType === 'delivery' &&
         (!address.name || !address.phone || !address.address)
@@ -114,9 +104,6 @@ const CheckList = () => {
         numberOfPeople: parseInt(personCount),
       };
 
-      // console.log('check for data:', orderData)
-      // console.log('check for ordertype:', orderType)
-
       if (!dineInName || !dineInPhone || !personCount) {
         console.log('Warning: Dine-in information is missing!');
         setShowWarningShake(true);
@@ -133,16 +120,25 @@ const CheckList = () => {
 
     try {
       console.log('final data:', orderData);
-      // console.log('final ordertype:', orderType)
-      const response = await placeOrder(orderData);
-      console.log('Order placed successfully:', response);
-      const orderId = response.data;
+      const { data, errors } = await placeOrderMutation({
+        variables: {
+          placeOrderDTO: orderData,
+        },
+      });
+
+      if (errors) {
+        console.error('GraphQL errors:', errors);
+        return;
+      }
+
+      console.log('Order placed successfully:', data.placeOrder);
+      const orderId = data.placeOrder;
       router.push(`/pay?orderId=${orderId}&totalPrice=${totalPrice}`);
 
       dispatch({ type: Action.CLEAR_CART });
       dispatch({ type: Action.CLEAR_UNSELECTED_INGREDIENTS });
     } catch (error) {
-      console.error('Error placing order:', error.response);
+      console.error('Error placing order:', error);
     }
   };
 

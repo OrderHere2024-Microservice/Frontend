@@ -40,7 +40,7 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
     skip: !order?.restaurantId,
   });
 
-  const address =  order?.address || data?.getRestaurantById?.address;
+  const address = order?.address || data?.getRestaurantById?.address;
 
   const handleClose = () => {
     if (isEditMode) {
@@ -206,11 +206,18 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
                 mb: 2,
               }}
             >
-              <Box sx={{ maxWidth: '50%', display: 'flex', flexDirection: 'column' }}>
+              <Box
+                sx={{
+                  maxWidth: '50%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
                 <Typography
                   sx={{ color: 'text.secondary', textTransform: 'capitalize' }}
                 >
-                  {order.orderType === 'dine_in' ? 'Dine in' : order.orderType} Address
+                  {order.orderType === 'dine_in' ? 'Dine in' : order.orderType}{' '}
+                  Address
                 </Typography>
                 <Box display="flex" alignItems="center">
                   <LocationOnIcon />
@@ -255,7 +262,9 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
                       <Typography
                         sx={{ fontWeight: 'bold', textTransform: 'capitalize' }}
                       >
-                        {order.orderStatus === 'in_transit' ? 'In transit' : order.orderStatus}
+                        {order.orderStatus === 'in_transit'
+                          ? 'In transit'
+                          : order.orderStatus}
                       </Typography>
                     )}
                   </Box>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getUserOrder } from '../../services/orderService';
-import { useApolloClient } from '@apollo/client'; 
+import { useApolloClient } from '@apollo/client';
 import { GET_RESTAURANT_INFO } from '../../services/Restaurant';
 import { Grid, Box } from '@mui/material';
 
@@ -79,11 +79,21 @@ const History = () => {
           fontWeight: 700,
         }}
       >
-        <Grid item xs={2.4}>Restaurant Name</Grid>
-        <Grid item xs={2.4}>Order ID</Grid>
-        <Grid item xs={2.4}>Date</Grid>
-        <Grid item xs={2.4}>Cost</Grid>
-        <Grid item xs={2.4}>Status</Grid>
+        <Grid item xs={2.4}>
+          Restaurant Name
+        </Grid>
+        <Grid item xs={2.4}>
+          Order ID
+        </Grid>
+        <Grid item xs={2.4}>
+          Date
+        </Grid>
+        <Grid item xs={2.4}>
+          Cost
+        </Grid>
+        <Grid item xs={2.4}>
+          Status
+        </Grid>
       </Grid>
 
       {/* History Data */}
