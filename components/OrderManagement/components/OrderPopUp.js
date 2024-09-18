@@ -12,7 +12,8 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
-import { updateOrderStatus, deleteOrder } from '../../../services/orderService';
+import { useMutation } from '@apollo/client';
+import { UPDATE_ORDER_STATUS, DELETE_ORDER } from '../../../services/orderService';
 import { useQuery } from '@apollo/client';
 import { GET_RESTAURANT_ADDRESS } from '../../../services/Restaurant';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -34,6 +35,10 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
   const [originalStatus, setOriginalStatus] = useState('');
   const [isEditMode, setEditMode] = useState(false);
   const [statusValue, setStatusValue] = useState(order?.orderStatus || '');
+
+  const [updateOrderStatusMutation] = useMutation(UPDATE_ORDER_STATUS);
+
+  const [deleteOrderMutation] = useMutation(DELETE_ORDER);
 
   const { data, loading, error } = useQuery(GET_RESTAURANT_ADDRESS, {
     variables: { restaurantId: order?.restaurantId },
@@ -63,12 +68,15 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
 
   const handleEditStatusSubmit = async () => {
     try {
-      const statusInfo = {
-        orderId: parseInt(order.orderId),
-        orderStatus: statusValue,
-      };
-      const response = await updateOrderStatus(statusInfo);
-      if (response) {
+      const response = await updateOrderStatusMutation({
+        variables: {
+          updateOrderStatusDTO: {
+            orderId: parseInt(order.orderId),
+            orderStatus: statusValue,
+          },
+        },
+      });
+      if (response.data) {
         dispatch({
           type: Action.UPDATE_ORDER_STATUS,
           payload: { orderId: order.orderId, newStatus: statusValue },
@@ -79,17 +87,23 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
         onClose();
       }
     } catch (error) {
-      console.error('Error updating status:', error.response);
+      console.error('Error updating status:', error);
     }
   };
 
   const handleRejectedOrder = async () => {
     try {
-      await deleteOrder({ orderId: parseInt(order.orderId) });
+      await deleteOrderMutation({
+        variables: {
+          deleteOrderDTO: {
+            orderId: parseInt(order.orderId),
+          },
+        },
+      });
       dispatch({ type: Action.DELETE_ORDER, payload: order.orderId });
       onClose();
     } catch (error) {
-      console.error('Error deleting order:', error.response);
+      console.error('Error deleting order:', error);
     }
   };
 

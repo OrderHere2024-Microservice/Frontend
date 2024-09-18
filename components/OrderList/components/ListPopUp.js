@@ -12,13 +12,13 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
-import { updateOrderStatus, deleteOrder } from '../../../services/orderService';
+import { useMutation, useQuery } from '@apollo/client';
+import { UPDATE_ORDER_STATUS, DELETE_ORDER } from '../../../services/orderService';
 import { GET_RESTAURANT_ADDRESS } from '../../../services/Restaurant';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import * as Action from '../../../store/actionTypes';
 import { useDispatch, useSelector } from 'react-redux';
 import { jwtInfo } from '../../../utils/jwtInfo';
-import { useQuery } from '@apollo/client';
 import dynamic from 'next/dynamic';
 
 const ListMap = dynamic(() => import('./ListMap'), { ssr: false });
@@ -35,13 +35,12 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
   const [distance, setDistance] = useState('');
   const [duration, setDuration] = useState('');
 
-  const {
-    data: restaurantData,
-    loading: restaurantLoading,
-    error: restaurantError,
-  } = useQuery(GET_RESTAURANT_ADDRESS, {
+  const { data: restaurantData, loading: restaurantLoading, error: restaurantError } = useQuery(GET_RESTAURANT_ADDRESS, {
     variables: { restaurantId: 1 },
   });
+
+  const [updateOrderStatusMutation] = useMutation(UPDATE_ORDER_STATUS);
+  const [deleteOrderMutation] = useMutation(DELETE_ORDER);
 
   useEffect(() => {
     if (restaurantData && restaurantData.getRestaurantById) {
@@ -65,17 +64,19 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
   };
 
   const handleStatusChange = (event) => {
-    console.log('status:', event.target.value);
     setStatusValue(event.target.value);
   };
 
   const handleEditStatusSubmit = async () => {
     try {
-      const statusInfo = {
-        orderId: parseInt(order.orderId),
-        orderStatus: 'delivered',
-      };
-      const response = await updateOrderStatus(statusInfo);
+      const response = await updateOrderStatusMutation({
+        variables: {
+          updateOrderStatusDTO: {
+            orderId: parseInt(order.orderId),
+            orderStatus: 'delivered',
+          },
+        },
+      });
       if (response) {
         dispatch({
           type: Action.UPDATE_ORDER_STATUS,
@@ -87,62 +88,50 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
         setEditMode(false);
       }
     } catch (error) {
-      console.error('Error updating status:', error.response);
+      console.error('Error updating status:', error);
+    }
+  };
+
+  const handleRejectedOrder = async () => {
+    const orderId = parseInt(order.orderId);
+    try {
+      const response = await deleteOrderMutation({
+        variables: {
+          deleteOrderDTO: {
+            orderId: orderId,
+          },
+        },
+      });
+      if (response) {
+        dispatch({ type: Action.DELETE_ORDER, payload: orderId });
+        onClose();
+        console.log('Success delete order #', order.orderId);
+      }
+    } catch (error) {
+      console.error('Error deleting order:', error);
     }
   };
 
   const handleDistanceAndDuration = (distance, duration) => {
     setDistance(distance);
     setDuration(duration);
-    console.log(`Distance: ${distance}, Duration: ${duration}`);
-  };
-
-  const handleRejectedOrder = async () => {
-    const orderId = parseInt(order.orderId);
-    try {
-      const orderData = {
-        orderId: orderId,
-      };
-      await deleteOrder(orderData);
-      dispatch({ type: Action.DELETE_ORDER, payload: orderId });
-      onClose();
-      console.log('Success delete order #', order.orderId);
-    } catch (error) {
-      console.error('Error deleting order:', error.response);
-    }
   };
 
   const convertToMelbourneTime = (utcTimestamp) => {
     if (!utcTimestamp) return 'Null';
 
-    const trimmedTimestamp = /(\.\d{3})\d*Z$/.test(utcTimestamp)
-      ? utcTimestamp.replace(/(\.\d{3})\d*Z$/, '$1Z')
-      : utcTimestamp;
-
-    const date = new Date(trimmedTimestamp);
+    const date = new Date(utcTimestamp);
     if (isNaN(date)) return 'Null';
 
-    const dateOptions = {
+    return date.toLocaleString('en-AU', {
+      timeZone: 'Australia/Melbourne',
       year: 'numeric',
       month: 'numeric',
       day: 'numeric',
-      timeZone: 'Australia/Melbourne',
-    };
-    const timeOptions = {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
-      timeZone: 'Australia/Melbourne',
-    };
-
-    const formattedDate = new Intl.DateTimeFormat('en-AU', dateOptions).format(
-      date,
-    );
-    const formattedTime = new Intl.DateTimeFormat('en-AU', timeOptions).format(
-      date,
-    );
-
-    return `${formattedDate}\n${formattedTime}`;
+    });
   };
 
   const renderOrderTypeInfo = () => {

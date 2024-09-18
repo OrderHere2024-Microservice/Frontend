@@ -37,7 +37,7 @@ const History = () => {
   };
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error fetching orders</p>;
+  if (error) return <p>Order not found</p>;
 
   const filteredOrders = data.getUserOrders.filter((order) => {
     if (active === 'all') {

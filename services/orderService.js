@@ -15,13 +15,13 @@ const getOrderInfo = (orderId) => {
   return http(`/v1/public/orders/${orderId}`, { method: 'GET' });
 };
 
-export const deleteOrder = (orderData) =>
+const deleteOrder = (orderData) =>
   http(`/v1/public/orders/delete`, {
     method: 'DELETE',
     data: orderData,
   });
 
-export const updateOrderStatus = (statusInfo) =>
+const updateOrderStatus = (statusInfo) =>
   http(`/v1/public/orders/status`, {
     method: 'PATCH',
     data: statusInfo,
@@ -111,5 +111,20 @@ export const GET_ORDER_BY_ID = gql`
       phone
       numberOfPeople
     }
+  }
+`;
+
+export const UPDATE_ORDER_STATUS = gql`
+  mutation UpdateOrderStatus($updateOrderStatusDTO: UpdateOrderStatusInput!) {
+    updateOrderStatus(updateOrderStatusDTO: $updateOrderStatusDTO) {
+      orderId
+      orderStatus
+    }
+  }
+`;
+
+export const DELETE_ORDER = gql`
+  mutation DeleteOrder($deleteOrderDTO: DeleteOrderInput!) {
+    deleteOrder(deleteOrderDTO: $deleteOrderDTO)
   }
 `;

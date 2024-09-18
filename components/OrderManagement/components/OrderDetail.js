@@ -149,7 +149,7 @@ const OrderDetail = () => {
 
   if (userRole === 'ROLE_sys_admin' && allOrdersLoading) return <p>Loading all orders...</p>;
   if (userRole !== 'ROLE_sys_admin' && userLoading) return <p>Loading user orders...</p>;
-  if (allOrdersError || userError) return <p>Error fetching orders</p>;
+  if (allOrdersError || userError) return <p>Order not found</p>;
 
   return (
     <Container>
