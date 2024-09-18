@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { updateOrderStatus, deleteOrder } from '../../../services/orderService';
 import { useQuery } from '@apollo/client';
-import { GET_RESTAURANT_ADDRESS } from '../../../services/Restaurant'; // Import GraphQL query
+import { GET_RESTAURANT_ADDRESS } from '../../../services/Restaurant';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import * as Action from '../../../store/actionTypes';
 import { useDispatch, useSelector } from 'react-redux';
