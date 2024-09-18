@@ -6,7 +6,6 @@ import { Box, Divider, Grid, Typography } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 export const OrderDetail = ({ orderId }) => {
-
   console.log(orderId);
   const [restaurantId, setRestaurantId] = useState(1);
 

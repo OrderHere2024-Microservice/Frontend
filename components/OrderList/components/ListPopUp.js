@@ -13,7 +13,10 @@ import {
   MenuItem,
 } from '@mui/material';
 import { useMutation, useQuery } from '@apollo/client';
-import { UPDATE_ORDER_STATUS, DELETE_ORDER } from '../../../services/orderService';
+import {
+  UPDATE_ORDER_STATUS,
+  DELETE_ORDER,
+} from '../../../services/orderService';
 import { GET_RESTAURANT_ADDRESS } from '../../../services/Restaurant';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import * as Action from '../../../store/actionTypes';
@@ -35,7 +38,11 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
   const [distance, setDistance] = useState('');
   const [duration, setDuration] = useState('');
 
-  const { data: restaurantData, loading: restaurantLoading, error: restaurantError } = useQuery(GET_RESTAURANT_ADDRESS, {
+  const {
+    data: restaurantData,
+    loading: restaurantLoading,
+    error: restaurantError,
+  } = useQuery(GET_RESTAURANT_ADDRESS, {
     variables: { restaurantId: 1 },
   });
 
