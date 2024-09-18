@@ -1,26 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { getUserOrder } from '../../services/orderService';
-import { useApolloClient } from '@apollo/client'; 
+import { useApolloClient, useQuery } from '@apollo/client';
+import { GET_USER_ORDERS } from '../../services/orderService'; // GraphQL query
 import { GET_RESTAURANT_INFO } from '../../services/Restaurant';
 import { Grid, Box } from '@mui/material';
 
 const History = () => {
-  const [orders, setOrders] = useState([]);
   const [restaurants, setRestaurants] = useState({});
   const active = useSelector((state) => state.history.active);
   const client = useApolloClient();
 
+  const { data, loading, error } = useQuery(GET_USER_ORDERS);
+
   useEffect(() => {
-    getUserOrder()
-      .then((response) => {
-        setOrders(response.data);
-        response.data.forEach((order) => {
-          fetchRestaurantInfo(order.restaurantId);
-        });
-      })
-      .catch((error) => console.error('Fetching orders failed', error));
-  }, []);
+    if (data && data.getUserOrders) {
+      data.getUserOrders.forEach((order) => {
+        fetchRestaurantInfo(order.restaurantId);
+      });
+    }
+  }, [data]);
 
   const fetchRestaurantInfo = async (restaurantId) => {
     try {
@@ -38,7 +36,10 @@ const History = () => {
     }
   };
 
-  const filteredOrders = orders.filter((order) => {
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Order not found</p>;
+
+  const filteredOrders = data.getUserOrders.filter((order) => {
     if (active === 'all') {
       return true;
     }
@@ -79,11 +80,21 @@ const History = () => {
           fontWeight: 700,
         }}
       >
-        <Grid item xs={2.4}>Restaurant Name</Grid>
-        <Grid item xs={2.4}>Order ID</Grid>
-        <Grid item xs={2.4}>Date</Grid>
-        <Grid item xs={2.4}>Cost</Grid>
-        <Grid item xs={2.4}>Status</Grid>
+        <Grid item xs={2.4}>
+          Restaurant Name
+        </Grid>
+        <Grid item xs={2.4}>
+          Order ID
+        </Grid>
+        <Grid item xs={2.4}>
+          Date
+        </Grid>
+        <Grid item xs={2.4}>
+          Cost
+        </Grid>
+        <Grid item xs={2.4}>
+          Status
+        </Grid>
       </Grid>
 
       {/* History Data */}

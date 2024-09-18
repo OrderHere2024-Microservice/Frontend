@@ -12,9 +12,10 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
-import { updateOrderStatus, deleteOrder } from '../../../services/orderService';
+import { useMutation } from '@apollo/client';
+import { UPDATE_ORDER_STATUS, DELETE_ORDER } from '../../../services/orderService';
 import { useQuery } from '@apollo/client';
-import { GET_RESTAURANT_ADDRESS } from '../../../services/Restaurant'; // Import GraphQL query
+import { GET_RESTAURANT_ADDRESS } from '../../../services/Restaurant';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import * as Action from '../../../store/actionTypes';
 import { useDispatch, useSelector } from 'react-redux';
@@ -35,12 +36,16 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
   const [isEditMode, setEditMode] = useState(false);
   const [statusValue, setStatusValue] = useState(order?.orderStatus || '');
 
+  const [updateOrderStatusMutation] = useMutation(UPDATE_ORDER_STATUS);
+
+  const [deleteOrderMutation] = useMutation(DELETE_ORDER);
+
   const { data, loading, error } = useQuery(GET_RESTAURANT_ADDRESS, {
     variables: { restaurantId: order?.restaurantId },
     skip: !order?.restaurantId,
   });
 
-  const address =  order?.address || data?.getRestaurantById?.address;
+  const address = order?.address || data?.getRestaurantById?.address;
 
   const handleClose = () => {
     if (isEditMode) {
@@ -63,12 +68,15 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
 
   const handleEditStatusSubmit = async () => {
     try {
-      const statusInfo = {
-        orderId: parseInt(order.orderId),
-        orderStatus: statusValue,
-      };
-      const response = await updateOrderStatus(statusInfo);
-      if (response) {
+      const response = await updateOrderStatusMutation({
+        variables: {
+          updateOrderStatusDTO: {
+            orderId: parseInt(order.orderId),
+            orderStatus: statusValue,
+          },
+        },
+      });
+      if (response.data) {
         dispatch({
           type: Action.UPDATE_ORDER_STATUS,
           payload: { orderId: order.orderId, newStatus: statusValue },
@@ -79,17 +87,23 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
         onClose();
       }
     } catch (error) {
-      console.error('Error updating status:', error.response);
+      console.error('Error updating status:', error);
     }
   };
 
   const handleRejectedOrder = async () => {
     try {
-      await deleteOrder({ orderId: parseInt(order.orderId) });
+      await deleteOrderMutation({
+        variables: {
+          deleteOrderDTO: {
+            orderId: parseInt(order.orderId),
+          },
+        },
+      });
       dispatch({ type: Action.DELETE_ORDER, payload: order.orderId });
       onClose();
     } catch (error) {
-      console.error('Error deleting order:', error.response);
+      console.error('Error deleting order:', error);
     }
   };
 
@@ -206,11 +220,18 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
                 mb: 2,
               }}
             >
-              <Box sx={{ maxWidth: '50%', display: 'flex', flexDirection: 'column' }}>
+              <Box
+                sx={{
+                  maxWidth: '50%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
                 <Typography
                   sx={{ color: 'text.secondary', textTransform: 'capitalize' }}
                 >
-                  {order.orderType === 'dine_in' ? 'Dine in' : order.orderType} Address
+                  {order.orderType === 'dine_in' ? 'Dine in' : order.orderType}{' '}
+                  Address
                 </Typography>
                 <Box display="flex" alignItems="center">
                   <LocationOnIcon />
@@ -255,7 +276,9 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
                       <Typography
                         sx={{ fontWeight: 'bold', textTransform: 'capitalize' }}
                       >
-                        {order.orderStatus === 'in_transit' ? 'In transit' : order.orderStatus}
+                        {order.orderStatus === 'in_transit'
+                          ? 'In transit'
+                          : order.orderStatus}
                       </Typography>
                     )}
                   </Box>

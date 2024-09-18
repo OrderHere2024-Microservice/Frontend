@@ -9,10 +9,11 @@ import {
   Button,
 } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { getAllOrders, getUserOrder } from '../../../services/orderService';
+import { useDispatch, useSelector } from 'react-redux';
+import { useQuery } from '@apollo/client';
+import { GET_USER_ORDERS, GET_ALL_ORDERS } from '../../../services/orderService';
 import OrderPopUp from './OrderPopUp';
 import * as Action from '../../../store/actionTypes';
-import { useDispatch, useSelector } from 'react-redux';
 import { jwtInfo } from '../../../utils/jwtInfo';
 
 const OrderDetail = () => {
@@ -30,35 +31,28 @@ const OrderDetail = () => {
   const { token } = useSelector((state) => state.sign);
   const { userRole } = jwtInfo(token);
 
+  const { data: userData, loading: userLoading, error: userError } = useQuery(GET_USER_ORDERS, {
+    skip: userRole === 'ROLE_sys_admin',
+  });
+
+  const { data: allOrdersData, loading: allOrdersLoading, error: allOrdersError } = useQuery(GET_ALL_ORDERS, {
+    skip: userRole !== 'ROLE_sys_admin',
+  });
+
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        let ordersData;
-        if (userRole === 'ROLE_sys_admin') {
-          ordersData = await getAllOrders();
-        } else {
-          ordersData = await getUserOrder();
-        }
-        dispatch({ type: Action.FETCH_ORDERS, payload: ordersData.data });
-      } catch (error) {
-        console.error('Failed to fetch orders:', error);
-      }
-    };
-    fetchOrders();
+    if (userRole === 'ROLE_sys_admin' && allOrdersData && allOrdersData.getAllOrders) {
+      dispatch({ type: Action.FETCH_ORDERS, payload: allOrdersData.getAllOrders });
+    } else if (userData && userData.getUserOrders) {
+      dispatch({ type: Action.FETCH_ORDERS, payload: userData.getUserOrders });
+    }
     dispatch({ type: Action.SET_SEARCH_TEXT, payload: '' });
-  }, [dispatch, userRole]);
+  }, [dispatch, userRole, allOrdersData, userData]);
 
   useEffect(() => {
-    // const indexOfLastOrder = currentPage * ordersPerPage;
-    // const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-    // const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
-
-    // let updatedOrders = currentOrders;
     let updatedOrders = [...orders];
 
     if (options && status) {
       updatedOrders = updatedOrders.filter((order) => {
-        // console.log('order status currently:', order.orderStatus);
         const orderTypeIsValid = options[order.orderType] ?? true;
         const orderStatusIsValid = status[order.orderStatus] ?? true;
         return orderTypeIsValid && orderStatusIsValid;
@@ -118,12 +112,8 @@ const OrderDetail = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   const pageCount = Math.ceil(orders.length / ordersPerPage);
-  // console.log('all orders:', orders.length);
-  // console.log('current page:', currentPage);
-  // console.log('order number on page:', currentOrders.length);
 
   const handleClickOpen = (order) => {
-    console.log('Opening dialog for order', order);
     setSelectedOrder(order);
     setOpen(true);
   };
@@ -156,6 +146,10 @@ const OrderDetail = () => {
       ),
     );
   };
+
+  if (userRole === 'ROLE_sys_admin' && allOrdersLoading) return <p>Loading all orders...</p>;
+  if (userRole !== 'ROLE_sys_admin' && userLoading) return <p>Loading user orders...</p>;
+  if (allOrdersError || userError) return <p>Order not found</p>;
 
   return (
     <Container>
@@ -205,7 +199,7 @@ const OrderDetail = () => {
         order={selectedOrder}
         time={selectedOrder ? convertTime(selectedOrder.updatedTime) : ''}
         onOrderStatusUpdate={handleOrderStatusUpdate}
-      ></OrderPopUp>
+      />
       <Box display="flex" justifyContent="center" my={2}>
         {Array.from({ length: pageCount }, (_, index) => (
           <Button key={index + 1} onClick={() => paginate(index + 1)}>

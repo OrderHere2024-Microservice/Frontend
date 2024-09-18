@@ -1,13 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_RESTAURANT_ADDRESS } from '../../services/Restaurant';
-import { getOrderInfo } from '../../services/orderService';
+import { GET_ORDER_BY_ID } from '../../services/orderService';
 import { Box, Divider, Grid, Typography } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 export const OrderDetail = ({ orderId }) => {
-  const [order, setOrder] = useState('');
+
+  console.log(orderId);
   const [restaurantId, setRestaurantId] = useState(1);
+
+  const {
+    loading: loadingOrder,
+    error: orderError,
+    data: orderData,
+  } = useQuery(GET_ORDER_BY_ID, {
+    variables: { orderId },
+  });
 
   const {
     loading: loadingRestaurant,
@@ -15,17 +24,8 @@ export const OrderDetail = ({ orderId }) => {
     data: restaurantAddressData,
   } = useQuery(GET_RESTAURANT_ADDRESS, {
     variables: { restaurantId },
+    skip: !restaurantId,
   });
-
-  const fetchOrderDetail = async () => {
-    const res = await getOrderInfo(orderId);
-    console.log(res.data);
-    setOrder(res.data);
-  };
-
-  useEffect(() => {
-    fetchOrderDetail();
-  }, []);
 
   const convertToMelbourneTime = (utcTimestamp) => {
     if (!utcTimestamp) {
@@ -62,8 +62,8 @@ export const OrderDetail = ({ orderId }) => {
     return `${formattedDate}\n${formattedTime}`;
   };
 
-  const renderOrderTypeInfo = () => {
-    switch (order.orderType) {
+  const renderOrderTypeInfo = (order) => {
+    switch (order?.orderType) {
       case 'delivery':
         return (
           <>
@@ -87,13 +87,13 @@ export const OrderDetail = ({ orderId }) => {
                 PickUp Time
               </Typography>
               <Typography sx={{ fontWeight: 'bold' }}>
-                {convertToMelbourneTime(order.pickupTime)}
+                {convertToMelbourneTime(order?.pickupTime)}
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography sx={{ color: 'text.secondary' }}>Phone</Typography>
               <Typography sx={{ fontWeight: 'bold' }}>
-                {order.phone ? order.phone : 'Null'}
+                {order?.phone ? order?.phone : 'Null'}
               </Typography>
             </Grid>
           </>
@@ -106,7 +106,7 @@ export const OrderDetail = ({ orderId }) => {
                 Number of People
               </Typography>
               <Typography sx={{ fontWeight: 'bold' }}>
-                {order.numberOfPeople ? order.numberOfPeople : 'Null'}
+                {order?.numberOfPeople ? order?.numberOfPeople : 'Null'}
               </Typography>
             </Grid>
             <Grid item xs={6}>
@@ -114,7 +114,7 @@ export const OrderDetail = ({ orderId }) => {
                 PickUp Time
               </Typography>
               <Typography sx={{ fontWeight: 'bold' }}>
-                {order.pickUpTime ? order.pickUpTime : 'Null'}
+                {order?.pickUpTime ? order?.pickUpTime : 'Null'}
               </Typography>
             </Grid>
           </>
@@ -124,12 +124,15 @@ export const OrderDetail = ({ orderId }) => {
     }
   };
 
-  // Handle loading and error states for restaurant data
-  if (loadingRestaurant)
-    return <Typography>Loading restaurant info...</Typography>;
-  if (restaurantError)
-    return <Typography>Error loading restaurant info</Typography>;
+  if (loadingOrder || loadingRestaurant) {
+    return <Typography>Loading...</Typography>;
+  }
 
+  if (orderError || restaurantError) {
+    return <Typography>Error loading data</Typography>;
+  }
+
+  const order = orderData?.getOrderById;
   const restaurantAddress =
     restaurantAddressData?.getRestaurantById?.address || 'No address found';
 
@@ -143,7 +146,7 @@ export const OrderDetail = ({ orderId }) => {
           borderRadius: '5px',
           border: '1px solid #D9D9D9',
           padding: 2,
-          backgroundColor: '#fff', // Optional: Add a background color
+          backgroundColor: '#fff',
         }}
       >
         {order ? (
@@ -208,7 +211,7 @@ export const OrderDetail = ({ orderId }) => {
                 </Typography>
               </Box>
               <Grid container spacing={2} sx={{ maxWidth: '50%' }}>
-                {renderOrderTypeInfo()}
+                {renderOrderTypeInfo(order)}
                 <Grid item xs={6}>
                   <Typography sx={{ color: 'text.secondary' }}>
                     Payment
@@ -267,7 +270,7 @@ export const OrderDetail = ({ orderId }) => {
             </Box>
           </Box>
         ) : (
-          <Typography>Loading...</Typography>
+          <Typography>No order details found</Typography>
         )}
       </Box>
     </Box>
