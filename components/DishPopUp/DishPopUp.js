@@ -24,17 +24,19 @@ import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
 import HighlightOffRoundedIcon from '@mui/icons-material/HighlightOffRounded';
 import InsertPhotoOutlinedIcon from '@mui/icons-material/InsertPhotoOutlined';
 import {
-  getIngredientsByDish,
-  getIngredient,
-  createIngredient,
-  deleteIngredient,
-  updateIngredient,
+  GET_INGREDIENTS_BY_DISH_ID,
+  GET_INGREDIENT_BY_ID,
+  CREATE_INGREDIENT,
+  UPDATE_INGREDIENT,
+  DELETE_INGREDIENT,
 } from '../../services/Ingredient';
-import styles from './DishPopup.module.css';
+import { useApolloClient } from '@apollo/client';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Action from '../../store/actionTypes';
 import { updateDishes } from '../../services/Dish';
 import { jwtInfo } from '../../utils/jwtInfo';
+import { useQuery, useMutation } from '@apollo/client';
+import styles from './DishPopup.module.css';
 
 const DishPopup = ({
   dishId,
@@ -45,13 +47,13 @@ const DishPopup = ({
   open,
   onClose,
 }) => {
+  const client = useApolloClient();
   const [ingredientDetails, setIngredientDetails] = useState([]);
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items);
   const item = cartItems.find((item) => item.dishId === dishId);
   const quantity = item ? item.quantity : 0;
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const label = { inputProps: { 'aria-label': 'Checkbox' } };
   const [isEditMode, setIsEditMode] = useState(false);
   const [tempIngredientDetails, setTempIngredientDetails] = useState([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -72,31 +74,47 @@ const DishPopup = ({
   const { token } = useSelector((state) => state.sign);
   const { userRole } = jwtInfo(token);
   const [isAddedToCart, setIsAddedToCart] = React.useState(false);
-  // const unselectedIngredients = useSelector((state) => state.ingredient.unselectedIngredients);
-  // console.log('unselect', unselectedIngredients)
 
-  // console.log('show dish is:', dishId);
+  const { data: dishData } = useQuery(GET_INGREDIENTS_BY_DISH_ID, {
+    variables: { dishID: dishId },
+  });
+
+  const [createIngredient] = useMutation(CREATE_INGREDIENT);
+  const [updateIngredient] = useMutation(UPDATE_INGREDIENT);
+  const [deleteIngredient] = useMutation(DELETE_INGREDIENT);
+
   useEffect(() => {
-    getIngredientsByDish(dishId)
-      .then((response) => {
-        const ingredientPromises = response.data.map((dish) => {
-          return getIngredient(dish.ingredientId);
-        });
-        Promise.all(ingredientPromises)
-          .then((ingredientsResponses) => {
-            const details = ingredientsResponses.map((ingredientResponse) => ({
-              id: ingredientResponse.data.ingredientId,
-              name: ingredientResponse.data.name,
-            }));
-            setIngredientDetails(details);
-            setTempIngredientDetails(details);
-          })
-          .catch((error) =>
-            console.error('Fetching ingredient info failed', error),
-          );
-      })
-      .catch((error) => console.error('Fetching dishes failed', error));
-  }, [dishId]);
+    if (dishData && dishData.findIngredientsByDishID) {
+      const ingredientPromises = dishData.findIngredientsByDishID.map(
+        (dishIngredient) => {
+          return getIngredientById(dishIngredient.ingredientId);
+        },
+      );
+      Promise.all(ingredientPromises)
+        .then((ingredientsResponses) => {
+          const details = ingredientsResponses.map((ingredientResponse) => ({
+            id: ingredientResponse.data.getIngredientById.ingredientId,
+            name: ingredientResponse.data.getIngredientById.name,
+          }));
+          setIngredientDetails(details);
+          setTempIngredientDetails(details);
+        })
+        .catch((error) => console.error('Error fetching ingredients', error));
+    }
+  }, [dishData, dishId]);
+
+  const getIngredientById = async (ingredientId) => {
+    try {
+      const response = await client.query({
+        query: GET_INGREDIENT_BY_ID,
+        variables: { id: ingredientId },
+      });
+      return response;
+    } catch (error) {
+      console.error('Error fetching ingredient by ID:', error);
+      return null;
+    }
+  };
 
   const handleDishChange = (e) => {
     const { name, value, files } = e.target;
@@ -157,7 +175,6 @@ const DishPopup = ({
     if (isEditMode) {
       setTempIngredientDetails([...ingredientDetails]);
     }
-    // console.log('Entering edit mode');
     setIsEditMode(!isEditMode);
   };
 
@@ -186,30 +203,33 @@ const DishPopup = ({
       const ingredient = tempIngredientDetails[i];
       try {
         if (ingredient.isNew) {
-          try {
-            const response = await createIngredient({
-              dishId: dishId,
-              name: ingredient.name,
-              unit: 'grams',
-              quantityValue: 1,
-            });
-            // console.log('response', response.data);
-            updatedIngredients[i] = {
-              ...ingredient,
-              id: response.data,
-              isNew: false,
-            };
-          } catch (error) {
-            console.error('Error creating ingredient:', error.response);
-          }
+          const response = await createIngredient({
+            variables: {
+              postIngredientDTO: {
+                dishId: dishId,
+                name: ingredient.name,
+                unit: 'grams',
+                quantityValue: 1,
+              },
+            },
+          });
+          updatedIngredients[i] = {
+            ...ingredient,
+            id: response.data.createLinkIngredientDish,
+            isNew: false,
+          };
         } else {
           await updateIngredient({
-            ingredientId: ingredient.id,
-            name: ingredient.name,
+            variables: {
+              updateIngredientDTO: {
+                ingredientId: ingredient.id,
+                name: ingredient.name,
+              },
+            },
           });
         }
       } catch (error) {
-        console.error('Error updating ingredient:', error.response);
+        console.error('Error saving ingredient:', error);
       }
     }
     setTempIngredientDetails(updatedIngredients);
@@ -240,18 +260,21 @@ const DishPopup = ({
       setTempIngredientDetails(updatedIngredients);
     } else {
       try {
-        const response = await deleteIngredient({
-          dishId: dishId,
-          ingredientId: ingredientId,
+        await deleteIngredient({
+          variables: {
+            deleteIngredientDTO: {
+              dishId: dishId,
+              ingredientId: ingredientId,
+            },
+          },
         });
-        // console.log('Delete ingredient successfully:', response);
         const updatedIngredients = tempIngredientDetails.filter(
           (ingredient) => ingredient.id !== ingredientId,
         );
         setTempIngredientDetails(updatedIngredients);
         setDeleteDialogOpen(false);
       } catch (error) {
-        console.error('Error delete ingredient:', error.response);
+        console.error('Error deleting ingredient:', error);
       }
     }
   };
@@ -270,14 +293,10 @@ const DishPopup = ({
 
   const handleEditDishSubmit = async (newDishData) => {
     try {
-      console.log('newDishData', newDishData);
-      const response = await updateDishes(newDishData);
-
-      if (response) {
-        router.push('/');
-      }
+      await updateDishes(newDishData);
+      router.push('/');
     } catch (error) {
-      console.error('Error updating dish:', error.response);
+      console.error('Error updating dish:', error);
     }
     setIsEditMode(false);
   };
@@ -528,7 +547,6 @@ const DishPopup = ({
 
                         <HighlightOffRoundedIcon
                           onClick={() => {
-                            // console.log('Deleting ingredient:', ingredient);
                             if (!ingredient.name.trim() || ingredient.isNew) {
                               deleteIngredientItem(dishId, ingredient.id);
                             } else {
@@ -582,7 +600,6 @@ const DishPopup = ({
                       </Typography>
                     )}
                     <Checkbox
-                      {...label}
                       defaultChecked
                       onChange={(e) =>
                         handleCheckboxChange(ingredient.name, e.target.checked)
