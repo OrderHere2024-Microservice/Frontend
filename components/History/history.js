@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useApolloClient, useQuery } from '@apollo/client';
-import { GET_USER_ORDERS } from '../../services/orderService'; 
+import { GET_USER_ORDERS } from '../../services/orderService';
 import { GET_RESTAURANT_INFO } from '../../services/Restaurant';
 import { Grid, Box } from '@mui/material';
 
