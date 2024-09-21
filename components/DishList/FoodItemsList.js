@@ -35,11 +35,6 @@ const FoodItemsList = ({ dishes: initialDishes }) => {
     setAddDishModalOpen(false);
   };
 
-  // const handleRemoveDish = (dishId) => {
-  //   dispatch({ type: Action.REMOVE_DISH, payload: dishId });
-  //   setDishes(dishes.filter(dish => dish.dishId !== dishId));
-  // };
-
   const handleRemoveDish = async (dishId) => {
     try {
       const response = await deleteDish(dishId);
