@@ -37,7 +37,7 @@ export const updateDishes = (dishData) => {
   });
 };
 
-export const deleteDish = (dishId) => {
+const deleteDish = (dishId) => {
   return http(`/v1/public/dish/1/${dishId}`, {
     method: 'DELETE'
   });

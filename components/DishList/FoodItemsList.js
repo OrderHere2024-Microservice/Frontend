@@ -1,21 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { useMutation } from '@apollo/client';
 import FoodItem from '/components/DishList/FoodItem';
-import {
-  Box,
-  CircularProgress,
-  Alert,
-  Button,
-  IconButton,
-} from '@mui/material';
+import { Box, CircularProgress, Alert, Button } from '@mui/material';
 import AddDishModal from './AddDishModal';
-import { useDispatch } from 'react-redux';
 import { addDishStart, addDishSuccess, addDishError } from './AddDishModal';
-import { deleteDish, postDishes } from '../../services/Dish';
 import { jwtInfo } from '../../utils/jwtInfo';
-import * as Action from '../../store/actionTypes';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { DELETE_DISH, CREATE_DISH } from '../../services/Dish';
+import { postDishes } from '../../services/Dish';
 
 const FoodItemsList = ({ dishes: initialDishes }) => {
   const [dishes, setDishes] = useState(initialDishes);
@@ -27,31 +20,28 @@ const FoodItemsList = ({ dishes: initialDishes }) => {
 
   const dispatch = useDispatch();
   const router = useRouter();
-  const handleAddNewDishClick = () => {
-    setAddDishModalOpen(true);
-  };
+  const priceRange = useSelector((state) => state.filter.priceRange);
+  const { token } = useSelector((state) => state.sign);
+  const { userRole } = jwtInfo(token);
 
-  const handleCloseModal = () => {
-    setAddDishModalOpen(false);
-  };
+  const [deleteDishMutation] = useMutation(DELETE_DISH);
+  // const [addDishMutation] = useMutation(CREATE_DISH);
+
+  const handleAddNewDishClick = () => setAddDishModalOpen(true);
+  const handleCloseModal = () => setAddDishModalOpen(false);
 
   const handleRemoveDish = async (dishId) => {
     try {
-      const response = await deleteDish(dishId);
-      if (response.status === 200 || response.status === 204) {
+      const response = await deleteDishMutation({ variables: { dishId } });
+      if (response.data.deleteDish) {
         setDishes((currentDishes) =>
           currentDishes.filter((dish) => dish.dishId !== dishId),
         );
       }
     } catch (error) {
-      console.error(error);
+      setError('Error deleting dish');
     }
   };
-
-  const priceRange = useSelector((state) => state.filter.priceRange);
-
-  const { token } = useSelector((state) => state.sign);
-  const { userRole } = jwtInfo(token);
 
   const handleAddDishSubmit = async (newDishData) => {
     dispatch(addDishStart());
@@ -137,24 +127,9 @@ const FoodItemsList = ({ dishes: initialDishes }) => {
         />
       ))}
 
-      {userRole == 'ROLE_sys_admin' && (
+      {userRole === 'ROLE_sys_admin' && (
         <>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-            }}
-          >
-            {/* <IconButton
-              onClick={() => onRemoveDish(dishId)}
-              sx={{
-                position: 'absolute',
-                top: 0,
-                right: 0,
-              }}
-            >
-            <DeleteIcon />
-            </IconButton> */}
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <Button
               onClick={handleAddNewDishClick}
               sx={{
