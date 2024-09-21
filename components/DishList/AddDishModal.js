@@ -25,7 +25,7 @@ const AddDishModal = ({ open, handleClose, handleSubmit }) => {
   const [newDish, setNewDish] = useState({
     dishName: '',
     description: '',
-    price: '',
+    price: 0.0,
     restaurantId: 1,
     availability: true,
     imageFile: null,
@@ -62,7 +62,6 @@ const AddDishModal = ({ open, handleClose, handleSubmit }) => {
 
   const selectCategory = (categoryId) => parseInt(categoryId);
 
-  // Render loading and error states
   if (loading) return <p>Loading categories...</p>;
   if (error) return <p>Error loading categories: {error.message}</p>;
 

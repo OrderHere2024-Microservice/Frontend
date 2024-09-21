@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import Slider from '@mui/material/Slider';
 import { Typography, Box } from '@mui/material';
+import { useQuery } from '@apollo/client';
+import { GET_DISHES_PRICE_FILTER } from '../../services/Dish';
 import * as Action from '../../store/actionTypes';
-import { getDishes } from '../../services/Dish';
 
 const pricingFilterStyle = {
   background: '#FEF6E9',
@@ -13,45 +14,26 @@ const pricingFilterStyle = {
   marginBottom: '20px',
 };
 
-const pricingTagStyle = {
-  ...pricingFilterStyle,
-};
 
-const tagStyle = {
-  padding: '5px 10px',
-  borderRadius: '10px',
-  display: 'inline-block',
-  margin: '5px',
-  background: '#fff',
-  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-  color: '#000',
-  fontSize: '12px',
-  fontFamily: 'DM Sans',
-  cursor: 'pointer',
-};
-
-const newTagStyle = {
-  ...tagStyle,
-  background: '#AD343E',
-  color: '#fff',
-};
 
 const PricingFilter = () => {
   const dispatch = useDispatch();
   const [priceRange, setPriceRange] = useState({ min: 0, max: 100 });
   const [values, setValues] = useState([0, 100]);
 
+  const { loading, error, data } = useQuery(GET_DISHES_PRICE_FILTER, {
+    variables: { restaurantId: 1 },
+  });
+
   useEffect(() => {
-    getDishes().then((data) => {
-      if (data && data.data) {
-        const prices = data.data.data.map((dish) => dish.price);
-        const minPrice = Math.floor(Math.min(...prices));
-        const maxPrice = Math.ceil(Math.max(...prices));
-        setPriceRange({ min: minPrice, max: maxPrice });
-        setValues([minPrice, maxPrice]);
-      }
-    });
-  }, []);
+    if (data && data.getDishes) {
+      const prices = data.getDishes.data.map((dish) => dish.price);
+      const minPrice = Math.floor(Math.min(...prices));
+      const maxPrice = Math.ceil(Math.max(...prices));
+      setPriceRange({ min: minPrice, max: maxPrice });
+      setValues([minPrice, maxPrice]);
+    }
+  }, [data]);
 
   const handleChange = (event, newValues) => {
     setValues(newValues);
@@ -73,6 +55,9 @@ const PricingFilter = () => {
       position: 'bottom',
     },
   ];
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <Box sx={{ ...pricingFilterStyle, width: '100%' }}>
@@ -115,50 +100,4 @@ const PricingFilter = () => {
   );
 };
 
-const PricingTags = () => {
-  const [selectedTags, setSelectedTags] = useState({ New: true });
-
-  const handleTagClick = (code) => {
-    setSelectedTags((prevSelectedTags) => ({
-      ...prevSelectedTags,
-      [code]: !prevSelectedTags[code],
-    }));
-  };
-
-  const tags = [
-    { label: 'New', code: 'New' },
-    { label: 'Gluten Free', code: 'GF' },
-    { label: 'Nut Free', code: 'NF' },
-    { label: 'Low Carb', code: 'LC' },
-    { label: 'Vegetarian', code: 'V' },
-    { label: 'Dairy Free', code: 'DF' },
-    { label: 'Vegan', code: 'VE' },
-  ];
-
-  return (
-    <div style={pricingTagStyle}>
-      <h2>PRICING TAGS:</h2>
-      <Box sx={{ borderBottom: '1px dashed grey', width: '100%', my: 2 }} />
-      {tags.map((tag, index) => (
-        <div
-          key={index}
-          style={selectedTags[tag.code] ? newTagStyle : tagStyle}
-          onClick={() => handleTagClick(tag.code)}
-        >
-          {tag.code} - {tag.label}
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const Filter = () => {
-  return (
-    <div className="combine">
-      <PricingFilter />
-      <PricingTags />
-    </div>
-  );
-};
-
-export default Filter;
+export default PricingFilter;

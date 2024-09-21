@@ -77,7 +77,7 @@ const button = {
 
 const border = {
   main: '#999999',
-  light: 'D9D9D9',
+  light: '#D9D9D9',
   section: '#CBCBCB',
 };
 
