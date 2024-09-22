@@ -24,3 +24,10 @@ export interface CartState {
   totalPrice: number;
   orderType: string;
 }
+
+export interface FilterState {
+  priceRange: {
+    min: number;
+    max: number;
+  };
+}
