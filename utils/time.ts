@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-const time = (timestamp) => {
+const time = (timestamp: string | number | Date) => {
   const thatTime = moment(timestamp);
   if (thatTime.isSame(moment(), 'day')) {
     return thatTime.fromNow().toString();

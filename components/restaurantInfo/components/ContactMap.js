@@ -13,7 +13,6 @@ const ContactMap = ({ address }) => {
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         if (data.status === 'OK') {
           const location = data.results[0].geometry.location;
           setPosition({ lat: location.lat, lng: location.lng });

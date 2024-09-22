@@ -49,7 +49,6 @@ const OrderInfo = () => {
     };
     setChecked(newOptions);
     dispatch({ type: Action.SET_ORDER_OPTION, payload: newOptions });
-    // setChecked({ ...checked, [event.target.name]: event.target.checked });
   };
 
   const handleChangeStatus = (event) => {

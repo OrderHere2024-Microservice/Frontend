@@ -14,13 +14,13 @@ const Option = () => {
     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
       <Button
         sx={{
-          backgroundColor: orderType === 'delivery' ? 'button.main' : 'grey',
+          backgroundColor: orderType === 'delivery' ? 'primary.main' : 'grey',
           width: '120px',
           height: '48px',
           borderRadius: '50px',
           mb: 4,
           '&:hover': {
-            backgroundColor: orderType === 'dine in' ? 'button.main' : 'grey',
+            backgroundColor: orderType === 'dine in' ? 'primary.main' : 'grey',
           },
         }}
         onClick={() => handleClick('delivery')}
@@ -33,12 +33,12 @@ const Option = () => {
       </Button>
       <Button
         sx={{
-          backgroundColor: orderType === 'pickup' ? 'button.main' : 'grey',
+          backgroundColor: orderType === 'pickup' ? 'primary.main' : 'grey',
           width: '120px',
           height: '48px',
           borderRadius: '50px',
           '&:hover': {
-            backgroundColor: orderType === 'dine in' ? 'button.main' : 'grey',
+            backgroundColor: orderType === 'dine in' ? 'primary.main' : 'grey',
           },
         }}
         onClick={() => handleClick('pickup')}
@@ -51,12 +51,12 @@ const Option = () => {
       </Button>
       <Button
         sx={{
-          backgroundColor: orderType === 'dine in' ? 'button.main' : 'grey',
+          backgroundColor: orderType === 'dine in' ? 'primary.main' : 'grey',
           width: '120px',
           height: '48px',
           borderRadius: '50px',
           '&:hover': {
-            backgroundColor: orderType === 'dine in' ? 'button.main' : 'grey',
+            backgroundColor: orderType === 'dine in' ? 'primary.main' : 'grey',
           },
         }}
         onClick={() => handleClick('dine in')}

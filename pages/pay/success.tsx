@@ -73,10 +73,10 @@ const SuccessPage = () => {
             variant="contained"
             sx={{
               mt: 4,
-              backgroundColor: 'button.main',
+              backgroundColor: 'primary.main',
               '&:hover': {
                 opacity: 0.6,
-                backgroundColor: 'button.main',
+                backgroundColor: 'primary.main',
                 transition: '0.3s',
               },
               borderRadius: '8px',

@@ -79,9 +79,9 @@ const FailurePage = () => {
           sx={{
             marginTop: 8,
             marginBottom: 10,
-            backgroundColor: 'button.main',
+            backgroundColor: 'primary.main',
             '&:hover': {
-              backgroundColor: 'button.main',
+              backgroundColor: 'primary.main',
               opacity: 0.7,
               transition: '0.3s',
             },

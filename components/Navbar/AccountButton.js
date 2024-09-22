@@ -59,7 +59,6 @@ const AccountButton = ({ isLogin }) => {
           {content === 'login' ? (
             <Login
               register={() => dispatch(registerSignDialog())}
-              // forgetPassword={() => dispatch(forgetpasswordSignDialog())}
             />
           ) : (
             <Signup login={() => dispatch(loginSignDialog())} />

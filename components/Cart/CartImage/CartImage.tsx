@@ -13,18 +13,7 @@ const CartImage = () => {
         justifyContent: 'center',
         alignItems: 'center',
       }}
-    >
-      {/* <img 
-        backgroundImage: 'url(/image/cart-bg.png)',
-        alt="Picture" 
-        style={{ 
-          backgroundSize: 'cover',
-          maxWidth: '100%',  
-          width: '100%',  
-          height: '300px'  
-        }} 
-      /> */}
-    </Box>
+    ></Box>
   );
 };
 

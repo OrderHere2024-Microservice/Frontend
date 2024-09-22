@@ -105,9 +105,9 @@ const PickupTime = () => {
         <Button
           variant="outlined"
           sx={{
-            color: 'button.main',
+            color: 'primary.main',
             '&.MuiButton-outlined': {
-              borderColor: 'button.main',
+              borderColor: 'primary.main',
             },
           }}
           onClick={decrementDate}
@@ -128,9 +128,9 @@ const PickupTime = () => {
         <Button
           variant="outlined"
           sx={{
-            color: 'button.main',
+            color: 'primary.main',
             '&.MuiButton-outlined': {
-              borderColor: 'button.main',
+              borderColor: 'primary.main',
             },
           }}
           onClick={incrementDate}

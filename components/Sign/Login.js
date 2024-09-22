@@ -100,11 +100,6 @@ const Login = ({ register }) => {
     setIsForgetPasswordModalOpen(true);
   };
 
-  // const resetPassword = () => {
-  //   // dispatch(closeSignDialog());
-  //   setIsResetPasswordModalOpen(true);
-  // }
-
   const handleCloseForgetPasswordModal = (emailSent, userEmail) => {
     setIsForgetPasswordModalOpen(false);
     if (emailSent) {
@@ -112,12 +107,6 @@ const Login = ({ register }) => {
       setIsResetPasswordModalOpen(true);
     }
   };
-
-  // const notresetPassword = () => {
-  //   // dispatch(closeSignDialog());
-  //   setIsResetPasswordModalOpen(false);
-  //   // Router.push('/password-email', undefined, {shallow: true} );
-  // };
 
   return (
     <Box

@@ -1,9 +1,9 @@
 import * as React from 'react';
-import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const EmptyCart = () => {
   return (
@@ -30,7 +30,12 @@ const EmptyCart = () => {
           marginBottom: 2,
         }}
       >
-        <img src="/icons/cart/EmptyCartIcon.svg" alt="EmptyCart" />
+        <Image
+          src="/icons/cart/EmptyCartIcon.svg"
+          alt="EmptyCart"
+          height={200}
+          width={200}
+        />
       </Box>
       <Typography
         fontSize="45px"
@@ -58,9 +63,9 @@ const EmptyCart = () => {
           sx={{
             marginTop: 8,
             marginBottom: 10,
-            backgroundColor: 'button.main',
+            backgroundColor: 'primary.main',
             '&:hover': {
-              backgroundColor: 'button.main',
+              backgroundColor: 'primary.main',
               opacity: 0.7,
               transition: '0.3s',
             },

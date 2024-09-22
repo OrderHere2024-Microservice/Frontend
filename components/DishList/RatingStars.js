@@ -1,6 +1,6 @@
 import Rating from '@mui/material/Rating';
 
-export default function RatingStars({ rating }) {
+const RatingStars = ({ rating }) => {
   return (
     <Rating
       name="rating"
@@ -11,3 +11,5 @@ export default function RatingStars({ rating }) {
     />
   );
 }
+
+export default RatingStars;

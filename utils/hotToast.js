@@ -4,7 +4,7 @@ const hotToast = (status, text, promise) => {
   switch (status) {
     case 'success':
       toast.success(text, {
-        duration: 3000,
+        duration: 2000,
         style: {
           padding: '20px',
           borderRadius: '10px',
@@ -15,7 +15,7 @@ const hotToast = (status, text, promise) => {
       break;
     case 'error': {
       toast.error(text, {
-        duration: 3000,
+        duration: 2000,
         style: {
           padding: '20px',
           borderRadius: '10px',

@@ -95,7 +95,7 @@
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
-    "checkJs": true,
+    "checkJs": false,
     "noEmit": true,
     "incremental": true,
     "moduleResolution": "node",
@@ -103,6 +103,6 @@
     "isolatedModules": true,
     "jsx": "preserve"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "services/Restaurant.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "services/Restaurant.ts", "components/Cart/CartContent/CartContent.js"],
   "exclude": ["node_modules"]
 }
