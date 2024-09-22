@@ -19,7 +19,7 @@ dayjs.extend(timezone);
 
 const CustomColorRadio = styled(Radio)({
   '&.Mui-checked': {
-    color: '#AD343E',
+    color: '#1976d2',
   },
 });
 
@@ -105,9 +105,9 @@ const PickupTime = () => {
         <Button
           variant="outlined"
           sx={{
-            color: 'button.main',
+            color: 'primary.main',
             '&.MuiButton-outlined': {
-              borderColor: 'button.main',
+              borderColor: 'primary.main',
             },
           }}
           onClick={decrementDate}
@@ -128,9 +128,9 @@ const PickupTime = () => {
         <Button
           variant="outlined"
           sx={{
-            color: 'button.main',
+            color: 'primary.main',
             '&.MuiButton-outlined': {
-              borderColor: 'button.main',
+              borderColor: 'primary.main',
             },
           }}
           onClick={incrementDate}

@@ -26,7 +26,7 @@ const Nav = () => {
     fontSize: '1em',
     fontWeight: 700,
     backgroundColor:
-      active === buttonName.toLowerCase() ? '#AD343E' : 'transparent',
+      active === buttonName.toLowerCase() ? '#1976d2' : 'transparent',
     color: active === buttonName.toLowerCase() ? '#FFFFFF' : '#2C2F24',
     borderRadius: '50px',
     border: active === buttonName.toLowerCase() ? 'none' : '2px solid #DBDFD0',

@@ -1,21 +1,26 @@
 import React from 'react';
 import Image from 'next/image';
-import { signIn, useSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { Button, Typography, Box } from '@mui/material';
 
 /**
  * handle facebook login action
  */
-const loginWithFacebook = () =>
-  signIn('facebook', { callbackUrl: 'http://localhost:3000' });
+const loginWithFacebook = async () =>
+  await signIn('facebook', { callbackUrl: 'http://localhost:3000' });
 
 /**
  * Facebook Login button component
  */
-const FacebookSignInBtn = ({ children }) => {
+
+const FacebookSignInBtn = () => {
   return (
     <Button
-      onClick={loginWithFacebook}
+      onClick={() => {
+        loginWithFacebook().catch((error) => {
+          console.error('Google Sign In Error:', error);
+        });
+      }}
       variant="outlined"
       style={{ backgroundColor: 'white', width: '90%', maxWidth: '250px' }}
     >

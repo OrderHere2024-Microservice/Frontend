@@ -394,7 +394,7 @@ const DishPopup = ({
             <IconButton
               onClick={toggleEditMode}
               sx={{
-                backgroundColor: 'button.main',
+                backgroundColor: 'primary.main',
                 color: '#f4f4f4',
                 marginRight: 3,
                 paddingInline: 2,
@@ -463,7 +463,7 @@ const DishPopup = ({
             <IconButton
               onClick={() => handleEditDishSubmit(newDish)}
               sx={{
-                backgroundColor: 'button.main',
+                backgroundColor: 'primary.main',
                 color: '#f4f4f4',
                 marginRight: 3,
                 paddingInline: 2,
@@ -605,9 +605,9 @@ const DishPopup = ({
                         handleCheckboxChange(ingredient.name, e.target.checked)
                       }
                       sx={{
-                        color: 'button.main',
+                        color: 'primary.main',
                         '&.Mui-checked': {
-                          color: 'button.main',
+                          color: 'primary.main',
                         },
                       }}
                     />
@@ -640,7 +640,7 @@ const DishPopup = ({
                 <IconButton
                   onClick={() => saveIngredients()}
                   sx={{
-                    backgroundColor: 'button.main',
+                    backgroundColor: 'primary.main',
                     color: '#f4f4f4',
                     width: '95%',
                     fontWeight: 600,
@@ -677,7 +677,7 @@ const DishPopup = ({
           <Box
             sx={{
               mr: 14,
-              backgroundColor: 'button.main',
+              backgroundColor: 'primary.main',
               fontSize: '25px',
               width: '230px',
               height: '50px',
@@ -697,7 +697,7 @@ const DishPopup = ({
               display: 'flex',
               alignItems: 'center',
               mr: 4,
-              border: '1px solid #AD343E',
+              border: '1.5px solid #1976d2',
               borderRadius: '10px',
               width: '200px',
               height: '45px',
@@ -707,7 +707,7 @@ const DishPopup = ({
           >
             <IconButton
               onClick={decrementQuantity}
-              sx={{ color: 'button.main' }}
+              sx={{ color: 'primary.main' }}
               disabled={quantity === 0}
             >
               <RemoveIcon />
@@ -717,7 +717,7 @@ const DishPopup = ({
               primaryTypographyProps={{ fontWeight: 600 }}
               style={{ paddingLeft: '25%' }}
             />
-            <IconButton onClick={handleAddToCart} sx={{ color: 'button.main' }}>
+            <IconButton onClick={handleAddToCart} sx={{ color: 'primary.main' }}>
               <AddIcon />
             </IconButton>
           </Box>
@@ -726,14 +726,14 @@ const DishPopup = ({
             <Button
               sx={{
                 mr: 4,
-                backgroundColor: 'button.main',
+                backgroundColor: 'primary.main',
                 fontSize: '25px',
                 width: '200px',
                 height: '45px',
                 color: '#fff',
                 borderRadius: '10px',
                 '&:hover': {
-                  backgroundColor: 'button.main',
+                  backgroundColor: 'primary.main',
                   opacity: 0.6,
                   transition: '0.3s',
                 },

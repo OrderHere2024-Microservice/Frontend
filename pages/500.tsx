@@ -27,7 +27,7 @@ const ServerError = () => {
             }}
           >
             <Typography align="center" color="textPrimary" variant="h1">
-              500: ServerError
+              500: Server Error
             </Typography>
             <NextLink href="/" passHref>
               <Button

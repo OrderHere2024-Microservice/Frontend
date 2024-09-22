@@ -10,16 +10,20 @@ import hotToast from '../../../utils/hotToast';
  * google will handle the callback URL(config this in console.cloud.google.com )
  */
 const handleGoogleSignIn = async () => {
-  const res = await signIn('google');
+  await signIn('google');
 };
 
 /**
  * Google login button Component
  */
-const GoogleSignInBtn = ({ children }) => {
+const GoogleSignInBtn = () => {
   return (
     <Button
-      onClick={handleGoogleSignIn}
+      onClick={() => {
+        handleGoogleSignIn().catch((error) => {
+          console.error('Google Sign In Error:', error);
+        });
+      }}
       variant="outlined"
       style={{ backgroundColor: 'white', width: '90%', maxWidth: '250px' }}
     >

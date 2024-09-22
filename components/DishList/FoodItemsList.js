@@ -132,15 +132,14 @@ const FoodItemsList = ({ dishes: initialDishes }) => {
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <Button
               onClick={handleAddNewDishClick}
+              variant='contained'
               sx={{
                 mt: 5,
                 mr: 5,
-                backgroundColor: 'button.main',
-                fontSize: '14px',
-                width: '170px',
-                color: '#fff',
+                fontSize: '18px',
+                width: '180px',
+                borderColor: 'black',
                 '&:hover': {
-                  backgroundColor: 'button.main',
                   opacity: 0.6,
                   transition: '0.3s',
                 },

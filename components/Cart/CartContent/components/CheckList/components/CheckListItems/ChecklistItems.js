@@ -41,7 +41,7 @@ const CheckListItems = () => {
               sx={{
                 ml: 18,
                 border: 1.3,
-                borderColor: 'button.main',
+                borderColor: 'primary.main',
                 borderRadius: 1,
                 display: 'flex',
                 alignItems: 'center',

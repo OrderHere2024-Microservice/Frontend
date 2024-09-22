@@ -47,13 +47,13 @@ const Category = ({ categories: initialData }) => {
             sx={{
               backgroundColor:
                 selectedCategoryId === category.categoryId
-                  ? 'button.main'
+                  ? 'primary.main'
                   : 'grey',
               fontSize: '14px',
               width: '120px',
               color: 'white',
               '&:hover': {
-                backgroundColor: 'button.main',
+                backgroundColor: 'primary.main',
                 color: 'white',
                 transition: 'all 0.5s ease',
               },

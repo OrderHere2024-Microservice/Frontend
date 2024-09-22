@@ -177,7 +177,7 @@ const FoodItem = ({
                   display: 'flex',
                   alignItems: 'center',
                   ml: 3,
-                  border: '1px solid #AD343E',
+                  border: '1.5px solid #1976d2',
                   borderRadius: '10px',
                   width: '200px',
                   justifyContent: 'space-between',
@@ -186,7 +186,7 @@ const FoodItem = ({
               >
                 <IconButton
                   onClick={decrementQuantity}
-                  sx={{ color: 'button.main' }}
+                  sx={{ color: 'primary.main' }}
                   disabled={quantity === 0}
                 >
                   <RemoveIcon />
@@ -200,7 +200,7 @@ const FoodItem = ({
                 />
                 <IconButton
                   onClick={handleAddToCart}
-                  sx={{ color: 'button.main' }}
+                  sx={{ color: 'primary.main' }}
                 >
                   <AddIcon />
                 </IconButton>
@@ -209,12 +209,12 @@ const FoodItem = ({
               <Button
                 sx={{
                   ml: 3,
-                  backgroundColor: 'button.main',
+                  backgroundColor: 'primary.main',
                   fontSize: '13px',
                   width: '200px',
                   color: '#fff',
                   '&:hover': {
-                    backgroundColor: 'button.main',
+                    backgroundColor: 'primary.main',
                     opacity: 0.6,
                     transition: '0.3s',
                   },

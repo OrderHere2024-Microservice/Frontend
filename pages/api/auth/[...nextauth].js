@@ -3,8 +3,6 @@ import GoogleProvider from 'next-auth/providers/google';
 import FacebookProvider from 'next-auth/providers/facebook';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { login } from '../../../services/Public';
-import jwt from 'jsonwebtoken';
-import { use } from 'react';
 
 export const authOptions = {
   secret: process.env.AUTH_SECRET,

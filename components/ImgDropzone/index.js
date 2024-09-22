@@ -4,6 +4,7 @@ import { Box } from '@mui/material';
 import ImgCropDialog from './ImgCropDialog';
 import hotToast from '../../utils/hotToast';
 
+// Is this component used in the app?
 const ImgDropzone = ({
   children,
   accept,

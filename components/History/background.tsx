@@ -1,5 +1,6 @@
 import { Box } from '@mui/material';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import Image from 'next/image';
 
 const BgImage = () => {
   return (
@@ -12,9 +13,11 @@ const BgImage = () => {
         justifyContent: 'center',
       }}
     >
-      <img
+      <Image
         src="/image/cart-bg.png"
         alt="Picture"
+        width={200}
+        height={200}
         style={{ width: '100%', height: 'auto' }}
       />
       <Box
@@ -50,7 +53,7 @@ const BgImage = () => {
           sx={{ color: 'black', fontSize: 'large', marginInline: '0.5em' }}
         />
         <span style={{ color: 'black' }}>HOME ·&nbsp;</span>
-        <span style={{ color: '#AD343E', marginRight: '0.5em' }}>
+        <span style={{ color: '#1976d2', marginRight: '0.5em' }}>
           ORDER HISTORY
         </span>
       </Box>

@@ -1,7 +1,7 @@
 import Content from '../components/History';
 
-const OrderHistoryhistory = () => {
+const OrderHistory = () => {
   return <Content />;
 };
 
-export default OrderHistoryhistory;
+export default OrderHistory;

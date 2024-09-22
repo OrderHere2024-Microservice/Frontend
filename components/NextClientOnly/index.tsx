@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 
-const NextClientOnly = ({ children }) => {
+interface Props {
+  children: ReactNode;
+}
+
+const NextClientOnly = ({ children }: Props) => {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);

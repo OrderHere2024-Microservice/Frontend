@@ -66,7 +66,6 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }) => {
                 </NextClientOnly>
                 {isLoading ? <Loading /> : <Component {...pageProps} />}
               </Layout>
-              {/* </Container> */}
               <Footer />
             </ThemeProvider>
           </SessionProvider>

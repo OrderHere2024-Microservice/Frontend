@@ -56,10 +56,10 @@ const RestaurantInfoPage = () => {
             onClick={handleEditButtonClick}
             sx={{
               marginY: 4,
-              backgroundColor: 'button.main',
+              backgroundColor: 'primary.main',
               color: '#fff',
               '&:hover': {
-                backgroundColor: 'button.main',
+                backgroundColor: 'primary.main',
                 opacity: 0.6,
                 transition: '0.3s',
               },

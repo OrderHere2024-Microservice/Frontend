@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const FailurePage = () => {
   return (
@@ -34,7 +35,12 @@ const FailurePage = () => {
           },
         }}
       >
-        <img src="/icons/payment/failedImg.png" alt="Success" />
+        <Image
+          src="/icons/payment/failedImg.png"
+          alt="Failed"
+          width={100}
+          height={100}
+        />
       </Box>
       <Typography
         gutterBottom
@@ -73,9 +79,9 @@ const FailurePage = () => {
           sx={{
             marginTop: 8,
             marginBottom: 10,
-            backgroundColor: 'button.main',
+            backgroundColor: 'primary.main',
             '&:hover': {
-              backgroundColor: 'button.main',
+              backgroundColor: 'primary.main',
               opacity: 0.7,
               transition: '0.3s',
             },
