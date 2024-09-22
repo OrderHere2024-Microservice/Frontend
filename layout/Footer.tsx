@@ -236,7 +236,7 @@ const Footer = () => {
           </Grid>
           <Box mt={5} textAlign="center">
             <Typography variant="body2" sx={styleNew.copyright}>
-              Copyright © 2023 OrderHere Developer. All Rights Reserved
+              Copyright © 2024 OrderHere Developer. All Rights Reserved
             </Typography>
           </Box>
         </Box>

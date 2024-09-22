@@ -4,7 +4,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { SessionProvider } from 'next-auth/react';
 import { Session } from 'next-auth';
 import Head from 'next/head';
-import { AppProps, NextComponentType } from 'next/app';
+import { AppProps } from 'next/app';
 import { ThemeProvider } from '@mui/material/styles';
 import { Toaster } from 'react-hot-toast';
 import Router from 'next/router';
@@ -23,38 +23,30 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import Footer from '../layout/Footer';
 import Script from 'next/script';
-import {
-  ApolloClient,
-  ApolloProvider,
-  NormalizedCacheObject,
-} from '@apollo/client';
+import { ApolloProvider, NormalizedCacheObject } from '@apollo/client';
 import { useApollo } from '../lib/apolloClient';
 
 interface MyAppProps extends AppProps {
-  Component: NextComponentType;
   pageProps: {
     session?: Session;
-    initialApolloState?: NormalizedCacheObject | undefined;
+    initialApolloState?: NormalizedCacheObject;
   };
 }
 
-const MyApp = ({
-  Component,
-  pageProps: { session, ...pageProps },
-}: MyAppProps) => {
-  const apolloClient: ApolloClient<NormalizedCacheObject> = useApollo(
-    pageProps.initialApolloState,
-  );
+const MyApp = ({ Component, pageProps }: MyAppProps) => {
+  const apolloClient = useApollo(pageProps.initialApolloState);
 
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    Router.events.on('routeChangeStart', () => {
-      setIsLoading(true);
-    });
-    Router.events.on('routeChangeComplete', () => {
-      setIsLoading(false);
-    });
+    Router.events.on('routeChangeStart', () => setIsLoading(true));
+    Router.events.on('routeChangeComplete', () => setIsLoading(false));
+    Router.events.on('routeChangeError', () => setIsLoading(false));
+    return () => {
+      Router.events.off('routeChangeStart', () => setIsLoading(true));
+      Router.events.off('routeChangeComplete', () => setIsLoading(false));
+      Router.events.off('routeChangeError', () => setIsLoading(false));
+    };
   }, []);
 
   return (
@@ -65,7 +57,7 @@ const MyApp = ({
       />
       <ReduxProvider store={store}>
         <PersistGate loading={<Loading />} persistor={persistor}>
-          <SessionProvider session={session}>
+          <SessionProvider session={pageProps.session}>
             <ThemeProvider theme={createTheme()}>
               <CssBaseline />
               <Head>
