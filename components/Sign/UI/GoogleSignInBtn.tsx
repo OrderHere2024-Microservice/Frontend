@@ -1,9 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Image from 'next/image';
-import { signIn, useSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { Button, Box, Typography } from '@mui/material';
-import { useDispatch } from 'react-redux';
-import hotToast from '../../../utils/hotToast';
 
 /**
  * handle google login action

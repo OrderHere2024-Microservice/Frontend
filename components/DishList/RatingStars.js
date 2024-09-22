@@ -10,6 +10,6 @@ const RatingStars = ({ rating }) => {
       readOnly
     />
   );
-}
+};
 
 export default RatingStars;

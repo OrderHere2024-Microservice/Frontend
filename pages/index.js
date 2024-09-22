@@ -15,11 +15,19 @@ const Index = () => {
   const { token } = useSelector((state) => state.sign);
   const { userRole } = jwtInfo(token);
 
-  const { loading: dishesLoading, error: dishesError, data: dishesData } = useQuery(GET_DISHES, {
+  const {
+    loading: dishesLoading,
+    error: dishesError,
+    data: dishesData,
+  } = useQuery(GET_DISHES, {
     variables: { restaurantId: 1 },
   });
 
-  const { loading: categoriesLoading, error: categoriesError, data: categoriesData } = useQuery(GET_CATEGORIES_BY_RESTAURANT, {
+  const {
+    loading: categoriesLoading,
+    error: categoriesError,
+    data: categoriesData,
+  } = useQuery(GET_CATEGORIES_BY_RESTAURANT, {
     variables: { restaurantId: 1 },
   });
 
@@ -31,7 +39,8 @@ const Index = () => {
 
   if (dishesLoading || categoriesLoading) return <p>Loading...</p>;
   if (dishesError) return <p>Error fetching dishes: {dishesError.message}</p>;
-  if (categoriesError) return <p>Error loading categories: {categoriesError.message}</p>;
+  if (categoriesError)
+    return <p>Error loading categories: {categoriesError.message}</p>;
 
   return (
     <>

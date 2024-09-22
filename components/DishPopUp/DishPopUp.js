@@ -717,7 +717,10 @@ const DishPopup = ({
               primaryTypographyProps={{ fontWeight: 600 }}
               style={{ paddingLeft: '25%' }}
             />
-            <IconButton onClick={handleAddToCart} sx={{ color: 'primary.main' }}>
+            <IconButton
+              onClick={handleAddToCart}
+              sx={{ color: 'primary.main' }}
+            >
               <AddIcon />
             </IconButton>
           </Box>

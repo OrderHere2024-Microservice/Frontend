@@ -14,8 +14,6 @@ const pricingFilterStyle = {
   marginBottom: '20px',
 };
 
-
-
 const PricingFilter = () => {
   const dispatch = useDispatch();
   const [priceRange, setPriceRange] = useState({ min: 0, max: 100 });

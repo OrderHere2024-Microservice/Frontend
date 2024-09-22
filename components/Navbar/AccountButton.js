@@ -57,9 +57,7 @@ const AccountButton = ({ isLogin }) => {
       {isOpen && (
         <SignDialog isOpen={isOpen} onClose={() => dispatch(closeSignDialog())}>
           {content === 'login' ? (
-            <Login
-              register={() => dispatch(registerSignDialog())}
-            />
+            <Login register={() => dispatch(registerSignDialog())} />
           ) : (
             <Signup login={() => dispatch(loginSignDialog())} />
           )}

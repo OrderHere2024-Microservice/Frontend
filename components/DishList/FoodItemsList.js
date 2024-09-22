@@ -132,7 +132,7 @@ const FoodItemsList = ({ dishes: initialDishes }) => {
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <Button
               onClick={handleAddNewDishClick}
-              variant='contained'
+              variant="contained"
               sx={{
                 mt: 5,
                 mr: 5,
