@@ -38,7 +38,6 @@ const DineIn = () => {
 
   const handleNameChange = (event) => {
     setName(event.target.value);
-    // console.log('name:', event.target.value)
     dispatch({ type: Action.SET_NAME_DATA, payload: event.target.value });
   };
 

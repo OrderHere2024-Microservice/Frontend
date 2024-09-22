@@ -23,7 +23,6 @@ const Address = () => {
     try {
       const results = await geocodeByAddress(address);
       const latLng = await getLatLng(results[0]);
-      // console.log('Coordinates', latLng);
       const updatedFormData = { ...formData, address: address };
       setFormData(updatedFormData);
       dispatch({ type: Action.SET_ADDRESS_DATA, payload: updatedFormData });
