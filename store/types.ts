@@ -1,9 +1,9 @@
 export interface SignState {
   isOpen: boolean;
-  content: 'login' | 'register' | 'forgetpassword';
+  content: string;
   isLogin: boolean;
   token?: string;
-  passwordResetStatus?: 'success' | 'error';
+  passwordResetStatus?: string;
   message?: string;
   error?: string;
 }
@@ -23,4 +23,11 @@ export interface CartState {
   totalItems: number;
   totalPrice: number;
   orderType: string;
+}
+
+export interface FilterState {
+  priceRange: {
+    min: number;
+    max: number;
+  };
 }

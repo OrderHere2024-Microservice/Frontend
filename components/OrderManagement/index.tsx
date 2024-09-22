@@ -1,7 +1,7 @@
 import React from 'react';
 import OrderInfo from './components/OrderInfo';
 import OrderDetail from './components/OrderDetail';
-import Background from '../History/background';
+import Background from './components/background';
 import { Grid } from '@mui/material';
 
 const OrderManagement = () => {

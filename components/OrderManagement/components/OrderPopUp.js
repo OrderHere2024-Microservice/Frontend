@@ -13,10 +13,7 @@ import {
   MenuItem,
 } from '@mui/material';
 import { useMutation } from '@apollo/client';
-import {
-  UPDATE_ORDER_STATUS,
-  DELETE_ORDER,
-} from '@services/orderService';
+import { UPDATE_ORDER_STATUS, DELETE_ORDER } from '@services/orderService';
 import { useQuery } from '@apollo/client';
 import { GET_RESTAURANT_ADDRESS } from '@services/Restaurant';
 import LocationOnIcon from '@mui/icons-material/LocationOn';

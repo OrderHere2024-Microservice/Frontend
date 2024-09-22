@@ -84,7 +84,7 @@ const Login = ({ register }) => {
     },
   });
 
-  //set state for Remeber me Checkbox and event handler
+  //set state for Remember me Checkbox and event handler
   const [isRememberMeChecked, setIsRememberMeChecked] = useState(false);
   const handleRememberMeChange = (event) => {
     setIsRememberMeChecked(event.target.checked);

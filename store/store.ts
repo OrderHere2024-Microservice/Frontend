@@ -8,7 +8,6 @@ import signReducer from './reducers/signReducer';
 import cartReducer from './reducers/cartReducer';
 import deliveryReducer from './reducers/deliveryReducer';
 import filterReducer from './reducers/filterReducer';
-import historyReducer from './reducers/historyReducer';
 import ingredientReducer from './reducers/ingredientReducer';
 import dineInReducer from './reducers/dineInReducer';
 import pickupReducer from './reducers/pickupReducer';
@@ -30,7 +29,6 @@ const rootReducer = combineReducers({
   dinein: dineInReducer,
   pickup: pickupReducer,
   filter: filterReducer,
-  history: historyReducer,
   ingredient: ingredientReducer,
   order: orderReducer,
   dish: dishesReducer,
