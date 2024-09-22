@@ -177,7 +177,7 @@ const FoodItem = ({
                   display: 'flex',
                   alignItems: 'center',
                   ml: 3,
-                  border: '1px solid #1976d2',
+                  border: '1.5px solid #1976d2',
                   borderRadius: '10px',
                   width: '200px',
                   justifyContent: 'space-between',

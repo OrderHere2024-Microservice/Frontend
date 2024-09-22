@@ -697,7 +697,7 @@ const DishPopup = ({
               display: 'flex',
               alignItems: 'center',
               mr: 4,
-              border: '1px solid #AD343E',
+              border: '1.5px solid #1976d2',
               borderRadius: '10px',
               width: '200px',
               height: '45px',
