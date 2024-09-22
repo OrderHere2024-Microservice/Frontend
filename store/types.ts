@@ -1,9 +1,9 @@
 export interface SignState {
   isOpen: boolean;
-  content: 'login' | 'register' | 'forgetpassword';
+  content: string;
   isLogin: boolean;
   token?: string;
-  passwordResetStatus?: 'success' | 'error';
+  passwordResetStatus?: string;
   message?: string;
   error?: string;
 }

@@ -18,7 +18,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import * as Action from '@store/actionTypes';
 
 const ListInfo = () => {
-
   const dispatch = useDispatch();
   const [checkedStatus, setCheckedStatus] = useState({
     pending: true,

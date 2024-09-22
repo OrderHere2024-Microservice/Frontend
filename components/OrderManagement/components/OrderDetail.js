@@ -11,10 +11,7 @@ import {
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { useDispatch, useSelector } from 'react-redux';
 import { useQuery } from '@apollo/client';
-import {
-  GET_USER_ORDERS,
-  GET_ALL_ORDERS,
-} from '@services/orderService';
+import { GET_USER_ORDERS, GET_ALL_ORDERS } from '@services/orderService';
 import OrderPopUp from './OrderPopUp';
 import * as Action from '@store/actionTypes';
 import { jwtInfo } from '@utils/jwtInfo';

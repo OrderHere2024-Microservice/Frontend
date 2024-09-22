@@ -10,7 +10,7 @@ const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
 );
 
-export default function PayPage() {
+const PayPage = () => {
   const [clientSecret, setClientSecret] = useState('');
   const [paymentId, setPaymentId] = useState(null);
   const router = useRouter();
@@ -74,4 +74,6 @@ export default function PayPage() {
       )}
     </div>
   );
-}
+};
+
+export default PayPage;

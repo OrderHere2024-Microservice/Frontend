@@ -393,7 +393,7 @@ const DishPopup = ({
           {userRole == 'ROLE_sys_admin' && (
             <Button
               onClick={toggleEditMode}
-              variant='contained'
+              variant="contained"
               sx={{
                 backgroundColor: 'primary.main',
                 color: '#f4f4f4',
@@ -460,7 +460,7 @@ const DishPopup = ({
           {isEditMode && userRole == 'ROLE_sys_admin' && (
             <Button
               onClick={() => handleEditDishSubmit(newDish)}
-              variant='contained'
+              variant="contained"
               sx={{
                 color: '#f4f4f4',
                 marginRight: 3,
@@ -633,7 +633,7 @@ const DishPopup = ({
 
                 <Button
                   onClick={() => saveIngredients()}
-                  variant='contained'
+                  variant="contained"
                   sx={{
                     backgroundColor: 'primary.main',
                     color: '#f4f4f4',

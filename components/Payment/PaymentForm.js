@@ -12,7 +12,7 @@ import * as Action from '@store/actionTypes';
 import { useMutation } from '@apollo/client';
 import { SEND_PAYMENT_RESULT } from '@services/Payment';
 
-export default function PaymentForm({ paymentId, orderId }) {
+const PaymentForm = ({ paymentId, orderId }) => {
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
@@ -115,10 +115,6 @@ export default function PaymentForm({ paymentId, orderId }) {
       </form>
     </>
   );
-}
+};
 
-export async function getServerSideProps(context) {
-  return {
-    props: {},
-  };
-}
+export default PaymentForm;
