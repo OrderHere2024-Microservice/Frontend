@@ -110,7 +110,7 @@ export const OrderDetail = ({ orderId }) => {
             </Grid>
             <Grid item xs={6}>
               <Typography sx={{ color: 'text.secondary' }}>
-                PickUp Time
+                Dine In Time
               </Typography>
               <Typography sx={{ fontWeight: 'bold' }}>
                 {order?.pickUpTime ? order?.pickUpTime : 'Null'}

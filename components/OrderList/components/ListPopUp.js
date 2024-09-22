@@ -187,10 +187,10 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
             </Grid>
             <Grid item xs={6}>
               <Typography sx={{ color: 'text.secondary' }}>
-                PickUp Time
+                Dine In Time
               </Typography>
               <Typography sx={{ fontWeight: 'bold' }}>
-                {order.pickUpTime || 'Null'}
+                {order.pickupTime || 'Null'}
               </Typography>
             </Grid>
           </>
