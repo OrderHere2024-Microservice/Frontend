@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/client';
-import { GET_RESTAURANT_ADDRESS } from '../../services/Restaurant';
-import { GET_ORDER_BY_ID } from '../../services/orderService';
+import { GET_RESTAURANT_ADDRESS } from '@services/Restaurant';
+import { GET_ORDER_BY_ID } from '@services/orderService';
 import { Box, Divider, Grid, Typography } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 

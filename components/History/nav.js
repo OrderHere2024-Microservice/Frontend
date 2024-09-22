@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import * as Action from '../../store/actionTypes';
+import * as Action from '@store/actionTypes';
 import { useDispatch, useSelector } from 'react-redux';
 
 const Nav = () => {
-  // const [active, setActive] = useState('All');
   const dispatch = useDispatch();
   const active = useSelector((state) => state.history.active);
 
@@ -12,7 +11,6 @@ const Nav = () => {
       type: Action.SET_ACTIVE_NAV,
       payload: buttonName.toLowerCase(),
     });
-    // setActive(buttonName);
   };
 
   const navStyle = {

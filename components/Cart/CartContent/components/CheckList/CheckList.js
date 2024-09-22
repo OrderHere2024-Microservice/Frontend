@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { Box, Typography, Divider, ButtonBase } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import CheckListItems from './components/CheckListItems/ChecklistItems';
-import * as Action from '../../../../../store/actionTypes';
+import * as Action from '@store/actionTypes';
 import { useRouter } from 'next/router';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import { useMutation } from '@apollo/client';
-import { PLACE_ORDER } from '../../../../../services/orderService';
+import { PLACE_ORDER } from '@services/orderService';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);

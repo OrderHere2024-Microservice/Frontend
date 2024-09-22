@@ -1,7 +1,7 @@
 import { TextField, Box } from '@mui/material';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import * as Action from '../../../../../store/actionTypes';
+import * as Action from '@store/actionTypes';
 
 const Note = () => {
   const [formData, setFormData] = useState({

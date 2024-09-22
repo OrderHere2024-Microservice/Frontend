@@ -18,14 +18,14 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { closeSignDialog } from '../../store/actions/signAction';
-import hotToast from '../../utils/hotToast';
+import { closeSignDialog } from '@store/actions/signAction';
+import hotToast from '@utils/hotToast';
 import GoogleSignInBtn from './UI/GoogleSignInBtn';
 import FacebookSignInBtn from './UI/FacebookSignInBtn';
 import { getSession, signIn, useSession } from 'next-auth/react';
 import { getCsrfToken } from 'next-auth/react';
-import { loginSuccess } from '../../store/actions/httpAction';
-import { saveState, store } from '../../store/store';
+import { loginSuccess } from '@store/actions/httpAction';
+import { saveState, store } from '@store/store';
 
 const Login = ({ register }) => {
   /** state */

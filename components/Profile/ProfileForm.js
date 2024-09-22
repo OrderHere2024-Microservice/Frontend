@@ -21,7 +21,7 @@ import {
   updateUserProfile,
   getUserProfile,
   updateUserAvatar,
-} from '../../services/Profile';
+} from '@services/Profile';
 import PlacesAutocomplete, {
   geocodeByAddress,
   getLatLng,

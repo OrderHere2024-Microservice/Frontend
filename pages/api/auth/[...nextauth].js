@@ -2,7 +2,7 @@ import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import FacebookProvider from 'next-auth/providers/facebook';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { login } from '../../../services/Public';
+import { login } from '@services/Public';
 
 export const authOptions = {
   secret: process.env.AUTH_SECRET,

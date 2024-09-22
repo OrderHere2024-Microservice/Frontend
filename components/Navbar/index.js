@@ -22,9 +22,9 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { loginWithOauthProviderAction } from '../../store/actions/httpAction';
-import * as Action from '../../store/actionTypes';
-import { jwtInfo } from '../../utils/jwtInfo';
+import { loginWithOauthProviderAction } from '@store/actions/httpAction';
+import * as Action from '@store/actionTypes';
+import { jwtInfo } from '@utils/jwtInfo';
 
 export const styleNew = {
   title: {

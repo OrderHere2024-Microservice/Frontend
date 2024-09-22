@@ -1,4 +1,4 @@
-import http from '../utils/axios';
+import http from '@utils/axios';
 import { gql } from '@apollo/client';
 
 export const postDishes = (dishData) => {

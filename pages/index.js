@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client';
 import ThreeColumnsLayout from '../layout/ThreeColumnsLayout';
-import FoodItemsList from '../components/DishList/FoodItemsList';
-import Carousel from '../components/Carousel/Carousel';
-import Category from '../components/Category/Category';
-import { GET_DISHES } from '../services/Dish';
-import { GET_CATEGORIES_BY_RESTAURANT } from '../services/Category';
-import { jwtInfo } from '../utils/jwtInfo';
-import OrderList from '../components/OrderList/index';
+import FoodItemsList from '@components/DishList/FoodItemsList';
+import Carousel from '@components/Carousel/Carousel';
+import Category from '@components/Category/Category';
+import { GET_DISHES } from '@services/Dish';
+import { GET_CATEGORIES_BY_RESTAURANT } from '@services/Category';
+import { jwtInfo } from '@utils/jwtInfo';
+import OrderList from '@components/OrderList/index';
 import { useSelector } from 'react-redux';
 
 const Index = () => {

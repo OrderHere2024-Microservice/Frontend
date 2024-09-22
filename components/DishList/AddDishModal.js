@@ -16,10 +16,10 @@ import {
   ADD_DISH_START,
   ADD_DISH_SUCCESS,
   ADD_DISH_ERROR,
-} from '../../store/actionTypes';
+} from '@store/actionTypes';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-import { GET_CATEGORIES_BY_RESTAURANT } from '../../services/Category';
+import { GET_CATEGORIES_BY_RESTAURANT } from '@services/Category';
 
 const AddDishModal = ({ open, handleClose, handleSubmit }) => {
   const [newDish, setNewDish] = useState({

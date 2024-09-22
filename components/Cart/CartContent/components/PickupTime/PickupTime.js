@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
-import * as Action from '../../../../../store/actionTypes';
+import * as Action from '@store/actionTypes';
 import {
   Box,
   Button,

@@ -11,9 +11,9 @@ import {
   registerSignDialog,
   loginSignDialog,
   forgetpasswordSignDialog,
-} from '../../store/actions/signAction';
+} from '@store/actions/signAction';
 import { useSession } from 'next-auth/react';
-import { getUserProfile } from '../../services/Profile';
+import { getUserProfile } from '@services/Profile';
 
 const AccountButton = ({ isLogin }) => {
   const anchorRef = useRef(null);

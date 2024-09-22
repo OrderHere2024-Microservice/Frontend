@@ -6,9 +6,8 @@ import FoodItem from '/components/DishList/FoodItem';
 import { Box, CircularProgress, Alert, Button } from '@mui/material';
 import AddDishModal from './AddDishModal';
 import { addDishStart, addDishSuccess, addDishError } from './AddDishModal';
-import { jwtInfo } from '../../utils/jwtInfo';
-import { DELETE_DISH, CREATE_DISH } from '../../services/Dish';
-import { postDishes } from '../../services/Dish';
+import { jwtInfo } from '@utils/jwtInfo';
+import { postDishes, DELETE_DISH, CREATE_DISH } from '@services/Dish';
 
 const FoodItemsList = ({ dishes: initialDishes }) => {
   const [dishes, setDishes] = useState(initialDishes);

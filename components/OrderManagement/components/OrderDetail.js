@@ -14,10 +14,10 @@ import { useQuery } from '@apollo/client';
 import {
   GET_USER_ORDERS,
   GET_ALL_ORDERS,
-} from '../../../services/orderService';
+} from '@services/orderService';
 import OrderPopUp from './OrderPopUp';
-import * as Action from '../../../store/actionTypes';
-import { jwtInfo } from '../../../utils/jwtInfo';
+import * as Action from '@store/actionTypes';
+import { jwtInfo } from '@utils/jwtInfo';
 
 const OrderDetail = () => {
   const [displayOrders, setDisplayOrders] = useState([]);

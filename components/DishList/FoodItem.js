@@ -9,11 +9,11 @@ import {
   Button,
 } from '@mui/material';
 import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material';
-import * as Action from '../../store/actionTypes';
+import * as Action from '@store/actionTypes';
 import DishPopup from '../DishPopUp/DishPopUp';
 import RatingStars from './RatingStars';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { jwtInfo } from '../../utils/jwtInfo';
+import { jwtInfo } from '@utils/jwtInfo';
 
 const FoodItem = ({
   dishId,

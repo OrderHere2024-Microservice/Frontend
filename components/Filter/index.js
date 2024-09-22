@@ -3,8 +3,8 @@ import { useDispatch } from 'react-redux';
 import Slider from '@mui/material/Slider';
 import { Typography, Box } from '@mui/material';
 import { useQuery } from '@apollo/client';
-import { GET_DISHES_PRICE_FILTER } from '../../services/Dish';
-import * as Action from '../../store/actionTypes';
+import { GET_DISHES_PRICE_FILTER } from '@services/Dish';
+import * as Action from '@store/actionTypes';
 
 const pricingFilterStyle = {
   background: '#FEF6E9',

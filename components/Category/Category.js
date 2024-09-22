@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Button, Stack } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import * as Actions from '../../store/actionTypes';
+import * as Actions from '@store/actionTypes';
 
 const buttonGroupStyles = {
   justifyContent: 'center',

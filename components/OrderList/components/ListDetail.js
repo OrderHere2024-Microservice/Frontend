@@ -10,11 +10,11 @@ import {
 } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { useQuery } from '@apollo/client';
-import { GET_ALL_ORDERS } from '../../../services/orderService';
+import { GET_ALL_ORDERS } from '@services/orderService';
 import OrderPopUp from './ListPopUp';
-import * as Action from '../../../store/actionTypes';
+import * as Action from '@store/actionTypes';
 import { useDispatch, useSelector } from 'react-redux';
-import { jwtInfo } from '../../../utils/jwtInfo';
+import { jwtInfo } from '@utils/jwtInfo';
 
 const ListDetail = () => {
   const [displayOrders, setDisplayOrders] = useState([]);

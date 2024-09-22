@@ -13,9 +13,9 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useDispatch } from 'react-redux';
-import { forgetPasswordAction } from '../../store/actions/httpAction';
-import { forgetpassword } from '../../services/Public';
-import hotToast from '../../utils/hotToast';
+import { forgetPasswordAction } from '@store/actions/httpAction';
+import { forgetpassword } from '@services/Public';
+import hotToast from '@utils/hotToast';
 
 const ForgetPassword = ({ open, onClose, onEmailSent = () => {} }) => {
   const [isLoading, setLoading] = useState(false);
