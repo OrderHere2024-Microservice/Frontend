@@ -7,3 +7,9 @@ export interface SignState {
   message?: string;
   error?: string;
 }
+
+// export interface RestaurantState {
+//   data: any;
+//   loading: boolean;
+//   error: string | null;
+// }

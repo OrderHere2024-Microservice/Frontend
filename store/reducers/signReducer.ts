@@ -1,7 +1,8 @@
 import * as Action from '../actionTypes';
 import { ActionType } from '@store/actionTypes';
+import { SignState } from '@store/types';
 
-const initialState = {
+const initialState: SignState = {
   isOpen: false,
   content: 'login',
   isLogin: false,
