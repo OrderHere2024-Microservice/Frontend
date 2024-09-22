@@ -8,8 +8,19 @@ export interface SignState {
   error?: string;
 }
 
-// export interface RestaurantState {
-//   data: any;
-//   loading: boolean;
-//   error: string | null;
-// }
+export interface CartItem {
+  dishId: number;
+  dishName: string;
+  quantity: number;
+  price: number;
+  description?: string;
+  imageUrl?: string;
+}
+
+export interface CartState {
+  items: CartItem[];
+  isLoading: boolean;
+  totalItems: number;
+  totalPrice: number;
+  orderType: string;
+}

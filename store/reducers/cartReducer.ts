@@ -1,6 +1,31 @@
 import * as Action from '../actionTypes';
+import { CartState } from '@store/types';
 
-const initialState = {
+interface AddToCartPayload {
+  dishId: number;
+  dishName: string;
+  quantity: number;
+  price: number;
+  description?: string;
+  imageUrl?: string;
+}
+
+interface RemoveFromCartPayload {
+  dishId: number;
+}
+
+type CartAction =
+  | { type: typeof Action.ADD_TO_CART; payload: AddToCartPayload }
+  | { type: typeof Action.REMOVE_FROM_CART; payload: RemoveFromCartPayload }
+  | { type: typeof Action.SET_ORDER_TYPE; payload: string }
+  | { type: typeof Action.CLEAR_CART }
+  | { type: typeof Action.CART_OPERATION_START }
+  | { type: typeof Action.CART_OPERATION_END }
+  | { type: typeof Action.INCREASE_ITEM; payload: RemoveFromCartPayload }
+  | { type: typeof Action.DECREASE_ITEM; payload: RemoveFromCartPayload }
+  | { type: typeof Action.CALCULATE_TOTAL_PRICE };
+
+const initialState: CartState = {
   items: [],
   isLoading: false,
   totalItems: 0,
@@ -8,20 +33,20 @@ const initialState = {
   orderType: 'delivery',
 };
 
-const cartReducer = (state = initialState, { type, payload }) => {
-  switch (type) {
+const cartReducer = (state = initialState, action: CartAction): CartState => {
+  switch (action.type) {
     case Action.ADD_TO_CART:
       return {
         ...state,
         items: [
           ...state.items,
           {
-            dishId: payload.dishId,
-            dishName: payload.dishName,
-            quantity: payload.quantity,
-            price: payload.price,
-            description: payload.description,
-            imageUrl: payload.imageUrl,
+            dishId: action.payload.dishId,
+            dishName: action.payload.dishName,
+            quantity: action.payload.quantity,
+            price: action.payload.price,
+            description: action.payload.description,
+            imageUrl: action.payload.imageUrl,
           },
         ],
       };
@@ -29,7 +54,9 @@ const cartReducer = (state = initialState, { type, payload }) => {
     case Action.REMOVE_FROM_CART:
       return {
         ...state,
-        items: state.items.filter((item) => item.dishId !== payload.dishId),
+        items: state.items.filter(
+          (item) => item.dishId !== action.payload.dishId,
+        ),
       };
 
     case Action.CLEAR_CART:
@@ -51,7 +78,7 @@ const cartReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         items: state.items.map((item) =>
-          item.dishId === payload.dishId
+          item.dishId === action.payload.dishId
             ? { ...item, quantity: item.quantity + 1 }
             : item,
         ),
@@ -62,7 +89,7 @@ const cartReducer = (state = initialState, { type, payload }) => {
         ...state,
         items: state.items
           .map((item) =>
-            item.dishId === payload.dishId && item.quantity > 0
+            item.dishId === action.payload.dishId && item.quantity > 0
               ? { ...item, quantity: item.quantity - 1 }
               : item,
           )
@@ -85,7 +112,7 @@ const cartReducer = (state = initialState, { type, payload }) => {
     case Action.SET_ORDER_TYPE:
       return {
         ...state,
-        orderType: payload,
+        orderType: action.payload,
       };
 
     default:

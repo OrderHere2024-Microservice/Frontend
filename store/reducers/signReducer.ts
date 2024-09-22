@@ -1,6 +1,10 @@
 import * as Action from '../actionTypes';
-import { ActionType } from '@store/actionTypes';
 import { SignState } from '@store/types';
+
+export interface ActionType<T = never> {
+  type: string;
+  payload: T;
+}
 
 const initialState: SignState = {
   isOpen: false,
