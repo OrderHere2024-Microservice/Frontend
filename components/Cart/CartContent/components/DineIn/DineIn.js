@@ -5,7 +5,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { useDispatch } from 'react-redux';
-import * as Action from '../../../../../store/actionTypes';
+import * as Action from '@store/actionTypes';
 
 const DineIn = () => {
   const dispatch = useDispatch();
@@ -19,7 +19,6 @@ const DineIn = () => {
     setSelectedDate(dayjs(date));
     const formattedDate = dayjs(date).format('YYYY-MM-DD');
     dispatch({ type: Action.SET_DATE_DATA, payload: formattedDate });
-    // console.log('date', formattedDate)
   };
 
   const handleTimeChange = (time) => {

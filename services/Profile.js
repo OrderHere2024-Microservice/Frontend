@@ -1,4 +1,4 @@
-import http from "../utils/axios";
+import http from "@utils/axios";
 
 export const updateUserProfile = (userData) => http(`/v1/public/users/profile`, {
     method: 'PUT',

@@ -8,9 +8,9 @@ import { Button, Box, Typography } from '@mui/material';
 import styles from './PaymentForm.module.css';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
-import * as Action from '../../store/actionTypes';
+import * as Action from '@store/actionTypes';
 import { useMutation } from '@apollo/client';
-import { SEND_PAYMENT_RESULT } from '../../services/Payment';
+import { SEND_PAYMENT_RESULT } from '@services/Payment';
 
 export default function PaymentForm({ paymentId, orderId }) {
   const stripe = useStripe();

@@ -12,10 +12,10 @@ import {
   Divider,
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
-import Yup from '../../utils/yupValidation';
-import hotToast from '../../utils/hotToast';
-import { signup } from '../../services/Public';
-import { loginAction } from '../../store/actions/httpAction';
+import Yup from '@utils/yupValidation';
+import hotToast from '@utils/hotToast';
+import { signup } from '@services/Public';
+import { loginAction } from '@store/actions/httpAction';
 import GoogleSignInBtn from './UI/GoogleSignInBtn';
 import FacebookSignInBtn from './UI/FacebookSignInBtn';
 

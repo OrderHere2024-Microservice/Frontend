@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Container, Typography, Grid, Link, IconButton } from '@mui/material';
-import NextClientOnly from '../components/NextClientOnly';
+import NextClientOnly from '@components/NextClientOnly';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';

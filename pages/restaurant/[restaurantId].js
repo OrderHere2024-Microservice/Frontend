@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Box, Button } from '@mui/material';
 import { useRouter } from 'next/router';
-import RestaurantInfoHeader from '../../components/restaurantInfo/components/restaurantInfoHeader';
-import RestaurantInfoContent from '../../components/restaurantInfo/components/restaurantInfoContent';
-import Contact from '../../components/restaurantInfo/components/contact';
-import OpeningHours from '../../components/restaurantInfo/components/openingHours';
-import { EditRestaurantModal } from '../../components/restaurantInfo/EditRestaurantModal';
+import RestaurantInfoHeader from '@components/restaurantInfo/components/restaurantInfoHeader';
+import RestaurantInfoContent from '@components/restaurantInfo/components/restaurantInfoContent';
+import Contact from '@components/restaurantInfo/components/contact';
+import OpeningHours from '@components/restaurantInfo/components/openingHours';
+import { EditRestaurantModal } from '@components/restaurantInfo/EditRestaurantModal';
 import { useQuery } from '@apollo/client';
-import { GET_RESTAURANT_INFO } from '../../services/Restaurant';
-import { jwtInfo } from '../../utils/jwtInfo';
+import { GET_RESTAURANT_INFO } from '@services/Restaurant';
+import { jwtInfo } from '@utils/jwtInfo';
 import { useSelector } from 'react-redux';
 
 const RestaurantInfoPage = () => {

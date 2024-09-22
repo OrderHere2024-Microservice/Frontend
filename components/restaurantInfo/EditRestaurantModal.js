@@ -11,7 +11,7 @@ import {
   InputLabel,
 } from '@mui/material';
 import { useMutation } from '@apollo/client';
-import { UPDATE_RESTAURANT } from '../../services/Restaurant';
+import { UPDATE_RESTAURANT } from '@services/Restaurant';
 
 export const EditRestaurantModal = ({
   restaurantId,

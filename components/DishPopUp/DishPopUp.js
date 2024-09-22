@@ -29,12 +29,12 @@ import {
   CREATE_INGREDIENT,
   UPDATE_INGREDIENT,
   DELETE_INGREDIENT,
-} from '../../services/Ingredient';
+} from '@services/Ingredient';
 import { useApolloClient } from '@apollo/client';
 import { useDispatch, useSelector } from 'react-redux';
-import * as Action from '../../store/actionTypes';
-import { updateDishes } from '../../services/Dish';
-import { jwtInfo } from '../../utils/jwtInfo';
+import * as Action from '@store/actionTypes';
+import { updateDishes } from '@services/Dish';
+import { jwtInfo } from '@utils/jwtInfo';
 import { useQuery, useMutation } from '@apollo/client';
 import styles from './DishPopup.module.css';
 

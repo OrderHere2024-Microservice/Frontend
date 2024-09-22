@@ -1,4 +1,4 @@
-import http from '../utils/axios';
+import http from '@utils/axios';
 
 export const login = (email, password) =>
   http(`/login`, { method: 'POST', data: { email, password } });

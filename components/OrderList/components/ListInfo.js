@@ -15,16 +15,11 @@ import {
   Typography,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import * as Action from '../../../store/actionTypes';
+import * as Action from '@store/actionTypes';
 
 const ListInfo = () => {
-  const dispatch = useDispatch();
-  //   const [checked, setChecked] = useState({
-  //     delivery: true,
-  //     dine_in: true,
-  //     pickup: true,
-  //   });
 
+  const dispatch = useDispatch();
   const [checkedStatus, setCheckedStatus] = useState({
     pending: true,
     preparing: true,

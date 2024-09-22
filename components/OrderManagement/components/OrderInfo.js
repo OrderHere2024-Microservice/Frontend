@@ -15,7 +15,7 @@ import {
   Typography,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import * as Action from '../../../store/actionTypes';
+import * as Action from '@store/actionTypes';
 
 const OrderInfo = () => {
   const dispatch = useDispatch();

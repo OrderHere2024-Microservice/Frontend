@@ -1,6 +1,6 @@
 import { Container, Grid, useTheme, useMediaQuery, Box } from '@mui/material';
 import Footer from './Footer';
-import Filter from '../components/Filter';
+import Filter from '@components/Filter';
 
 const ThreeColumnsLayout = ({ children, noFooter = false }) => {
   const theme = useTheme();

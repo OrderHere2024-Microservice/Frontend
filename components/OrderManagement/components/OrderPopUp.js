@@ -16,13 +16,13 @@ import { useMutation } from '@apollo/client';
 import {
   UPDATE_ORDER_STATUS,
   DELETE_ORDER,
-} from '../../../services/orderService';
+} from '@services/orderService';
 import { useQuery } from '@apollo/client';
-import { GET_RESTAURANT_ADDRESS } from '../../../services/Restaurant';
+import { GET_RESTAURANT_ADDRESS } from '@services/Restaurant';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import * as Action from '../../../store/actionTypes';
+import * as Action from '@store/actionTypes';
 import { useDispatch, useSelector } from 'react-redux';
-import { jwtInfo } from '../../../utils/jwtInfo';
+import { jwtInfo } from '@utils/jwtInfo';
 import dynamic from 'next/dynamic';
 
 const ContactMap = dynamic(

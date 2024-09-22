@@ -1,4 +1,4 @@
-import Content from '../components/History';
+import Content from '@components/History';
 
 const OrderHistory = () => {
   return <Content />;

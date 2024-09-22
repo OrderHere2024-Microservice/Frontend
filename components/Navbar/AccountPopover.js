@@ -16,12 +16,12 @@ import { useSelector } from 'react-redux';
 import LogoutIcon from '@mui/icons-material/Logout';
 import HistoryIcon from '@mui/icons-material/History';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { logoutAction } from '../../store/actions/signAction';
+import { logoutAction } from '@store/actions/signAction';
 import { signOut } from 'next-auth/react';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
-import { jwtInfo } from '../../utils/jwtInfo';
-import { getUserProfile } from '../../services/Profile';
+import { jwtInfo } from '@utils/jwtInfo';
+import { getUserProfile } from '@services/Profile';
 
 const AccountPopover = (props) => {
   const { anchorEl, onClose, open, ...other } = props;

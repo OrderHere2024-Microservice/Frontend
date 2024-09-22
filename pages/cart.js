@@ -1,6 +1,6 @@
-import Content from '../components/Cart/CartContent/CartContent.js';
-import CartImage from '../components/Cart/CartImage/CartImage';
-import CartEmpty from '../components/Cart/CartEmpty/CartEmpty';
+import Content from '@components/Cart/CartContent/CartContent.js';
+import CartImage from '@components/Cart/CartImage/CartImage';
+import CartEmpty from '@components/Cart/CartEmpty/CartEmpty';
 import { useSelector } from 'react-redux';
 
 const Cart = () => {

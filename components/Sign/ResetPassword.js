@@ -12,8 +12,8 @@ import {
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { resetpassword } from '../../services/Public';
-import hotToast from '../../utils/hotToast';
+import { resetpassword } from '@services/Public';
+import hotToast from '@utils/hotToast';
 
 const ResetPassword = ({ open, onClose, email }) => {
   const [isLoading, setLoading] = useState(false);

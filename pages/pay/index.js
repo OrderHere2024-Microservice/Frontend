@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
-import PaymentForm from '../../components/Payment/PaymentForm';
+import PaymentForm from '@components/Payment/PaymentForm';
 import { useMutation } from '@apollo/client';
-import { CREATE_PAYMENT } from '../../services/Payment';
+import { CREATE_PAYMENT } from '@services/Payment';
 import { useRouter } from 'next/router';
 
 const stripePromise = loadStripe(

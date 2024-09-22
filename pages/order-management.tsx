@@ -1,4 +1,4 @@
-import Content from '../components/OrderManagement';
+import Content from '@components/OrderManagement';
 
 const OrderManagement = () => {
   return <Content />;
