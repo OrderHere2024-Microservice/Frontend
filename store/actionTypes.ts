@@ -60,3 +60,8 @@ export const SET_ORDER_STATUS = 'SET_ORDER_STATUS';
 export const SET_SORTED_ORDER = 'SET_SORTED_ORDER';
 export const SET_SEARCH_TEXT = 'SET_SEARCH_TEXT';
 export const UPDATE_ORDER_STATUS = 'UPDATE_ORDER_STATUS';
+
+export interface ActionType<T = never> {
+  type: string;
+  payload: T;
+}
