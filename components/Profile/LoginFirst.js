@@ -9,7 +9,6 @@ export default function LoginFirst() {
         <img
           src="/image/ProfileHeader.svg"
           alt="Profile Header"
-          alt="Profile Header"
           width="100%"
         />
       </Box>

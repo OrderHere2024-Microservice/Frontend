@@ -1,8 +1,6 @@
 import http from '../utils/axios';
 import { gql } from '@apollo/client';
 
-const getDishes = () => http(`/v1/public/dish/1`, { method: 'GET' });
-
 export const postDishes = (dishData) => {
   const formData = new FormData();
   for (const key in dishData) {

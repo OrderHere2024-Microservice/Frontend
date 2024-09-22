@@ -1,17 +1,4 @@
-import http from '../utils/axios';
 import { gql } from '@apollo/client';
-
-const getRestaurantInfo = (restaurantId) => {
-    return http(`/v1/public/restaurants/${restaurantId}`, { method: 'GET' });
-};
-
-const updateRestaurant = (restaurantId, restaurantData) => http(`/v1/public/restaurants/${restaurantId}`, {
-    method: 'PUT',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    data: JSON.stringify(restaurantData)
-});
 
 export const GET_RESTAURANT_ADDRESS = gql`
   query GetRestaurantInfo($restaurantId: Int!) {
@@ -45,8 +32,14 @@ export const GET_RESTAURANT_INFO = gql`
 `;
 
 export const UPDATE_RESTAURANT = gql`
-  mutation UpdateRestaurantById($restaurantId: Int!, $restaurantUpdateDTO: RestaurantInput!) {
-    updateRestaurantById(restaurantId: $restaurantId, restaurantUpdateDTO: $restaurantUpdateDTO) {
+  mutation UpdateRestaurantById(
+    $restaurantId: Int!
+    $restaurantUpdateDTO: RestaurantInput!
+  ) {
+    updateRestaurantById(
+      restaurantId: $restaurantId
+      restaurantUpdateDTO: $restaurantUpdateDTO
+    ) {
       restaurantId
       name
       description

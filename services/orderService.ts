@@ -1,31 +1,4 @@
-import http from '../utils/axios';
 import { gql } from '@apollo/client';
-
-const placeOrder = (orderData) =>
-  http(`/v1/public/orders`, {
-    method: 'POST',
-    data: orderData,
-  });
-
-const getUserOrder = () => http(`/v1/public/orders/user`, { method: 'GET' });
-
-const getAllOrders = () => http(`/v1/public/orders`, { method: 'GET' });
-
-const getOrderInfo = (orderId) => {
-  return http(`/v1/public/orders/${orderId}`, { method: 'GET' });
-};
-
-const deleteOrder = (orderData) =>
-  http(`/v1/public/orders/delete`, {
-    method: 'DELETE',
-    data: orderData,
-  });
-
-const updateOrderStatus = (statusInfo) =>
-  http(`/v1/public/orders/status`, {
-    method: 'PATCH',
-    data: statusInfo,
-  });
 
 export const PLACE_ORDER = gql`
   mutation PlaceOrder($placeOrderDTO: PlaceOrderInput!) {

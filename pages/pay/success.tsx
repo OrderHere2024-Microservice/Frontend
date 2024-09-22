@@ -4,10 +4,11 @@ import Button from '@mui/material/Button';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { OrderDetail } from '../../components/Payment/OrderDetail';
+import Image from 'next/image';
 
 const SuccessPage = () => {
   const router = useRouter();
-  let { orderId } = router.query;
+  const { orderId } = router.query;
 
   return (
     <Box
@@ -46,7 +47,12 @@ const SuccessPage = () => {
             },
           }}
         >
-          <img src="/icons/payment/successImg.svg" alt="Success" />
+          <Image
+            src="/icons/payment/successImg.svg"
+            alt="Success"
+            height={100}
+            width={100}
+          />
         </Box>
         <Typography
           gutterBottom
