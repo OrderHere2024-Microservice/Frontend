@@ -1,13 +1,15 @@
 import * as Action from '../actionTypes';
+import { ActionType } from '@store/actionTypes';
+import { SignState } from '@store/types';
 
-const initialState = {
+const initialState: SignState = {
   isOpen: false,
   content: 'login',
   isLogin: false,
   token: undefined,
 };
 
-const signReducer = (state = initialState, { type, payload }) => {
+const signReducer = (state = initialState, { type, payload }: ActionType) => {
   switch (type) {
     case Action.OPEN_SIGN_DIALOG:
       return {
@@ -33,20 +35,13 @@ const signReducer = (state = initialState, { type, payload }) => {
         content: 'register',
       };
 
-    case Action.FORGETPASSWORD_SIGN_DIALOG:
-      return {
-        ...state,
-        // isOpen: true,
-        content: 'forgetpassword',
-      };
-
     case Action.FORGET_PASSWORD_SUCCESS:
       // Handle state update for a successful password reset request
       return {
         ...state,
         // other state updates
         passwordResetStatus: 'success', // example state field
-        message: Action.payload, // the success message from the backend
+        message: payload, // the success message from the backend
       };
 
     case Action.FORGET_PASSWORD_ERROR:
@@ -55,7 +50,7 @@ const signReducer = (state = initialState, { type, payload }) => {
         ...state,
         // other state updates
         passwordResetStatus: 'error', // example state field
-        error: Action.payload, // the error message
+        error: payload, // the error message
       };
 
     case Action.LOGIN_SUCCESS:

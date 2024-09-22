@@ -21,10 +21,6 @@ export const DECREASE_ITEM = 'DECREASE_ITEM';
 export const CALCULATE_TOTAL_PRICE = 'CALCULATE_TOTAL_PRICE';
 export const SET_ORDER_TYPE = 'SET_ORDER_TYPE';
 
-export const FETCH_RESTAURANT_START = 'FETCH_RESTAURANT_START';
-export const FETCH_RESTAURANT_SUCCESS = 'FETCH_RESTAURANT_SUCCESS';
-export const FETCH_RESTAURANT_ERROR = 'FETCH_RESTAURANT_ERROR';
-
 export const SET_ADDRESS_DATA = 'SET_ADDRESS_DATA';
 export const SET_NOTE_DATA = 'SET_NOTE_DATA';
 
@@ -60,3 +56,8 @@ export const SET_ORDER_STATUS = 'SET_ORDER_STATUS';
 export const SET_SORTED_ORDER = 'SET_SORTED_ORDER';
 export const SET_SEARCH_TEXT = 'SET_SEARCH_TEXT';
 export const UPDATE_ORDER_STATUS = 'UPDATE_ORDER_STATUS';
+
+export interface ActionType<T = never> {
+  type: string;
+  payload: T;
+}

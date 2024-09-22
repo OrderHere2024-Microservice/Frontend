@@ -391,8 +391,9 @@ const DishPopup = ({
             <Typography variant="h5">{dishName}</Typography>
           )}
           {userRole == 'ROLE_sys_admin' && (
-            <IconButton
+            <Button
               onClick={toggleEditMode}
+              variant='contained'
               sx={{
                 backgroundColor: 'primary.main',
                 color: '#f4f4f4',
@@ -400,13 +401,10 @@ const DishPopup = ({
                 paddingInline: 2,
                 fontWeight: 600,
                 fontSize: '1.2rem',
-                '&:hover': {
-                  backgroundColor: '#BF5B5F',
-                },
               }}
             >
               Edit
-            </IconButton>
+            </Button>
           )}
         </DialogContentText>
 
@@ -460,25 +458,21 @@ const DishPopup = ({
           }}
         >
           {isEditMode && userRole == 'ROLE_sys_admin' && (
-            <IconButton
+            <Button
               onClick={() => handleEditDishSubmit(newDish)}
+              variant='contained'
               sx={{
-                backgroundColor: 'primary.main',
                 color: '#f4f4f4',
                 marginRight: 3,
                 paddingInline: 2,
-                height: '45px',
                 width: '250px',
                 fontWeight: 600,
                 fontSize: '1.3rem',
                 mb: 2,
-                '&:hover': {
-                  backgroundColor: '#BF5B5F',
-                },
               }}
             >
               Edit Dish
-            </IconButton>
+            </Button>
           )}
         </Box>
 
@@ -637,8 +631,9 @@ const DishPopup = ({
                   <AddCircleRoundedIcon style={{ fontSize: 40 }} />
                 </Box>
 
-                <IconButton
+                <Button
                   onClick={() => saveIngredients()}
+                  variant='contained'
                   sx={{
                     backgroundColor: 'primary.main',
                     color: '#f4f4f4',
@@ -650,13 +645,10 @@ const DishPopup = ({
                     marginTop: 1.5,
                     marginLeft: 'auto',
                     marginRight: 'auto',
-                    '&:hover': {
-                      backgroundColor: '#BF5B5F',
-                    },
                   }}
                 >
                   Save Ingredients
-                </IconButton>
+                </Button>
               </Box>
             ) : null}
           </Collapse>

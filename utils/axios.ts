@@ -1,19 +1,19 @@
-import axios from 'axios';
-import { store } from '../store/store';
+import axios, { AxiosRequestConfig, AxiosError } from 'axios';
+import { store, RootState } from '@store/store';
 import { logoutAction } from '../store/actions/signAction';
 
 const backendHttpInstance = () => {
   const axiosInstance = axios.create();
   axiosInstance.defaults.baseURL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-  axiosInstance.defaults.headers.common.Authorization = store.getState().sign
-    .token
-    ? store.getState().sign.token
+  const state: RootState = store.getState();
+  axiosInstance.defaults.headers.common.Authorization = state.sign.token
+    ? state.sign.token
     : '';
 
   axiosInstance.interceptors.response.use(
     (config) => config,
-    (error) => {
+    (error: AxiosError) => {
       error && console.log(error.response);
 
       // jwt expired or invalid
@@ -34,12 +34,12 @@ const backendHttpInstance = () => {
   return axiosInstance;
 };
 
-const http = (endpoint, config) => {
+const http = (endpoint: string, config: AxiosRequestConfig) => {
   const axiosInstance = backendHttpInstance();
   return axiosInstance(endpoint, { ...config });
 };
 
-export const nextapi = (endpoint, config) => {
+export const nextapi = (endpoint: string, config: AxiosRequestConfig) => {
   const axiosInstance = axios.create();
   return axiosInstance(endpoint, { ...config });
 };

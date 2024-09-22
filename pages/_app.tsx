@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { SessionProvider } from 'next-auth/react';
+import { Session } from 'next-auth';
 import Head from 'next/head';
-import Container from '@mui/material/Container';
+import { AppProps, NextComponentType } from 'next/app';
 import { ThemeProvider } from '@mui/material/styles';
 import { Toaster } from 'react-hot-toast';
 import Router from 'next/router';
@@ -22,11 +23,28 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import Footer from '../layout/Footer';
 import Script from 'next/script';
-import { ApolloProvider } from '@apollo/client';
+import {
+  ApolloClient,
+  ApolloProvider,
+  NormalizedCacheObject,
+} from '@apollo/client';
 import { useApollo } from '../lib/apolloClient';
 
-const MyApp = ({ Component, pageProps: { session, ...pageProps } }) => {
-  const apolloClient = useApollo(pageProps.initialApolloState);
+interface MyAppProps extends AppProps {
+  Component: NextComponentType;
+  pageProps: {
+    session?: Session;
+    initialApolloState?: NormalizedCacheObject | undefined;
+  };
+}
+
+const MyApp = ({
+  Component,
+  pageProps: { session, ...pageProps },
+}: MyAppProps) => {
+  const apolloClient: ApolloClient<NormalizedCacheObject> = useApollo(
+    pageProps.initialApolloState,
+  );
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -49,7 +67,6 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }) => {
         <PersistGate loading={<Loading />} persistor={persistor}>
           <SessionProvider session={session}>
             <ThemeProvider theme={createTheme()}>
-              {/* <Container maxWidth="lg" style={{ padding: 0, margin: 'auto' }}> */}
               <CssBaseline />
               <Head>
                 <title>OrderHere</title>
