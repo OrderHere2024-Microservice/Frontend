@@ -37,16 +37,6 @@ const ListInfo = () => {
     dispatch({ type: Action.SET_SEARCH_TEXT, payload: '' });
   }, []);
 
-  //   const handleChangeOptions = (event) => {
-  //     const newOptions = {
-  //       ...checked,
-  //       [event.target.name]: event.target.checked,
-  //     };
-  //     setChecked(newOptions);
-  //     dispatch({ type: Action.SET_ORDER_OPTION, payload: newOptions });
-  //     // setChecked({ ...checked, [event.target.name]: event.target.checked });
-  //   };
-
   const handleChangeStatus = (event) => {
     const newStatus = {
       ...checkedStatus,
@@ -137,66 +127,6 @@ const ListInfo = () => {
           </Select>
         </FormControl>
       </Box>
-      {/* <Box
-        my={2}
-        sx={{
-          border: '1px solid #D9D9D9',
-          borderRadius: '3px',
-          paddingBlock: 1,
-          pl: 2,
-        }}
-      >
-        <Typography sx={{ color: 'black', fontSize: '1.3rem' }}>
-          ORDERING OPTIONS
-        </Typography>
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={checked.delivery}
-                onChange={handleChangeOptions}
-                name="delivery"
-                sx={{
-                  '&.Mui-checked': {
-                    color: '#1976d2',
-                  },
-                }}
-              />
-            }
-            label="Delivery"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={checked.dine_in}
-                onChange={handleChangeOptions}
-                name="dine_in"
-                sx={{
-                  '&.Mui-checked': {
-                    color: '#1976d2',
-                  },
-                }}
-              />
-            }
-            label="Dine In"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={checked.pickup}
-                onChange={handleChangeOptions}
-                name="pickup"
-                sx={{
-                  '&.Mui-checked': {
-                    color: '#1976d2',
-                  },
-                }}
-              />
-            }
-            label="Pick Up"
-          />
-        </FormGroup>
-      </Box> */}
       <Box
         my={2}
         sx={{
