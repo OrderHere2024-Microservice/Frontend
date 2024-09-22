@@ -6,7 +6,6 @@ import storage from 'redux-persist/lib/storage';
 
 import signReducer from './reducers/signReducer';
 import cartReducer from './reducers/cartReducer';
-import restaurantReducer from './reducers/restaurantReducer';
 import deliveryReducer from './reducers/deliveryReducer';
 import filterReducer from './reducers/filterReducer';
 import historyReducer from './reducers/historyReducer';
@@ -27,7 +26,6 @@ const persistedSignReducer = persistReducer(signPersistConfig, signReducer);
 const rootReducer = combineReducers({
   sign: persistedSignReducer,
   cart: cartReducer,
-  restaurant: restaurantReducer,
   delivery: deliveryReducer,
   dinein: dineInReducer,
   pickup: pickupReducer,
