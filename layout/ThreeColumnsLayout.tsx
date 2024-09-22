@@ -1,8 +1,15 @@
-import { Container, Grid, useTheme, useMediaQuery, Box } from '@mui/material';
+import { ReactNode } from 'react';
+import { Container, Grid, useTheme, useMediaQuery } from '@mui/material';
 import Footer from './Footer';
 import Filter from '@components/Filter';
 
-const ThreeColumnsLayout = ({ children, noFooter = false }) => {
+const ThreeColumnsLayout = ({
+  children,
+  noFooter = false,
+}: {
+  children: ReactNode;
+  noFooter: boolean;
+}) => {
   const theme = useTheme();
   const mobileDevice = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -42,7 +49,6 @@ const ThreeColumnsLayout = ({ children, noFooter = false }) => {
         <Grid item xs={9} style={{ position: 'relative', flex: '1 1 auto' }}>
           {children}
         </Grid>
-        {/* {!noFooter && <Footer />} */}
       </Grid>
     </Container>
   );
