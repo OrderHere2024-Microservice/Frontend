@@ -30,7 +30,7 @@ export const styleNew = {
     lineHeight: '24px',
   },
   redCircleBackground: {
-    backgroundColor: '#AD343E',
+    backgroundColor: '#1976d2',
     borderRadius: '50%',
     display: 'inline-flex',
     justifyContent: 'center',

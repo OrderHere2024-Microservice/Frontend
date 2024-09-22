@@ -374,7 +374,7 @@ export default function ProfileForm() {
                 width: '120px',
                 height: '40px',
                 borderRadius: '40px',
-                backgroundColor: '#AD343E',
+                backgroundColor: '#1976d2',
               }}
             >
               {editMode ? 'Cancel' : 'Edit'}
@@ -389,7 +389,7 @@ export default function ProfileForm() {
                 width: '120px',
                 height: '40px',
                 borderRadius: '40px',
-                backgroundColor: '#AD343E',
+                backgroundColor: '#1976d2',
               }}
             >
               Save

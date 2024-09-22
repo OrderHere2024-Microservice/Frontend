@@ -71,7 +71,7 @@ const PricingFilter = () => {
         valueLabelDisplay="off"
         marks={marks}
         sx={{
-          color: '#AD343E',
+          color: '#1976d2',
           '& .MuiSlider-thumb': {
             height: 24,
             width: 24,

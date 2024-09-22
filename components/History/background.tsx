@@ -53,7 +53,7 @@ const BgImage = () => {
           sx={{ color: 'black', fontSize: 'large', marginInline: '0.5em' }}
         />
         <span style={{ color: 'black' }}>HOME ·&nbsp;</span>
-        <span style={{ color: '#AD343E', marginRight: '0.5em' }}>
+        <span style={{ color: '#1976d2', marginRight: '0.5em' }}>
           ORDER HISTORY
         </span>
       </Box>

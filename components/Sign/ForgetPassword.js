@@ -111,7 +111,7 @@ const ForgetPassword = ({ open, onClose, onEmailSent = () => {} }) => {
               sx={{
                 mt: 3,
                 mb: 2,
-                backgroundColor: '#AD343E',
+                backgroundColor: '#1976d2',
                 '&:hover': {
                   backgroundColor: '#931F1D',
                 },

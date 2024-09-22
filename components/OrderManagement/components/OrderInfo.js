@@ -162,7 +162,7 @@ const OrderInfo = () => {
                 name="delivery"
                 sx={{
                   '&.Mui-checked': {
-                    color: '#AD343E',
+                    color: '#1976d2',
                   },
                 }}
               />
@@ -177,7 +177,7 @@ const OrderInfo = () => {
                 name="dine_in"
                 sx={{
                   '&.Mui-checked': {
-                    color: '#AD343E',
+                    color: '#1976d2',
                   },
                 }}
               />
@@ -192,7 +192,7 @@ const OrderInfo = () => {
                 name="pickup"
                 sx={{
                   '&.Mui-checked': {
-                    color: '#AD343E',
+                    color: '#1976d2',
                   },
                 }}
               />
@@ -222,7 +222,7 @@ const OrderInfo = () => {
                 name="pending"
                 sx={{
                   '&.Mui-checked': {
-                    color: '#AD343E',
+                    color: '#1976d2',
                   },
                 }}
               />
@@ -237,7 +237,7 @@ const OrderInfo = () => {
                 name="finished"
                 sx={{
                   '&.Mui-checked': {
-                    color: '#AD343E',
+                    color: '#1976d2',
                   },
                 }}
               />
@@ -252,7 +252,7 @@ const OrderInfo = () => {
                 name="preparing"
                 sx={{
                   '&.Mui-checked': {
-                    color: '#AD343E',
+                    color: '#1976d2',
                   },
                 }}
               />
@@ -267,7 +267,7 @@ const OrderInfo = () => {
                 name="in_transit"
                 sx={{
                   '&.Mui-checked': {
-                    color: '#AD343E',
+                    color: '#1976d2',
                   },
                 }}
               />
@@ -282,7 +282,7 @@ const OrderInfo = () => {
                 name="delayed"
                 sx={{
                   '&.Mui-checked': {
-                    color: '#AD343E',
+                    color: '#1976d2',
                   },
                 }}
               />
@@ -297,7 +297,7 @@ const OrderInfo = () => {
                 name="delivered"
                 sx={{
                   '&.Mui-checked': {
-                    color: '#AD343E',
+                    color: '#1976d2',
                   },
                 }}
               />
@@ -312,7 +312,7 @@ const OrderInfo = () => {
                 name="cancelled"
                 sx={{
                   '&.Mui-checked': {
-                    color: '#AD343E',
+                    color: '#1976d2',
                   },
                 }}
               />

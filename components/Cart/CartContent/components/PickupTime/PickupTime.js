@@ -19,7 +19,7 @@ dayjs.extend(timezone);
 
 const CustomColorRadio = styled(Radio)({
   '&.Mui-checked': {
-    color: '#AD343E',
+    color: '#1976d2',
   },
 });
 
