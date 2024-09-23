@@ -5,9 +5,8 @@ import {
   ListItemText,
   ButtonBase,
 } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { CartItem as CartItemType } from '@store/types';
-import { RootState } from '@store/store';
 import * as Action from '@store/actionTypes';
 
 const CartItem = ({
@@ -16,10 +15,9 @@ const CartItem = ({
   description,
   price,
   imageUrl,
+  quantity,
 }: CartItemType) => {
   const dispatch = useDispatch();
-  const cartItems = useSelector((state: RootState) => state.cart.items);
-  const item = cartItems.find((item) => item.dishId === dishId);
 
   const handleIncreaseQuantity = () => {
     dispatch({ type: Action.INCREASE_ITEM, payload: { dishId } });
@@ -97,7 +95,7 @@ const CartItem = ({
               -
             </ButtonBase>
             <ListItemText
-              primary={item?.quantity}
+              primary={quantity}
               primaryTypographyProps={{ fontWeight: 600 }}
             />
             <ButtonBase

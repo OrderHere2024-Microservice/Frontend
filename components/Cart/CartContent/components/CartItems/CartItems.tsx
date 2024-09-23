@@ -45,6 +45,7 @@ const CartItems = () => {
             description={cartItem.description}
             imageUrl={cartItem.imageUrl}
             price={cartItem.price}
+            quantity={cartItem.quantity}
           />
           <Divider sx={{ borderColor: 'border.main' }} />
         </React.Fragment>
