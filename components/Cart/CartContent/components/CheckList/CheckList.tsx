@@ -28,6 +28,7 @@ const CheckList = () => {
   const shippingFee = 0;
 
   const address = useSelector((state: RootState) => state.delivery.addressData);
+  const note = useSelector((state: RootState) => state.delivery.noteData);
   const orderType = useSelector((state: RootState) => state.cart.orderType);
 
   const dineInPhone = useSelector(
@@ -91,7 +92,7 @@ const CheckList = () => {
       orderStatus: 'pending',
       discount: 0,
       totalPrice: parseFloat(totalPrice),
-      note: '',
+      note: note,
       tableNumber: 0,
       dishes: cartItems.map((item) => ({
         dishId: item.dishId,

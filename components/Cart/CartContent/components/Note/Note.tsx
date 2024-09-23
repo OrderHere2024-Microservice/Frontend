@@ -10,15 +10,14 @@ const Note = () => {
 
   const dispatch = useDispatch();
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<{ note?: string }>({});
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    // setFormData({ ...formData, [name]: value });
     const newFormData = { ...formData, [name]: value };
     setFormData(newFormData);
 
-    let newErrors = { ...errors };
+    const newErrors = { ...errors };
     switch (name) {
       case 'note':
         newErrors[name] =
@@ -29,7 +28,7 @@ const Note = () => {
     }
     setErrors(newErrors);
 
-    dispatch({ type: Action.SET_NOTE_DATA, payload: newFormData });
+    dispatch({ type: Action.SET_NOTE_DATA, payload: newFormData.note });
   };
 
   return (
