@@ -111,6 +111,6 @@
     "isolatedModules": true,
     "jsx": "preserve"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "services/Restaurant.ts", "components/Cart/CartContent/CartContent.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "services/Restaurant.ts", "components/Cart/CartContent/CartContent.tsx"],
   "exclude": ["node_modules"]
 }

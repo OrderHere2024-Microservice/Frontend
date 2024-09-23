@@ -1,12 +1,13 @@
 import { Box, Typography, Button } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '@store/store';
 import * as Action from '@store/actionTypes';
 
 const Option = () => {
   const dispatch = useDispatch();
-  const orderType = useSelector((state) => state.cart.orderType);
+  const orderType = useSelector((state: RootState) => state.cart.orderType);
 
-  const handleClick = (newOrderType) => {
+  const handleClick = (newOrderType: string) => {
     dispatch({ type: Action.SET_ORDER_TYPE, payload: newOrderType });
   };
 
