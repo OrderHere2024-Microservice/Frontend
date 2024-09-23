@@ -39,16 +39,6 @@ const CheckList = () => {
   const PickUpzonedDateTime = combinedPickUpDateTime.utc().format();
   const [placeOrderMutation] = useMutation(PLACE_ORDER);
 
-  const unselectedIngredients = useSelector(
-    (state) => state.ingredient.unselectedIngredients,
-  );
-  let formattedIngredients = '';
-  for (const [dish, unselected] of Object.entries(unselectedIngredients)) {
-    const unselectedString = unselected.join(', No ');
-    formattedIngredients += `${dish}: No ${unselectedString}\n`;
-  }
-  formattedIngredients = formattedIngredients.trim();
-
   const [showWarningShake, setShowWarningShake] = useState(false);
 
   const warningShakeStyle = {
@@ -65,9 +55,7 @@ const CheckList = () => {
       orderStatus: 'pending',
       discount: 0,
       totalPrice: parseFloat(totalPrice),
-      note: `${note.note} ${
-        formattedIngredients ? `Customized detail: ${formattedIngredients}` : ''
-      }`,
+      note: '',
       dishes: cartItems.map((item) => ({
         dishId: item.dishId,
         dishName: item.dishName,

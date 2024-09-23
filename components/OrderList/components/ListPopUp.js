@@ -84,7 +84,7 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
       if (response) {
         dispatch({
           type: Action.UPDATE_ORDER_STATUS,
-          payload: { orderId: order.orderId, newStatus: 'delivered' },
+          payload: { orderId: order.orderId, orderStatus: 'delivered' },
         });
         setOriginalStatus('delivered');
         onClose();

@@ -26,7 +26,7 @@
     "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
     "paths": {
       "@components/*": ["components/*"],
-      "@types/*": ["types/*"],
+      "@interfaces/*": ["interfaces/*"],
       "@store/*": ["store/*"],
       "@utils/*": ["utils/*"],
       "@services/*": ["services/*"],

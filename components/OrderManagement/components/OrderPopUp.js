@@ -79,7 +79,7 @@ const OrderPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
       if (response.data) {
         dispatch({
           type: Action.UPDATE_ORDER_STATUS,
-          payload: { orderId: order.orderId, newStatus: statusValue },
+          payload: { orderId: order.orderId, orderStatus: statusValue },
         });
         setOriginalStatus(statusValue);
         setEditMode(false);
