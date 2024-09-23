@@ -24,7 +24,6 @@ const DineIn = () => {
   const handleTimeChange = (time) => {
     setSelectedTime(dayjs(time));
     const formattedTime = dayjs(time).format('HH:mm');
-    // console.log('formattedTime', formattedTime)
     dispatch({ type: Action.SET_TIME_DATA, payload: formattedTime });
   };
 

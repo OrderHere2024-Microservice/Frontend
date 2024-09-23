@@ -26,7 +26,6 @@ const Address = () => {
       const updatedFormData = { ...formData, address: address };
       setFormData(updatedFormData);
       dispatch({ type: Action.SET_ADDRESS_DATA, payload: updatedFormData });
-      console.log('new address', updatedFormData);
     } catch (error) {
       console.error('Error', error);
     }
@@ -59,7 +58,6 @@ const Address = () => {
     }
     setErrors(newErrors);
     dispatch({ type: Action.SET_ADDRESS_DATA, payload: newFormData });
-    console.log('formData', newFormData);
   };
 
   return (

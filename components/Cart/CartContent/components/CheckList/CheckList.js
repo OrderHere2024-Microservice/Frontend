@@ -42,14 +42,12 @@ const CheckList = () => {
   const unselectedIngredients = useSelector(
     (state) => state.ingredient.unselectedIngredients,
   );
-  console.log('unselect', unselectedIngredients);
   let formattedIngredients = '';
   for (const [dish, unselected] of Object.entries(unselectedIngredients)) {
     const unselectedString = unselected.join(', No ');
     formattedIngredients += `${dish}: No ${unselectedString}\n`;
   }
   formattedIngredients = formattedIngredients.trim();
-  console.log('format unselected', formattedIngredients);
 
   const [showWarningShake, setShowWarningShake] = useState(false);
 
@@ -119,7 +117,6 @@ const CheckList = () => {
     }
 
     try {
-      console.log('final data:', orderData);
       const { data, errors } = await placeOrderMutation({
         variables: {
           placeOrderDTO: orderData,

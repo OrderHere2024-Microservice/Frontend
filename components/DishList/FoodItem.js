@@ -65,16 +65,6 @@ const FoodItem = ({
     dispatch({ type: Action.CALCULATE_TOTAL_PRICE });
   };
 
-  // const handleRemoveDish = () => {
-
-  //   dispatch({ type: Action.REMOVE_DISH, payload: dishIdToRemove });
-
-  // }
-
-  const handleRemoveDish = () => {
-    dispatch({ type: Action.REMOVE_DISH, payload: { dishId } });
-  };
-
   const decrementQuantity = () => {
     if (quantity > 1) {
       dispatch({ type: Action.DECREASE_ITEM, payload: { dishId } });
