@@ -6,11 +6,19 @@ import {
   ButtonBase,
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
+import { CartItem as CartItemType } from '@store/types';
+import { RootState } from '@store/store';
 import * as Action from '@store/actionTypes';
 
-const CartItem = ({ dishId, dishName, description, price, imageUrl }) => {
+const CartItem = ({
+  dishId,
+  dishName,
+  description,
+  price,
+  imageUrl,
+}: CartItemType) => {
   const dispatch = useDispatch();
-  const cartItems = useSelector((state) => state.cart.items);
+  const cartItems = useSelector((state: RootState) => state.cart.items);
   const item = cartItems.find((item) => item.dishId === dishId);
 
   const handleIncreaseQuantity = () => {
@@ -26,10 +34,6 @@ const CartItem = ({ dishId, dishName, description, price, imageUrl }) => {
   const handleRemoveFromCart = () => {
     dispatch({ type: Action.REMOVE_FROM_CART, payload: { dishId } });
     dispatch({ type: Action.CALCULATE_TOTAL_PRICE });
-    dispatch({
-      type: Action.REMOVE_UNSELECTED_INGREDIENTS,
-      payload: { dish: dishName },
-    });
   };
 
   return (

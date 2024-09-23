@@ -1,10 +1,11 @@
 import CartItem from './components/CartItem/CartItem';
 import { Box, Typography, Divider } from '@mui/material';
 import { useSelector } from 'react-redux';
+import { RootState } from '@store/store';
 import React from 'react';
 
 const CartItems = () => {
-  const cartItems = useSelector((state) => state.cart.items);
+  const cartItems = useSelector((state: RootState) => state.cart.items);
 
   return (
     <>
