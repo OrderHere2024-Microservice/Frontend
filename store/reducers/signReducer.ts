@@ -13,7 +13,10 @@ const initialState: SignState = {
   token: undefined,
 };
 
-const signReducer = (state = initialState, { type, payload }: ActionType) => {
+const signReducer = (
+  state = initialState,
+  { type, payload }: ActionType,
+): SignState => {
   switch (type) {
     case Action.OPEN_SIGN_DIALOG:
       return {

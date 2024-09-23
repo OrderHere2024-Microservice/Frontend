@@ -7,9 +7,10 @@ import Note from './components/Note/Note';
 import Option from './components/Option/Option';
 import PickupTime from './components/PickupTime/PickupTime';
 import DineIn from './components/DineIn/DineIn';
+import { RootState } from '@store/store';
 
 const Content = () => {
-  const orderType = useSelector((state) => state.cart.orderType);
+  const orderType = useSelector((state: RootState) => state.cart.orderType);
 
   return (
     <Box sx={{ display: 'flex', marginTop: 3 }}>

@@ -16,7 +16,7 @@ interface SetPriceRangeAction {
 const filterReducer = (
   state = initialState,
   { type, payload }: SetPriceRangeAction,
-) => {
+): FilterState => {
   switch (type) {
     case Action.SET_PRICE_RANGE:
       return {

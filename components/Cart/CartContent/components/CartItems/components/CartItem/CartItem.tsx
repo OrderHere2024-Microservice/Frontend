@@ -5,13 +5,19 @@ import {
   ListItemText,
   ButtonBase,
 } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { CartItem as CartItemType } from '@store/types';
 import * as Action from '@store/actionTypes';
 
-const CartItem = ({ dishId, dishName, description, price, imageUrl }) => {
+const CartItem = ({
+  dishId,
+  dishName,
+  description,
+  price,
+  imageUrl,
+  quantity,
+}: CartItemType) => {
   const dispatch = useDispatch();
-  const cartItems = useSelector((state) => state.cart.items);
-  const item = cartItems.find((item) => item.dishId === dishId);
 
   const handleIncreaseQuantity = () => {
     dispatch({ type: Action.INCREASE_ITEM, payload: { dishId } });
@@ -26,10 +32,6 @@ const CartItem = ({ dishId, dishName, description, price, imageUrl }) => {
   const handleRemoveFromCart = () => {
     dispatch({ type: Action.REMOVE_FROM_CART, payload: { dishId } });
     dispatch({ type: Action.CALCULATE_TOTAL_PRICE });
-    dispatch({
-      type: Action.REMOVE_UNSELECTED_INGREDIENTS,
-      payload: { dish: dishName },
-    });
   };
 
   return (
@@ -93,7 +95,7 @@ const CartItem = ({ dishId, dishName, description, price, imageUrl }) => {
               -
             </ButtonBase>
             <ListItemText
-              primary={item?.quantity}
+              primary={quantity}
               primaryTypographyProps={{ fontWeight: 600 }}
             />
             <ButtonBase

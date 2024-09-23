@@ -1,18 +1,19 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { List, ListItem, ListItemText, Box, Typography } from '@mui/material';
+import { RootState } from '@store/store';
 import * as Action from '@store/actionTypes';
 
 const CheckListItems = () => {
   const dispatch = useDispatch();
-  const cartItems = useSelector((state) => state.cart.items);
+  const cartItems = useSelector((state: RootState) => state.cart.items);
 
-  const handleIncreaseQuantity = (dishId) => {
+  const handleIncreaseQuantity = (dishId: number) => {
     dispatch({ type: Action.INCREASE_ITEM, payload: { dishId } });
     dispatch({ type: Action.CALCULATE_TOTAL_PRICE });
   };
 
-  const handleDecreaseQuantity = (dishId) => {
+  const handleDecreaseQuantity = (dishId: number) => {
     dispatch({ type: Action.DECREASE_ITEM, payload: { dishId } });
     dispatch({ type: Action.CALCULATE_TOTAL_PRICE });
   };
@@ -57,7 +58,6 @@ const CheckListItems = () => {
                   mx: 1.25,
                   ':hover': { cursor: 'pointer', opacity: 0.5 },
                 }}
-                disabled={item.quantity === 0}
               >
                 -
               </Typography>

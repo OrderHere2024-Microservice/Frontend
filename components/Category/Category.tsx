@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Button, Stack } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import * as Actions from '@store/actionTypes';
+import { CategoryGetDto } from '@interfaces/CategoryDTOs';
 
 const buttonGroupStyles = {
   justifyContent: 'center',
@@ -9,13 +10,14 @@ const buttonGroupStyles = {
   backgroundColor: '#fff',
 };
 
-const Category = ({ categories: initialData }) => {
-  const [categories, setCategories] = useState(initialData);
-  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+const Category = ({ categories }: { categories: CategoryGetDto[] }) => {
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
+    null,
+  );
 
   const dispatch = useDispatch();
 
-  const handleCategoryClick = (categoryId) => {
+  const handleCategoryClick = (categoryId: number) => {
     if (selectedCategoryId === categoryId) {
       setSelectedCategoryId(null);
       dispatch({ type: Actions.SET_CATEGORY, payload: null });

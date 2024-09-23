@@ -1,7 +1,15 @@
 import * as Action from '../actionTypes';
 import dayjs from 'dayjs';
 
-const initialState = {
+interface DineInState {
+  selectedDate: string;
+  selectedTime: string;
+  name: string;
+  phoneNumber: string;
+  personCount: number;
+}
+
+const initialState: DineInState = {
   selectedDate: dayjs().format('YYYY-MM-DD'),
   selectedTime: dayjs().format('HH:mm'),
   name: '',
@@ -9,7 +17,17 @@ const initialState = {
   personCount: 0,
 };
 
-const dineInReducer = (state = initialState, { type, payload }) => {
+type DineInAction =
+  | { type: typeof Action.SET_DATE_DATA; payload: string }
+  | { type: typeof Action.SET_TIME_DATA; payload: string }
+  | { type: typeof Action.SET_PHONE_DATA; payload: string }
+  | { type: typeof Action.SET_NAME_DATA; payload: string }
+  | { type: typeof Action.SET_PERSON_COUNT_DATA; payload: number };
+
+const dineInReducer = (
+  state: DineInState = initialState,
+  { type, payload }: DineInAction,
+): DineInState => {
   switch (type) {
     case Action.SET_DATE_DATA:
       return {

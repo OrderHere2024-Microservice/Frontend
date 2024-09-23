@@ -9,6 +9,9 @@ import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import { useMutation } from '@apollo/client';
 import { PLACE_ORDER } from '@services/orderService';
+import { RootState } from '@store/store';
+import { PlaceOrderDTO } from '@interfaces/OrderDTOs';
+import Image from 'next/image';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -17,40 +20,44 @@ const CheckList = () => {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const totalPrice = useSelector((state) => state.cart.totalPrice).toFixed(2);
-  const cartItems = useSelector((state) => state.cart.items);
+  const totalPrice = useSelector(
+    (state: RootState) => state.cart.totalPrice,
+  ).toFixed(2);
+  const cartItems = useSelector((state: RootState) => state.cart.items);
 
   const shippingFee = 0;
 
-  const address = useSelector((state) => state.delivery.addressData);
-  const note = useSelector((state) => state.delivery.noteData);
-  const orderType = useSelector((state) => state.cart.orderType);
+  const address = useSelector((state: RootState) => state.delivery.addressData);
+  const note = useSelector((state: RootState) => state.delivery.noteData);
+  const orderType = useSelector((state: RootState) => state.cart.orderType);
 
-  const dineInPhone = useSelector((state) => state.dinein.phoneNumber);
-  const personCount = useSelector((state) => state.dinein.personCount);
-  const dineInDate = useSelector((state) => state.dinein.selectedDate);
-  const dineInTime = useSelector((state) => state.dinein.selectedTime);
+  const dineInPhone = useSelector(
+    (state: RootState) => state.dinein.phoneNumber,
+  );
+  const personCount = useSelector(
+    (state: RootState) => state.dinein.personCount,
+  );
+  const dineInDate = useSelector(
+    (state: RootState) => state.dinein.selectedDate,
+  );
+  const dineInTime = useSelector(
+    (state: RootState) => state.dinein.selectedTime,
+  );
   const combinedDateTime = dayjs(`${dineInDate} ${dineInTime}`);
   const dineInZonedDateTime = combinedDateTime.utc().format();
-  const dineInName = useSelector((state) => state.dinein.name);
-  const PickUpTime = useSelector((state) => state.pickup.selectedTime);
-  const PickUpDate = useSelector((state) => state.pickup.selectedDate);
+  const dineInName = useSelector((state: RootState) => state.dinein.name);
+  const PickUpTime = useSelector(
+    (state: RootState) => state.pickup.selectedTime,
+  );
+  const PickUpDate = useSelector(
+    (state: RootState) => state.pickup.selectedDate,
+  );
   const combinedPickUpDateTime = dayjs(`${PickUpDate} ${PickUpTime}`);
   const PickUpzonedDateTime = combinedPickUpDateTime.utc().format();
-  const [placeOrderMutation] = useMutation(PLACE_ORDER);
-
-  const unselectedIngredients = useSelector(
-    (state) => state.ingredient.unselectedIngredients,
-  );
-  console.log('unselect', unselectedIngredients);
-  let formattedIngredients = '';
-  for (const [dish, unselected] of Object.entries(unselectedIngredients)) {
-    const unselectedString = unselected.join(', No ');
-    formattedIngredients += `${dish}: No ${unselectedString}\n`;
-  }
-  formattedIngredients = formattedIngredients.trim();
-  console.log('format unselected', formattedIngredients);
-
+  const [placeOrderMutation] = useMutation<
+    { placeOrder: boolean },
+    { placeOrderDTO: PlaceOrderDTO }
+  >(PLACE_ORDER);
   const [showWarningShake, setShowWarningShake] = useState(false);
 
   const warningShakeStyle = {
@@ -62,20 +69,41 @@ const CheckList = () => {
     dispatch({ type: Action.CALCULATE_TOTAL_PRICE });
   };
   const handleCheckout = async () => {
-    let orderData = {
+    let orderData: {
+      restaurantId: number;
+      orderStatus: string;
+      discount: number;
+      totalPrice: number;
+      note: string;
+      tableNumber: number;
+      dishes: {
+        dishId: number;
+        dishName: string;
+        dishQuantity: number;
+        dishPrice: number;
+      }[];
+      orderType: string;
+      address: string;
+      phone: string;
+      pickupTime: string;
+      numberOfPeople?: number;
+    } = {
       restaurantId: 1,
       orderStatus: 'pending',
       discount: 0,
       totalPrice: parseFloat(totalPrice),
-      note: `${note.note} ${
-        formattedIngredients ? `Customized detail: ${formattedIngredients}` : ''
-      }`,
+      note: note,
+      tableNumber: 0,
       dishes: cartItems.map((item) => ({
         dishId: item.dishId,
         dishName: item.dishName,
         dishQuantity: item.quantity,
         dishPrice: item.price,
       })),
+      orderType: orderType,
+      address: '',
+      phone: '',
+      pickupTime: '',
     };
 
     if (orderType === 'delivery') {
@@ -101,7 +129,7 @@ const CheckList = () => {
         orderType: 'dine_in',
         pickupTime: dineInZonedDateTime,
         phone: dineInPhone,
-        numberOfPeople: parseInt(personCount),
+        numberOfPeople: personCount ? parseInt(personCount.toString()) : 0,
       };
 
       if (!dineInName || !dineInPhone || !personCount) {
@@ -119,10 +147,12 @@ const CheckList = () => {
     }
 
     try {
-      console.log('final data:', orderData);
       const { data, errors } = await placeOrderMutation({
         variables: {
-          placeOrderDTO: orderData,
+          placeOrderDTO: {
+            ...orderData,
+            numberOfPeople: orderData.numberOfPeople ?? 0,
+          },
         },
       });
 
@@ -131,12 +161,18 @@ const CheckList = () => {
         return;
       }
 
-      console.log('Order placed successfully:', data.placeOrder);
+      if (!data || !data.placeOrder) {
+        console.error('Error: No data returned from placeOrderMutation');
+        return;
+      }
       const orderId = data.placeOrder;
-      router.push(`/pay?orderId=${orderId}&totalPrice=${totalPrice}`);
+      await router
+        .push(`/pay?orderId=${orderId}&totalPrice=${totalPrice}`)
+        .catch((error) => {
+          console.error('Error navigating to payment page:', error);
+        });
 
       dispatch({ type: Action.CLEAR_CART });
-      dispatch({ type: Action.CLEAR_UNSELECTED_INGREDIENTS });
     } catch (error) {
       console.error('Error placing order:', error);
     }
@@ -160,7 +196,12 @@ const CheckList = () => {
             },
           }}
         >
-          <img src="icons/cart/trash.png" alt="trash" />
+          <Image
+            src="/icons/cart/trash.png"
+            alt="trash"
+            height={25}
+            width={25}
+          />
         </ButtonBase>
       </Box>
       <Divider sx={{ mx: 2, borderColor: 'border.section' }} />
@@ -210,7 +251,12 @@ const CheckList = () => {
           time, and method of delivery, and will be added to this amount.
         </Typography>
         <Box sx={{ ml: 2 }}>
-          <img src="icons/cart/warning-2.png" alt="question" />
+          <Image
+            src="/icons/cart/warning-2.png"
+            alt="question"
+            height={25}
+            width={25}
+          />
         </Box>
       </Box>
 
@@ -276,13 +322,17 @@ const CheckList = () => {
         sx={{ padding: 2, display: 'flex', justifyContent: 'center', mb: 4 }}
       >
         <ButtonBase
-          onClick={handleCheckout}
+          onClick={() => {
+            handleCheckout().catch((error) => {
+              console.error('Error checking out:', error);
+            });
+          }}
           sx={{ backgroundColor: 'primary.main', width: '100%', height: 40 }}
         >
           <Typography sx={{ marginRight: 2, color: 'white' }}>
             Check Out
           </Typography>{' '}
-          <img src="/icons/cart/user.png" />
+          <Image src="/icons/cart/user.png" alt="user" height={25} width={25} />
         </ButtonBase>
       </Box>
     </>

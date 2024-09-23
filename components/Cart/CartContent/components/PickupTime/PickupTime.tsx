@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
 import * as Action from '@store/actionTypes';
 import {
@@ -31,8 +30,6 @@ const PickupTime = () => {
   );
   const dispatch = useDispatch();
 
-  const router = useRouter();
-
   const incrementDate = () => {
     setSelectedDate((prevDate) => {
       const newDate = new Date(prevDate);
@@ -49,19 +46,14 @@ const PickupTime = () => {
     });
   };
 
-  const handleSubmit = (e) => {
-    // e.preventDefault();
+  const handleSubmit = () => {
     const extractedDate = selectedDate.toISOString().split('T')[0];
     console.log('time frame:', timeFrame);
-    const extractedTime = timeFrame.match(/\d{1,2}:\d{2}/)[0];
+    const matchResult = timeFrame.match(/\d{1,2}:\d{2}/);
+    const extractedTime = matchResult ? matchResult[0] : '';
     dispatch({ type: Action.SET_PICK_UP_DATE, payload: extractedDate });
     dispatch({ type: Action.SET_PICK_UP_TIME, payload: extractedTime });
     console.log('time and date:', extractedDate, extractedTime);
-    setTimeConfirmed(true);
-  };
-
-  const handleChangeClick = () => {
-    setTimeConfirmed(false);
   };
 
   const isToday = useMemo(() => {
@@ -80,7 +72,7 @@ const PickupTime = () => {
     return timeFrames;
   }, [now, selectedDate]);
 
-  const getDayLabel = (selectedDate) => {
+  const getDayLabel = (selectedDate: Date) => {
     const today = new Date();
     if (selectedDate.toDateString() === today.toDateString()) return 'Today';
     else return selectedDate.toLocaleDateString('en-US', { weekday: 'short' });

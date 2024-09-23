@@ -130,10 +130,6 @@ const DishPopup = ({
       dispatch({ type: Action.DECREASE_ITEM, payload: { dishId } });
     } else if (quantity === 1) {
       dispatch({ type: Action.REMOVE_FROM_CART, payload: { dishId } });
-      dispatch({
-        type: Action.REMOVE_UNSELECTED_INGREDIENTS,
-        payload: { dish: dishName },
-      });
     }
     dispatch({ type: Action.CALCULATE_TOTAL_PRICE });
   };
@@ -154,17 +150,6 @@ const DishPopup = ({
       dispatch({ type: Action.INCREASE_ITEM, payload: { dishId } });
     }
     dispatch({ type: Action.CALCULATE_TOTAL_PRICE });
-
-    tempUnselectedIngredients.forEach((ingredient) => {
-      dispatch({
-        type: Action.SET_UNSELECTED_INGREDIENT,
-        payload: {
-          dish: dishName,
-          ingredient: ingredient,
-        },
-      });
-    });
-    setTempUnselectedIngredients(new Set());
   };
 
   const toggleCollapse = () => {
