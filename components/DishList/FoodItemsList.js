@@ -24,7 +24,6 @@ const FoodItemsList = ({ dishes: initialDishes }) => {
   const { userRole } = jwtInfo(token);
 
   const [deleteDishMutation] = useMutation(DELETE_DISH);
-  // const [addDishMutation] = useMutation(CREATE_DISH);
 
   const handleAddNewDishClick = () => setAddDishModalOpen(true);
   const handleCloseModal = () => setAddDishModalOpen(false);
