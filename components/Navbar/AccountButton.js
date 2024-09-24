@@ -10,7 +10,6 @@ import {
   closeSignDialog,
   registerSignDialog,
   loginSignDialog,
-  forgetpasswordSignDialog,
 } from '@store/actions/signAction';
 import { useSession } from 'next-auth/react';
 import { getUserProfile } from '@services/Profile';
