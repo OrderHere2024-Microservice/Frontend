@@ -1,33 +1,43 @@
 import React, { useState } from 'react';
-import { TextField, Box, Typography, Select, MenuItem } from '@mui/material';
+import {
+  TextField,
+  Box,
+  Typography,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
+} from '@mui/material';
 import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import { TimeView } from '@mui/x-date-pickers';
 import { useDispatch } from 'react-redux';
 import * as Action from '@store/actionTypes';
 
 const DineIn = () => {
   const dispatch = useDispatch();
-  const [selectedDate, setSelectedDate] = useState(dayjs());
-  const [selectedTime, setSelectedTime] = useState(dayjs());
-  const [personCount, setPersonCount] = useState('');
-  const [name, setName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
+  const [selectedTime, setSelectedTime] = useState<Dayjs | null>(dayjs());
+  const [personCount, setPersonCount] = useState<string>('');
 
-  const handleDateChange = (date) => {
-    setSelectedDate(dayjs(date));
-    const formattedDate = dayjs(date).format('YYYY-MM-DD');
-    dispatch({ type: Action.SET_DATE_DATA, payload: formattedDate });
+  const handleDateChange = (date: Dayjs | null) => {
+    if (date) {
+      setSelectedDate(dayjs(date));
+      const formattedDate = dayjs(date).format('YYYY-MM-DD');
+      dispatch({ type: Action.SET_DATE_DATA, payload: formattedDate });
+    }
   };
 
-  const handleTimeChange = (time) => {
-    setSelectedTime(dayjs(time));
-    const formattedTime = dayjs(time).format('HH:mm');
-    dispatch({ type: Action.SET_TIME_DATA, payload: formattedTime });
+  const handleTimeChange = (time: Dayjs | null) => {
+    if (time) {
+      setSelectedTime(dayjs(time));
+      const formattedTime = dayjs(time).format('HH:mm');
+      dispatch({ type: Action.SET_TIME_DATA, payload: formattedTime });
+    }
   };
 
-  const handlePersonCountChange = (event) => {
+  const handlePersonCountChange = (event: SelectChangeEvent<string>) => {
     setPersonCount(event.target.value);
     dispatch({
       type: Action.SET_PERSON_COUNT_DATA,
@@ -35,26 +45,26 @@ const DineIn = () => {
     });
   };
 
-  const handleNameChange = (event) => {
-    setName(event.target.value);
+  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({ type: Action.SET_NAME_DATA, payload: event.target.value });
   };
 
-  const handlePhoneNumberChange = (event) => {
-    setPhoneNumber(event.target.value);
+  const handlePhoneNumberChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     dispatch({ type: Action.SET_PHONE_DATA, payload: event.target.value });
   };
 
-  const disablePastDates = (date) => {
+  const disablePastDates = (date: Dayjs | null) => {
     return dayjs(date).isBefore(dayjs(), 'day');
   };
 
-  const disablePastTimes = (timeValue, timeType) => {
-    if (selectedDate.isSame(dayjs(), 'day')) {
-      if (timeType === 'hours') {
-        return timeValue < dayjs().hour();
-      } else if (timeType === 'minutes') {
-        return timeValue < dayjs().minute();
+  const disablePastTimes = (value: Dayjs, view: TimeView) => {
+    if (selectedDate && selectedDate.isSame(dayjs(), 'day')) {
+      if (view === 'hours') {
+        return value.hour() < dayjs().hour();
+      } else if (view === 'minutes') {
+        return value.minute() < dayjs().minute();
       }
     }
     return false;
@@ -99,9 +109,6 @@ const DineIn = () => {
                 borderRadius: '40px',
               },
             }}
-            // renderInput={(props) => (
-            //   <TextField {...props} fullWidth margin="normal" />
-            // )}
             slotProps={{ textField: { variant: 'outlined' } }}
           />
 
@@ -118,9 +125,6 @@ const DineIn = () => {
                 borderRadius: '40px',
               },
             }}
-            // renderInput={(props) => (
-            //   <TextField {...props} fullWidth margin="normal" />
-            // )}
             slotProps={{ textField: { variant: 'outlined' } }}
           />
         </Box>
@@ -155,7 +159,7 @@ const DineIn = () => {
 
           <TextField
             margin="normal"
-            name="person"
+            name="phone"
             label="Phone number"
             rows={1}
             fullWidth
@@ -179,7 +183,6 @@ const DineIn = () => {
           onChange={handlePersonCountChange}
           displayEmpty
           fullWidth
-          // margin="normal"
           sx={{
             marginTop: '20px',
             borderRadius: '40px',

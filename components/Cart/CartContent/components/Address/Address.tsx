@@ -2,10 +2,7 @@ import { TextField, Box, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import * as Action from '@store/actionTypes';
-import PlacesAutocomplete, {
-  geocodeByAddress,
-  getLatLng,
-} from 'react-places-autocomplete';
+import PlacesAutocomplete from 'react-places-autocomplete';
 
 const Address = () => {
   const [formData, setFormData] = useState({
@@ -16,13 +13,19 @@ const Address = () => {
 
   const [selectedAddress, setSelectedAddress] = useState('');
   const dispatch = useDispatch();
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<{
+    phone?: string;
+    name?: string;
+    address?: string;
+  }>({
+    phone: '',
+    name: '',
+    address: '',
+  });
 
-  const handleSelect = async (address) => {
+  const handleSelect = (address: string) => {
     setSelectedAddress(address);
     try {
-      const results = await geocodeByAddress(address);
-      const latLng = await getLatLng(results[0]);
       const updatedFormData = { ...formData, address: address };
       setFormData(updatedFormData);
       dispatch({ type: Action.SET_ADDRESS_DATA, payload: updatedFormData });
@@ -31,16 +34,16 @@ const Address = () => {
     }
   };
 
-  const handleChange = (address) => {
+  const handleChange = (address: string) => {
     setSelectedAddress(address);
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const newFormData = { ...formData, [name]: value };
     setFormData(newFormData);
 
-    let newErrors = { ...errors };
+    const newErrors = { ...errors };
     switch (name) {
       case 'phone':
         newErrors.phone = /^\d{10}$/.test(value) ? '' : 'Invalid phone number';
@@ -123,7 +126,9 @@ const Address = () => {
         value={selectedAddress}
         onChange={(address) => {
           handleChange(address);
-          handleInputChange({ target: { name: 'address', value: address } });
+          handleInputChange({
+            target: { name: 'address', value: address },
+          } as React.ChangeEvent<HTMLInputElement>);
         }}
         onSelect={handleSelect}
       >
@@ -159,7 +164,10 @@ const Address = () => {
                   ? { backgroundColor: '#a8d0e6', cursor: 'pointer' }
                   : { backgroundColor: '#ffffff', cursor: 'pointer' };
                 return (
-                  <div {...getSuggestionItemProps(suggestion, { style })}>
+                  <div
+                    {...getSuggestionItemProps(suggestion, { style })}
+                    key={suggestion.placeId}
+                  >
                     {suggestion.description}
                   </div>
                 );
