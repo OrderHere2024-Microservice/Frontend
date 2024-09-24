@@ -1,7 +1,6 @@
 import React, { ReactNode } from 'react';
-import { Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -13,7 +12,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-const BootstrapDialogTitle = ({ onClose }) => {
+const BootstrapDialogTitle = ({ onClose }: { onClose: () => void }) => {
   return (
     <DialogTitle sx={{ m: 0, p: 2 }}>
       {onClose ? (
@@ -27,7 +26,7 @@ const BootstrapDialogTitle = ({ onClose }) => {
             color: (theme) => theme.palette.grey[500],
             '&:hover': {
               backgroundColor: '#d32f2f',
-              color: (theme) => 'rgba(255,255,255,1)',
+              color: 'rgba(255,255,255,1)',
             },
           }}
         >
@@ -38,10 +37,17 @@ const BootstrapDialogTitle = ({ onClose }) => {
   );
 };
 
-const SignDialog = ({ children, isOpen, onClose }) => {
+interface SignDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  children: ReactNode;
+}
+
+const SignDialog = ({ children, isOpen, onClose }: SignDialogProps) => {
   return (
     <BootstrapDialog
       open={isOpen}
+      onClose={onClose}
       sx={{
         '.MuiDialog-paper': {
           backgroundColor: '#FEF6E9',
