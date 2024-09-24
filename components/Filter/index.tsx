@@ -14,12 +14,23 @@ const pricingFilterStyle = {
   marginBottom: '20px',
 };
 
-const PricingFilter = () => {
+const PricingFilter: React.FC = () => {
   const dispatch = useDispatch();
   const [priceRange, setPriceRange] = useState({ min: 0, max: 100 });
-  const [values, setValues] = useState([0, 100]);
+  const [values, setValues] = useState<number[]>([0, 100]);
 
-  const { loading, error, data } = useQuery(GET_DISHES_PRICE_FILTER, {
+  const { loading, error, data } = useQuery<
+    {
+      getDishes: {
+        data: {
+          price: number;
+        }[];
+      };
+    },
+    {
+      restaurantId: number;
+    }
+  >(GET_DISHES_PRICE_FILTER, {
     variables: { restaurantId: 1 },
   });
 
@@ -33,11 +44,12 @@ const PricingFilter = () => {
     }
   }, [data]);
 
-  const handleChange = (event, newValues) => {
-    setValues(newValues);
+  const handleChange = (event: Event, newValues: number | number[]) => {
+    const newRange = newValues as number[];
+    setValues(newRange);
     dispatch({
       type: Action.SET_PRICE_RANGE,
-      payload: { min: newValues[0], max: newValues[1] },
+      payload: { min: newRange[0], max: newRange[1] },
     });
   };
 
@@ -45,12 +57,10 @@ const PricingFilter = () => {
     {
       value: values[0],
       label: `$${values[0]}`,
-      position: 'bottom',
     },
     {
       value: values[1],
       label: `$${values[1]}`,
-      position: 'bottom',
     },
   ];
 

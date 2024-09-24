@@ -10,17 +10,22 @@ import { useQuery } from '@apollo/client';
 import { GET_RESTAURANT_INFO } from '@services/Restaurant';
 import { jwtInfo } from '@utils/jwtInfo';
 import { useSelector } from 'react-redux';
+import { RootState } from '@store/store';
+import { RestaurantGetDTO } from '@interfaces/RestaurantDTOs';
 
 const RestaurantInfoPage = () => {
   const router = useRouter();
   const { restaurantId } = router.query;
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const { token } = useSelector((state) => state.sign);
-  const { userRole } = jwtInfo(token);
+  const { token } = useSelector((state: RootState) => state.sign);
+  const { userRole } = jwtInfo(token || '');
 
-  const { loading, error, data, refetch } = useQuery(GET_RESTAURANT_INFO, {
-    variables: { restaurantId: parseInt(restaurantId) },
-    skip: !restaurantId, // Avoid querying before restaurantId is available
+  const { loading, error, data, refetch } = useQuery<
+    { getRestaurantById: RestaurantGetDTO },
+    { restaurantId: number }
+  >(GET_RESTAURANT_INFO, {
+    variables: { restaurantId: parseInt(restaurantId as string) },
+    skip: !restaurantId,
     fetchPolicy: 'cache-and-network',
   });
 

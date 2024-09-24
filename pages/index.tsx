@@ -9,17 +9,24 @@ import { GET_CATEGORIES_BY_RESTAURANT } from '@services/Category';
 import { jwtInfo } from '@utils/jwtInfo';
 import OrderList from '@components/OrderList/index';
 import { useSelector } from 'react-redux';
+import { RootState } from '@store/store';
+import { DishGetDto } from '@interfaces/DishDTOs';
+import { PagingDto } from '@interfaces/PagingDTO';
+import { CategoryGetDto } from '@interfaces/CategoryDTOs';
 
 const Index = () => {
-  const [dishes, setDishes] = useState([]);
-  const { token } = useSelector((state) => state.sign);
-  const { userRole } = jwtInfo(token);
+  const [dishes, setDishes] = useState<DishGetDto[]>([]);
+  const { token } = useSelector((state: RootState) => state.sign);
+  const { userRole } = jwtInfo(token || '');
 
   const {
     loading: dishesLoading,
     error: dishesError,
     data: dishesData,
-  } = useQuery(GET_DISHES, {
+  } = useQuery<
+    { getDishes: PagingDto<DishGetDto[]> },
+    { restaurantId: number }
+  >(GET_DISHES, {
     variables: { restaurantId: 1 },
   });
 
@@ -27,9 +34,12 @@ const Index = () => {
     loading: categoriesLoading,
     error: categoriesError,
     data: categoriesData,
-  } = useQuery(GET_CATEGORIES_BY_RESTAURANT, {
-    variables: { restaurantId: 1 },
-  });
+  } = useQuery<{ getCategories: CategoryGetDto[] }, { restaurantId: number }>(
+    GET_CATEGORIES_BY_RESTAURANT,
+    {
+      variables: { restaurantId: 1 },
+    },
+  );
 
   useEffect(() => {
     if (dishesData && dishesData.getDishes) {
@@ -47,9 +57,11 @@ const Index = () => {
       {userRole === 'ROLE_driver' ? (
         <OrderList />
       ) : (
-        <ThreeColumnsLayout>
+        <ThreeColumnsLayout noFooter={false}>
           <Carousel />
-          <Category categories={categoriesData.getCategories} />
+          {categoriesData && (
+            <Category categories={categoriesData.getCategories} />
+          )}
           <FoodItemsList dishes={dishes} />
         </ThreeColumnsLayout>
       )}

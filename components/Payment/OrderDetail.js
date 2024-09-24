@@ -203,8 +203,7 @@ export const OrderDetail = ({ orderId }) => {
                   </Typography>
                 </Box>
                 <Typography sx={{ color: 'text.secondary' }}>
-                  Note:{' '}
-                  {order?.note || 'No special instructions.'}
+                  Note: {order?.note || 'No special instructions.'}
                 </Typography>
               </Box>
               <Grid container spacing={2} sx={{ maxWidth: '50%' }}>

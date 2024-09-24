@@ -1,25 +1,32 @@
 import React, { useState } from 'react';
 import {
   Box,
-  Button,
   Container,
   TextField,
   Typography,
   Modal,
-  Backdrop,
   Fade,
 } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { useDispatch } from 'react-redux';
-import { forgetPasswordAction } from '@store/actions/httpAction';
 import { forgetpassword } from '@services/Public';
 import hotToast from '@utils/hotToast';
+import { AxiosError } from 'axios';
 
-const ForgetPassword = ({ open, onClose, onEmailSent = () => {} }) => {
+interface ForgetPasswordProps {
+  open: boolean;
+  onClose: () => void;
+  onEmailSent?: (emailSent: boolean, userEmail?: string) => void;
+}
+
+const ForgetPassword = ({
+  open,
+  onClose,
+  onEmailSent = () => {},
+}: ForgetPasswordProps) => {
   const [isLoading, setLoading] = useState(false);
-  const dispatch = useDispatch();
+
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -31,16 +38,19 @@ const ForgetPassword = ({ open, onClose, onEmailSent = () => {} }) => {
     }),
     onSubmit: (values, { setSubmitting }) => {
       setSubmitting(true);
+      setLoading(true);
       forgetpassword(values.email)
         .then(() => {
           setSubmitting(false);
           hotToast('success', 'Reset link sent to your email.');
           onEmailSent(true, values.email);
+          setLoading(false);
           onClose();
         })
-        .catch((error) => {
+        .catch((error: AxiosError) => {
           setSubmitting(false);
-          if (error && error.response && error.response.status === 403) {
+          setLoading(false);
+          if (error?.response?.status === 403) {
             hotToast('error', 'Permission denied or invalid request.');
           } else {
             hotToast('error', `Your entered email is not registered.`);
@@ -51,15 +61,7 @@ const ForgetPassword = ({ open, onClose, onEmailSent = () => {} }) => {
   });
 
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      closeAfterTransition
-      BackdropComponent={Backdrop}
-      BackdropProps={{
-        timeout: 500,
-      }}
-    >
+    <Modal open={open} onClose={onClose} closeAfterTransition>
       <Fade in={open}>
         <Container
           maxWidth="sm"

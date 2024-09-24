@@ -5,25 +5,31 @@ import PaymentForm from '@components/Payment/PaymentForm';
 import { useMutation } from '@apollo/client';
 import { CREATE_PAYMENT } from '@services/Payment';
 import { useRouter } from 'next/router';
+import { PaymentCreateDto, PaymentPostDto } from '@interfaces/PaymentDTOs';
 
 const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
 );
 
 const PayPage = () => {
-  const [clientSecret, setClientSecret] = useState('');
-  const [paymentId, setPaymentId] = useState(null);
+  const [clientSecret, setClientSecret] = useState<string | null | undefined>(
+    '',
+  );
+  const [paymentId, setPaymentId] = useState<number | null>(null);
   const router = useRouter();
-  let { orderId, totalPrice } = router.query;
-  orderId = parseInt(orderId, 10);
-  const amount = parseFloat(totalPrice);
+  const { orderId, totalPrice } = router.query;
+  const parsedOrderId = parseInt(orderId as string, 10);
+  const amount = parseFloat(totalPrice as string);
   const currency = 'aud';
 
-  const [createPayment] = useMutation(CREATE_PAYMENT);
+  const [createPayment] = useMutation<
+    { createPayment: PaymentCreateDto },
+    { paymentPostDto: PaymentPostDto }
+  >(CREATE_PAYMENT);
 
   useEffect(() => {
-    const paymentPostDto = {
-      orderId: orderId,
+    const paymentPostDto: PaymentPostDto = {
+      orderId: parsedOrderId,
       amount: amount,
       currency: currency,
     };
@@ -34,14 +40,14 @@ const PayPage = () => {
       },
     })
       .then((response) => {
-        const data = response.data.createPayment;
-        if (data.clientSecret && data.paymentId) {
-          setClientSecret(data.clientSecret);
-          setPaymentId(data.paymentId);
+        const { createPayment } = response.data!;
+        if (createPayment.clientSecret && createPayment.paymentId) {
+          setClientSecret(createPayment.clientSecret);
+          setPaymentId(createPayment.paymentId);
         } else {
           console.error(
             'Client secret or payment ID not found in response:',
-            data,
+            createPayment,
           );
         }
       })
@@ -51,23 +57,21 @@ const PayPage = () => {
   }, [orderId, amount, currency, createPayment]);
 
   const appearance = {
-    theme: 'stripe',
+    theme: 'stripe' as 'flat' | 'stripe' | 'night',
   };
 
-  const options = {
-    clientSecret,
-    appearance,
-  };
+  const options = clientSecret
+    ? {
+        clientSecret,
+        appearance,
+      }
+    : undefined;
 
   return (
     <div className="App">
       {clientSecret ? (
         <Elements stripe={stripePromise} options={options}>
-          <PaymentForm
-            paymentId={paymentId}
-            clientSecret={clientSecret}
-            orderId={orderId}
-          />
+          <PaymentForm paymentId={paymentId} orderId={orderId} />
         </Elements>
       ) : (
         <p>Loading...</p>
