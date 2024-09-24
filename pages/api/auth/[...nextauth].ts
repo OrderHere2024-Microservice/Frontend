@@ -1,59 +1,71 @@
-import NextAuth from 'next-auth';
+import NextAuth, { NextAuthOptions, Session } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import FacebookProvider from 'next-auth/providers/facebook';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { JWT } from 'next-auth/jwt';
 import { login } from '@services/Public';
 
-export const authOptions = {
+interface JWTBody {
+  sub: string;
+  userId: string;
+  userName: string;
+  avatarURL: string;
+}
+
+export const authOptions: NextAuthOptions = {
   secret: process.env.AUTH_SECRET,
 
-  // Configure authentication providers
   providers: [
-    //email and password login
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
         email: { label: 'Email', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
+        if (!credentials) return null;
+
         try {
           const response = await login(credentials.email, credentials.password);
           if (response.status === 200 && response.data) {
-            const token = response.data.token;
-            //verify Jwt token
+            const token: string = (response.data as { token: string }).token;
+
+            // verify and decode JWT token
             const parts = token.split('.');
             if (parts.length !== 3) {
               console.error('JWT token error, invalid JWT');
+              return null;
             }
-            //parse Jwt to Json
+
             const decoded = atob(parts[1]);
-            const jwtObject = JSON.parse(decoded);
-            //extract key information
+            const jwtObject = JSON.parse(decoded) as JWTBody;
+
+            // Extract key information from JWT
             const userEmail = jwtObject.sub;
             const userId = jwtObject.userId;
             const userName = jwtObject.userName;
             const userAvatar = jwtObject.avatarURL;
 
-            //return User object
+            // Return user object
             return {
               id: userId,
               name: userName,
+              email: userEmail,
               image: userAvatar,
               token: jwtObject,
               jwt: token,
             };
           }
+          return null;
         } catch (error) {
+          console.error('Authorization error:', error);
           return null;
         }
       },
     }),
-    // Google Provider
     GoogleProvider({
-      clientId: process.env.GOOGLE_ID,
-      clientSecret: process.env.GOOGLE_SECRET,
-      //avoid token refresh
+      clientId: process.env.GOOGLE_ID || '',
+      clientSecret: process.env.GOOGLE_SECRET || '',
       authorization: {
         params: {
           prompt: 'consent',
@@ -61,25 +73,25 @@ export const authOptions = {
         },
       },
     }),
-    // Facebook Provideer
     FacebookProvider({
-      clientId: process.env.FACEBOOK_ID,
-      clientSecret: process.env.FACEBOOK_SECRET,
+      clientId: process.env.FACEBOOK_ID || '',
+      clientSecret: process.env.FACEBOOK_SECRET || '',
     }),
   ],
+
   callbacks: {
-    async jwt({ token, user, account }) {
+    jwt({ token, user, account }): Promise<JWT> {
       if (user) {
         token.user = user;
       }
       if (account) {
         token.account = account;
       }
-      return token;
+      return Promise.resolve(token);
     },
-    async session({ session, token }) {
+    session({ session, token }): Session {
       if (token) {
-        session.token = token;
+        (session as Session & { token?: JWT }).token = token;
       }
       return session;
     },
