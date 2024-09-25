@@ -16,7 +16,7 @@ import { RestaurantUpdateDTO } from '@interfaces/RestaurantDTOs';
 import { SelectChangeEvent } from '@mui/material';
 
 interface EditRestaurantModalProps {
-  restaurantId: number;
+  restaurantId: string;
   initialData: RestaurantUpdateDTO;
   onClose: () => void;
   onUpdate: () => void;

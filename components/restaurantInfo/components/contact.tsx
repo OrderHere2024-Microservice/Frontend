@@ -11,7 +11,7 @@ const ContactMap = dynamic(() => import('./ContactMap'), { ssr: false });
 const Contact = ({
   data,
 }: {
-  data: { contactNumber: string; email: string; address: string };
+  data: { contactNumber: string; address: string };
 }) => {
   return (
     <Box sx={{ mt: 4, width: '30%' }}>
@@ -19,7 +19,6 @@ const Contact = ({
         Contact
       </Typography>
       <Typography sx={{ fontSize: '20px' }}>{data.contactNumber}</Typography>
-      <Typography sx={{ fontSize: '20px' }}>{data.email}</Typography>
       <Typography sx={{ fontSize: '20px' }}>{data.address}</Typography>
       <ContactMap address={data.address} />
       <Box>

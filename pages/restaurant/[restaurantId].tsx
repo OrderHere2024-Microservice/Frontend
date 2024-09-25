@@ -74,10 +74,14 @@ const RestaurantInfoPage = () => {
           </Button>
           {isEditModalOpen && (
             <EditRestaurantModal
-              restaurantId={restaurantId}
+              restaurantId={restaurantId as string}
               initialData={restaurantData}
               onClose={() => setIsEditModalOpen(false)}
-              onUpdate={refreshRestaurantData}
+              onUpdate={() => {
+                refreshRestaurantData().catch((err) => {
+                  console.error(err);
+                });
+              }}
             />
           )}
         </Box>
