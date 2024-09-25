@@ -71,7 +71,7 @@ const PayPage = () => {
     <div className="App">
       {clientSecret ? (
         <Elements stripe={stripePromise} options={options}>
-          <PaymentForm paymentId={paymentId} orderId={orderId} />
+          <PaymentForm paymentId={paymentId!} orderId={parsedOrderId} />
         </Elements>
       ) : (
         <p>Loading...</p>
