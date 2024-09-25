@@ -5,7 +5,7 @@ import { useMutation } from '@apollo/client';
 import FoodItem from '/components/DishList/FoodItem';
 import { Box, CircularProgress, Alert, Button } from '@mui/material';
 import AddDishModal from './AddDishModal';
-import { addDishStart, addDishSuccess, addDishError } from './AddDishModal';
+import { addDishStart, addDishSuccess, addDishError } from '@store/actions/dishAction';
 import { jwtInfo } from '@utils/jwtInfo';
 import { postDishes, DELETE_DISH, CREATE_DISH } from '@services/Dish';
 
@@ -47,7 +47,7 @@ const FoodItemsList = ({ dishes: initialDishes }) => {
       const response = await postDishes(newDishData);
 
       if (response) {
-        dispatch(addDishSuccess(response.data.data));
+        dispatch(addDishSuccess());
         setDishAdditionCount((count) => count + 1);
         router.push('/');
       }

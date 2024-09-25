@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -10,19 +10,35 @@ import {
   TextField,
   FormControl,
   Button,
+  SelectChangeEvent,
 } from '@mui/material';
 import { useQuery } from '@apollo/client';
-import {
-  ADD_DISH_START,
-  ADD_DISH_SUCCESS,
-  ADD_DISH_ERROR,
-} from '@store/actionTypes';
 import DeleteIcon from '@mui/icons-material/Delete';
-
 import { GET_CATEGORIES_BY_RESTAURANT } from '@services/Category';
+import { CategoryGetDto } from '@interfaces/CategoryDTOs';
 
-const AddDishModal = ({ open, handleClose, handleSubmit }) => {
-  const [newDish, setNewDish] = useState({
+interface AddDishModalProps {
+  open: boolean;
+  handleClose: () => void;
+  handleSubmit: (newDishData: DishFormData) => void;
+}
+
+interface DishFormData {
+  dishName: string;
+  description: string;
+  price: number;
+  restaurantId: number;
+  availability: boolean;
+  imageFile: File | null;
+  categoryId: number;
+}
+
+const AddDishModal = ({
+  open,
+  handleClose,
+  handleSubmit,
+}: AddDishModalProps) => {
+  const [newDish, setNewDish] = useState<DishFormData>({
     dishName: '',
     description: '',
     price: 0.0,
@@ -32,17 +48,23 @@ const AddDishModal = ({ open, handleClose, handleSubmit }) => {
     categoryId: 0,
   });
 
-  const [imageName, setImageName] = useState('');
+  const [imageName, setImageName] = useState<string>('');
 
-  const { loading, error, data } = useQuery(GET_CATEGORIES_BY_RESTAURANT, {
+  const { loading, error, data } = useQuery<{
+    getCategories: CategoryGetDto[];
+  }>(GET_CATEGORIES_BY_RESTAURANT, {
     variables: { restaurantId: newDish.restaurantId },
     skip: !open,
   });
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
+  const handleChange = (
+    e:
+      | ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+      | SelectChangeEvent<number>,
+  ) => {
+    const { name, value, files } = e.target as HTMLInputElement;
 
-    if (name === 'imageFile') {
+    if (name === 'imageFile' && files) {
       setNewDish({ ...newDish, imageFile: files[0] });
       setImageName(files[0].name);
     } else {
@@ -59,8 +81,6 @@ const AddDishModal = ({ open, handleClose, handleSubmit }) => {
     setImageName('');
     setNewDish({ ...newDish, imageFile: null });
   };
-
-  const selectCategory = (categoryId) => parseInt(categoryId);
 
   if (loading) return <p>Loading categories...</p>;
   if (error) return <p>Error loading categories: {error.message}</p>;
@@ -88,13 +108,14 @@ const AddDishModal = ({ open, handleClose, handleSubmit }) => {
           label="Price"
           fullWidth
           margin="normal"
+          type="number"
           onChange={handleChange}
         />
         <FormControl fullWidth margin="normal">
           <InputLabel>Category</InputLabel>
           <Select
             name="categoryId"
-            value={selectCategory(newDish.categoryId)}
+            value={newDish.categoryId}
             label="Category"
             onChange={handleChange}
           >
@@ -139,17 +160,3 @@ const AddDishModal = ({ open, handleClose, handleSubmit }) => {
 };
 
 export default AddDishModal;
-
-export const addDishStart = () => ({
-  type: ADD_DISH_START,
-});
-
-export const addDishSuccess = (dishData) => ({
-  type: ADD_DISH_SUCCESS,
-  payload: dishData,
-});
-
-export const addDishError = (error) => ({
-  type: ADD_DISH_ERROR,
-  payload: error,
-});

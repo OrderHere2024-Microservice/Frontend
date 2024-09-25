@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Box,
@@ -9,11 +9,22 @@ import {
   Button,
 } from '@mui/material';
 import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import * as Action from '@store/actionTypes';
 import DishPopup from '../DishPopUp/DishPopUp';
 import RatingStars from './RatingStars';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { jwtInfo } from '@utils/jwtInfo';
+import { RootState } from '@store/store';
+
+interface FoodItemProps {
+  dishId: number;
+  dishName: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+  rating: number;
+  onRemoveDish: (dishId: number) => void;
+}
 
 const FoodItem = ({
   dishId,
@@ -23,16 +34,16 @@ const FoodItem = ({
   imageUrl,
   rating,
   onRemoveDish,
-}) => {
+}: FoodItemProps) => {
   const dispatch = useDispatch();
-  const cartItems = useSelector((state) => state.cart.items);
+  const cartItems = useSelector((state: RootState) => state.cart.items);
   const item = cartItems.find((item) => item.dishId === dishId);
   const quantity = item ? item.quantity : 0;
-  const [popupOpen, setPopupOpen] = React.useState(false);
-  const [isAddedToCart, setIsAddedToCart] = React.useState(false);
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [isAddedToCart, setIsAddedToCart] = useState(false);
 
-  const { token } = useSelector((state) => state.sign);
-  const { userRole } = jwtInfo(token);
+  const { token } = useSelector((state: RootState) => state.sign);
+  const { userRole } = jwtInfo(token as string);
 
   useEffect(() => {
     if (quantity === 0) {
@@ -91,7 +102,7 @@ const FoodItem = ({
           height: '200px',
         }}
       >
-        {userRole == 'ROLE_sys_admin' && (
+        {userRole === 'ROLE_sys_admin' && (
           <IconButton
             onClick={() => onRemoveDish(dishId)}
             sx={{
@@ -223,7 +234,6 @@ const FoodItem = ({
         description={description}
         price={price}
         imageUrl={imageUrl}
-        rating={rating}
         open={popupOpen}
         onClose={togglePopup}
       />
