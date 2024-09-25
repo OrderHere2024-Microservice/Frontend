@@ -122,7 +122,6 @@ const FoodItemsList = ({ dishes: initialDishes }: FoodItemsListProps) => {
     );
   }
 
-  // Handle error state
   if (error) {
     return (
       <Box
