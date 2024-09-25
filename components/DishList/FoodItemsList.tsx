@@ -107,7 +107,6 @@ const FoodItemsList = ({ dishes: initialDishes }: FoodItemsListProps) => {
     setError(null);
   }, [priceRange, dishAdditionCount, initialDishes, searchTerm, category]);
 
-  // Handle loading state
   if (isLoading) {
     return (
       <Box
