@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   Box,
-  Button,
   Container,
   TextField,
   Typography,
@@ -15,10 +14,22 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { resetpassword } from '@services/Public';
 import hotToast from '@utils/hotToast';
 
-const ResetPassword = ({ open, onClose, email }) => {
+interface ResetPasswordProps {
+  open: boolean;
+  onClose: () => void;
+  email: string;
+}
+
+interface ResetPasswordFormValues {
+  code: string;
+  newPassword: string;
+}
+
+const ResetPassword = ({ open, onClose, email }: ResetPasswordProps) => {
   const [isLoading, setLoading] = useState(false);
 
-  const formik = useFormik({
+  // Formik for form handling with initial values and validation schema
+  const formik = useFormik<ResetPasswordFormValues>({
     initialValues: {
       code: '',
       newPassword: '',
@@ -26,22 +37,29 @@ const ResetPassword = ({ open, onClose, email }) => {
     validationSchema: Yup.object({
       code: Yup.string().required('Verification code is required'),
       newPassword: Yup.string()
-        .min(6, 'must be at least 6 characters long')
-        .max(16)
+        .min(6, 'Must be at least 6 characters long')
+        .max(16, 'Must not exceed 16 characters')
         .required('Password is required'),
     }),
-    onSubmit: (values, { setSubmitting }) => {
+    onSubmit: async (values) => {
       setLoading(true);
-      resetpassword(email, values.code, values.newPassword)
-        .then((response) => {
-          setLoading(false);
-          hotToast('success', 'Password reset successful.');
-          onClose();
-        })
-        .catch((error) => {
-          setLoading(false);
-          hotToast('error', error.response.data || 'An unknown error occurred');
-        });
+      try {
+        await resetpassword(email, values.code, values.newPassword);
+        hotToast('success', 'Password reset successful.');
+        onClose();
+      } catch (error: unknown) {
+        let errorMessage = 'An unknown error occurred';
+        if (error instanceof Error) {
+          const errorResponse = error as { response?: { data?: string } };
+          errorMessage =
+            typeof errorResponse.response?.data === 'string'
+              ? errorResponse.response.data
+              : error.message;
+        }
+        hotToast('error', errorMessage);
+      } finally {
+        setLoading(false);
+      }
     },
   });
 

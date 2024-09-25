@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import {
   Avatar,
@@ -22,21 +22,31 @@ import {
   getUserProfile,
   updateUserAvatar,
 } from '@services/Profile';
-import PlacesAutocomplete, {
-  geocodeByAddress,
-  getLatLng,
-} from 'react-places-autocomplete';
+import PlacesAutocomplete, { Suggestion } from 'react-places-autocomplete';
+import { UserGetDto } from '@interfaces/UserDTOs';
 
-export default function ProfileForm() {
+interface Profile {
+  userName: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  points: number;
+  avatarUrl: string;
+  language: string;
+  privacy: string;
+  address: string;
+}
+
+const ProfileForm: React.FC = () => {
   const [editMode, setEditMode] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, serError] = useState(null);
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('info');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<
+    'info' | 'success' | 'error'
+  >('info');
 
-  const defaultProfile = {
+  const defaultProfile: Profile = {
     userName: '',
     firstName: '',
     lastName: '',
@@ -48,74 +58,68 @@ export default function ProfileForm() {
     address: '',
   };
 
-  const [originalProfile, setOriginalProfile] = useState(defaultProfile);
-  const [profile, setProfile] = useState(defaultProfile);
+  const [originalProfile, setOriginalProfile] =
+    useState<Profile>(defaultProfile);
+  const [profile, setProfile] = useState<Profile>(defaultProfile);
 
   const router = useRouter();
 
   const fetchUserProfile = async () => {
-    setLoading(true);
     try {
-      const response = await getUserProfile();
+      const response = (await getUserProfile()) as { data: UserGetDto };
+      const data = response.data;
       setProfile({
-        userName: response.data.username,
-        firstName: response.data.firstname,
-        lastName: response.data.lastname,
-        email: response.data.email,
-        points: response.data.point,
-        avatarUrl: response.data.avatarUrl,
+        userName: data.username,
+        firstName: data.firstname,
+        lastName: data.lastname,
+        email: data.email,
+        points: data.point,
+        avatarUrl: data.avatarUrl,
         language: 'English',
         privacy: 'Public',
-        address: response.data.address,
+        address: data.address,
       });
       setOriginalProfile({
-        userName: response.data.username,
-        firstName: response.data.firstname,
-        lastName: response.data.lastname,
-        email: response.data.email,
-        points: response.data.point,
-        avatarUrl: response.data.avatarUrl,
+        userName: data.username,
+        firstName: data.firstname,
+        lastName: data.lastname,
+        email: data.email,
+        points: data.point,
+        avatarUrl: data.avatarUrl,
         language: 'English',
         privacy: 'Public',
-        address: response.data.address,
+        address: data.address,
       });
     } catch (error) {
       console.error('Error fetching user profile:', error);
-      serError(error);
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchUserProfile();
+    fetchUserProfile().catch((error) => {
+      console.error('Error fetching user profile:', error);
+    });
   }, []);
 
-  const handleChange = (e) => {
-    if (e && e.target) {
-      setProfile({
-        ...profile,
-        [e.target.name]: e.target.value,
-      });
-    } else {
-      setProfile({
-        ...profile,
-        address: e,
-      });
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setProfile({
+      ...profile,
+      [e.target.name]: e.target.value,
+    });
   };
 
-  const handleAvatarChange = async (e) => {
-    const file = e.target.files[0];
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
       const formData = new FormData();
       formData.append('imageFile', file);
 
       try {
-        setLoading(true);
-        const response = await updateUserAvatar(formData);
+        const response = (await updateUserAvatar(formData)) as {
+          status: number;
+          data: string;
+        };
         if (response.status === 200) {
-          console.log(response.data);
           setProfile({
             ...profile,
             avatarUrl: response.data,
@@ -136,13 +140,15 @@ export default function ProfileForm() {
         setSnackbarSeverity('error');
       } finally {
         setSnackbarOpen(true);
-        setLoading(false);
         router.reload();
       }
     }
   };
 
-  const handleSnackbarClose = (event, reason) => {
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string,
+  ) => {
     if (reason === 'clickaway') {
       return;
     }
@@ -151,16 +157,17 @@ export default function ProfileForm() {
 
   const handleEdit = () => {
     if (editMode) {
-      setProfile(originalProfile);
+      setProfile(originalProfile); // Revert changes if editing is canceled
     } else {
-      setOriginalProfile(profile);
+      setOriginalProfile(profile); // Save the current state
     }
     setEditMode(!editMode);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
     e.preventDefault();
-    setLoading(true);
     try {
       const userProfileUpdateDTO = {
         username: profile.userName,
@@ -169,17 +176,15 @@ export default function ProfileForm() {
         address: profile.address,
       };
       await updateUserProfile(userProfileUpdateDTO);
-      setOriginalProfile(profile);
+      setOriginalProfile(profile); // Save the updated profile as the new original
       setSnackbarMessage('User information change successful!');
       setSnackbarSeverity('success');
     } catch (error) {
       console.error('Error updating user profile:', error);
-      serError(error);
       setSnackbarMessage('Failed to update user information.');
       setSnackbarSeverity('error');
     } finally {
       setSnackbarOpen(true);
-      setLoading(false);
       router.reload();
     }
     setEditMode(false);
@@ -224,11 +229,26 @@ export default function ProfileForm() {
           }}
         >
           <BorderColorSharpIcon />
-          <input type="file" hidden onChange={handleAvatarChange} />
+          <input
+            type="file"
+            hidden
+            onChange={(e) => {
+              handleAvatarChange(e).catch((error) => {
+                console.error('Error updating avatar:', error);
+              });
+            }}
+          />
         </Button>
       </Box>
       <Paper elevation={3} sx={{ padding: 3 }}>
-        <form onSubmit={handleSubmit}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit(e).catch((error) => {
+              console.error('Error submitting payment:', error);
+            });
+          }}
+        >
           <Grid container spacing={2} alignItems="flex-start">
             <Grid item xs={12} md={6}>
               <Paper variant={'outlined'} sx={{ padding: 2 }}>
@@ -279,7 +299,9 @@ export default function ProfileForm() {
                 />
                 <PlacesAutocomplete
                   value={profile.address}
-                  onChange={handleChange}
+                  onChange={(value) =>
+                    setProfile({ ...profile, address: value })
+                  }
                 >
                   {({ getInputProps, suggestions, getSuggestionItemProps }) => (
                     <div>
@@ -292,7 +314,7 @@ export default function ProfileForm() {
                         })}
                       />
                       <div>
-                        {suggestions.map((suggestion) => (
+                        {suggestions.map((suggestion: Suggestion) => (
                           <div
                             {...getSuggestionItemProps(suggestion)}
                             key={suggestion.placeId}
@@ -383,7 +405,6 @@ export default function ProfileForm() {
               type="submit"
               variant="contained"
               color="secondary"
-              onClick={handleSubmit}
               disabled={!editMode}
               sx={{
                 width: '120px',
@@ -412,4 +433,6 @@ export default function ProfileForm() {
       </Snackbar>
     </Container>
   );
-}
+};
+
+export default ProfileForm;

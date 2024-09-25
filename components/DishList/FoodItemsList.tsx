@@ -2,65 +2,92 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector, useDispatch } from 'react-redux';
 import { useMutation } from '@apollo/client';
-import FoodItem from '/components/DishList/FoodItem';
 import { Box, CircularProgress, Alert, Button } from '@mui/material';
+import FoodItem from './FoodItem';
 import AddDishModal from './AddDishModal';
-import { addDishStart, addDishSuccess, addDishError } from './AddDishModal';
+import {
+  addDishStart,
+  addDishSuccess,
+  addDishError,
+} from '@store/actions/dishAction';
 import { jwtInfo } from '@utils/jwtInfo';
-import { postDishes, DELETE_DISH, CREATE_DISH } from '@services/Dish';
+import { postDishes, DELETE_DISH } from '@services/Dish';
+import { RootState } from '@store/store';
+import { DishGetDto } from '@interfaces/DishDTOs';
+import { DishCreateDto } from '@interfaces/DishDTOs';
 
-const FoodItemsList = ({ dishes: initialDishes }) => {
-  const [dishes, setDishes] = useState(initialDishes);
+interface FoodItemsListProps {
+  dishes: DishGetDto[];
+}
+
+const FoodItemsList = ({ dishes: initialDishes }: FoodItemsListProps) => {
+  const [dishes, setDishes] = useState<DishGetDto[]>(initialDishes);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [isAddDishModalOpen, setAddDishModalOpen] = useState(false);
   const [dishAdditionCount, setDishAdditionCount] = useState(0);
-  const { searchTerm, category } = useSelector((state) => state.dish);
 
+  const { searchTerm, category } = useSelector(
+    (state: RootState) => state.dish,
+  );
+  const priceRange = useSelector((state: RootState) => state.filter.priceRange);
+  const { token } = useSelector((state: RootState) => state.sign);
   const dispatch = useDispatch();
   const router = useRouter();
-  const priceRange = useSelector((state) => state.filter.priceRange);
-  const { token } = useSelector((state) => state.sign);
-  const { userRole } = jwtInfo(token);
+  const { userRole } = jwtInfo(token || '');
 
-  const [deleteDishMutation] = useMutation(DELETE_DISH);
+  const [deleteDishMutation] = useMutation<{ deleteDish: boolean }>(
+    DELETE_DISH,
+  );
 
   const handleAddNewDishClick = () => setAddDishModalOpen(true);
   const handleCloseModal = () => setAddDishModalOpen(false);
 
-  const handleRemoveDish = async (dishId) => {
+  const handleRemoveDish = async (dishId: number) => {
     try {
+      setIsLoading(true);
       const response = await deleteDishMutation({ variables: { dishId } });
-      if (response.data.deleteDish) {
+      if (response.data?.deleteDish) {
         setDishes((currentDishes) =>
           currentDishes.filter((dish) => dish.dishId !== dishId),
         );
       }
     } catch (error) {
       setError('Error deleting dish');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleAddDishSubmit = async (newDishData) => {
+  const handleAddDishSubmit = async (newDishData: DishCreateDto) => {
     dispatch(addDishStart());
     try {
+      setIsLoading(true);
       const response = await postDishes(newDishData);
 
       if (response) {
-        dispatch(addDishSuccess(response.data.data));
+        dispatch(addDishSuccess());
         setDishAdditionCount((count) => count + 1);
-        router.push('/');
+        await router.push('/');
       }
-    } catch (error) {
-      dispatch(addDishError(error.toString()));
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        dispatch(addDishError(error.message));
+      } else {
+        dispatch(addDishError('An unknown error occurred'));
+      }
+    } finally {
+      setIsLoading(false);
     }
     handleCloseModal();
   };
 
+  // Effect to filter dishes based on price range, search term, and category
   useEffect(() => {
     let filteredDishes = initialDishes.filter(
       (dish) => dish.price >= priceRange.min && dish.price <= priceRange.max,
     );
+
     if (searchTerm) {
       filteredDishes = filteredDishes.filter(
         (dish) =>
@@ -69,15 +96,18 @@ const FoodItemsList = ({ dishes: initialDishes }) => {
           dish.price.toString().includes(searchTerm),
       );
     }
+
     if (category) {
       filteredDishes = filteredDishes.filter(
         (dish) => dish.categoryId === category,
       );
     }
+
     setDishes(filteredDishes);
     setError(null);
   }, [priceRange, dishAdditionCount, initialDishes, searchTerm, category]);
 
+  // Handle loading state
   if (isLoading) {
     return (
       <Box
@@ -93,6 +123,7 @@ const FoodItemsList = ({ dishes: initialDishes }) => {
     );
   }
 
+  // Handle error state
   if (error) {
     return (
       <Box
@@ -121,7 +152,15 @@ const FoodItemsList = ({ dishes: initialDishes }) => {
           price={dish.price}
           imageUrl={dish.imageUrl}
           rating={dish.rating}
-          onRemoveDish={handleRemoveDish}
+          onRemoveDish={(dishId) => {
+            handleRemoveDish(dishId).catch((error: unknown) => {
+              if (error instanceof Error) {
+                setError(error.message);
+              } else {
+                setError('An unknown error occurred');
+              }
+            });
+          }}
         />
       ))}
 
@@ -149,7 +188,15 @@ const FoodItemsList = ({ dishes: initialDishes }) => {
           <AddDishModal
             open={isAddDishModalOpen}
             handleClose={handleCloseModal}
-            handleSubmit={handleAddDishSubmit}
+            handleSubmit={(newDishData) => {
+              handleAddDishSubmit(newDishData).catch((error: unknown) => {
+                if (error instanceof Error) {
+                  setError(error.message);
+                } else {
+                  setError('An unknown error occurred');
+                }
+              });
+            }}
           />
         </>
       )}

@@ -1,8 +1,9 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
+import { OpeningHourDTO } from '@interfaces/RestaurantDTOs';
 
-const OpeningHours = ({ data }) => {
-  const capitalizeFirstLetter = (string) => {
+const OpeningHours = ({ data }: { data: OpeningHourDTO[] }) => {
+  const capitalizeFirstLetter = (string: string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
 

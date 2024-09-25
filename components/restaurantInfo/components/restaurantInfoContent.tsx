@@ -1,7 +1,11 @@
 import React from 'react';
 import { Box, Container, Typography } from '@mui/material';
 
-const RestaurantInfoContent = ({ data }) => {
+const RestaurantInfoContent = ({
+  data,
+}: {
+  data: { name: string; description: string };
+}) => {
   return (
     <Box sx={{ display: 'flex', mt: 4, px: 8 }}>
       <Container maxWidth="md" style={{ padding: 0, margin: 'auto' }}>

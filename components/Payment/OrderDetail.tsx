@@ -1,19 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_RESTAURANT_ADDRESS } from '@services/Restaurant';
 import { GET_ORDER_BY_ID } from '@services/orderService';
 import { Box, Divider, Grid, Typography } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import { OrderGetDTO } from '@interfaces/OrderDTOs';
 
-export const OrderDetail = ({ orderId }) => {
-  console.log(orderId);
-  const [restaurantId, setRestaurantId] = useState(1);
+export const OrderDetail = ({ orderId }: { orderId: number }) => {
+  const restaurantId = 1;
 
   const {
     loading: loadingOrder,
     error: orderError,
     data: orderData,
-  } = useQuery(GET_ORDER_BY_ID, {
+  } = useQuery<{
+    getOrderById: OrderGetDTO;
+  }>(GET_ORDER_BY_ID, {
     variables: { orderId },
   });
 
@@ -21,12 +23,16 @@ export const OrderDetail = ({ orderId }) => {
     loading: loadingRestaurant,
     error: restaurantError,
     data: restaurantAddressData,
-  } = useQuery(GET_RESTAURANT_ADDRESS, {
+  } = useQuery<{
+    getRestaurantById: {
+      address: string;
+    };
+  }>(GET_RESTAURANT_ADDRESS, {
     variables: { restaurantId },
     skip: !restaurantId,
   });
 
-  const convertToMelbourneTime = (utcTimestamp) => {
+  const convertToMelbourneTime = (utcTimestamp: string | null | undefined) => {
     if (!utcTimestamp) {
       return 'Null';
     }
@@ -35,17 +41,17 @@ export const OrderDetail = ({ orderId }) => {
       : utcTimestamp;
 
     const date = new Date(trimmedTimestamp);
-    if (isNaN(date)) {
+    if (isNaN(date.getTime())) {
       return 'Null';
     }
 
-    const dateOptions = {
+    const dateOptions: Intl.DateTimeFormatOptions = {
       year: 'numeric',
       month: 'numeric',
       day: 'numeric',
       timeZone: 'Australia/Melbourne',
     };
-    const timeOptions = {
+    const timeOptions: Intl.DateTimeFormatOptions = {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
@@ -61,8 +67,10 @@ export const OrderDetail = ({ orderId }) => {
     return `${formattedDate}\n${formattedTime}`;
   };
 
-  const renderOrderTypeInfo = (order) => {
-    switch (order?.orderType) {
+  const renderOrderTypeInfo = (order: OrderGetDTO | null | undefined) => {
+    if (!order) return null;
+
+    switch (order.orderType) {
       case 'delivery':
         return (
           <>
@@ -113,7 +121,7 @@ export const OrderDetail = ({ orderId }) => {
                 Dine In Time
               </Typography>
               <Typography sx={{ fontWeight: 'bold' }}>
-                {order?.pickUpTime ? order?.pickUpTime : 'Null'}
+                {convertToMelbourneTime(order?.pickupTime)}
               </Typography>
             </Grid>
           </>
@@ -191,7 +199,7 @@ export const OrderDetail = ({ orderId }) => {
                 <Typography
                   sx={{ color: 'text.secondary', textTransform: 'capitalize' }}
                 >
-                  {order.orderType == 'dine_in' ? 'Dine in' : order.orderType}{' '}
+                  {order.orderType === 'dine_in' ? 'Dine in' : order.orderType}{' '}
                   Address
                 </Typography>
                 <Box display="flex" alignItems="center">
@@ -224,7 +232,7 @@ export const OrderDetail = ({ orderId }) => {
                     <Typography
                       sx={{ fontWeight: 'bold', textTransform: 'capitalize' }}
                     >
-                      {order.orderStatus == 'in_transit'
+                      {order.orderStatus === 'in_transit'
                         ? 'In transit'
                         : order.orderStatus}
                     </Typography>

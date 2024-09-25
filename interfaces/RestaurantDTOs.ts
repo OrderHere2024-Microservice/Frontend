@@ -1,6 +1,6 @@
 export interface OpeningHourDTO {
   id: number;
-  dayOfWeek: number;
+  dayOfWeek: string;
   openingTime: string;
   closingTime: string;
 }

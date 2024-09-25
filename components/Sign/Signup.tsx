@@ -19,54 +19,70 @@ import { loginAction } from '@store/actions/httpAction';
 import GoogleSignInBtn from './UI/GoogleSignInBtn';
 import FacebookSignInBtn from './UI/FacebookSignInBtn';
 
-const Signup = ({ login }) => {
+interface SignupProps {
+  login: () => void;
+}
+
+const Signup = ({ login }: SignupProps) => {
   const [isLoading, setLoading] = useState(false);
   const dispatch = useDispatch();
+
   const formik = useFormik({
     initialValues: {
       firstname: '',
       lastname: '',
       email: '',
       password: '',
-      submit: null,
     },
     validationSchema: Yup.object({
-      firstname: Yup.string().max(255).required('firstname is required'),
-      lastname: Yup.string().max(255).required('lastname is required'),
+      firstname: Yup.string().max(255).required('First name is required'),
+      lastname: Yup.string().max(255).required('Last name is required'),
       email: Yup.string()
         .email('Must be a valid email')
         .max(255)
         .required('Email is required'),
       password: Yup.string()
-        .min(6, 'must be at least 6 characters long')
-        .max(16)
+        .min(6, 'Must be at least 6 characters long')
+        .max(16, 'Must not exceed 16 characters')
         .required('Password is required'),
     }),
     onSubmit: async (values) => {
       const { firstname, lastname, email, password } = values;
       setLoading(true);
-      signup(firstname + ' ' + lastname, firstname, lastname, password, email)
-        .then(() => {
-          hotToast('success', 'Signup Success');
-          dispatch(
-            loginAction(
-              email,
-              password,
-              () => {},
-              (fail) => {
-                setLoading(false);
-                if (fail && fail.response && fail.response.status === 403) {
-                  hotToast('error', 'Invalid Email or Password');
-                }
-                hotToast('error', `something wrong${fail}`);
-              },
-            ),
-          );
-        })
-        .catch((error) => {
-          setLoading(false);
-          hotToast('error', `Something wrong: ${error}`);
-        });
+
+      try {
+        await signup(
+          firstname + ' ' + lastname,
+          firstname,
+          lastname,
+          password,
+          email,
+        );
+
+        hotToast('success', 'Signup Success');
+        dispatch(
+          loginAction(
+            email,
+            password,
+            () => {},
+            (error) => {
+              const fail = error as { response?: { status?: number } };
+              setLoading(false);
+              if (fail?.response?.status === 403) {
+                hotToast('error', 'Invalid Email or Password');
+              } else {
+                const errorMessage = fail?.response?.status
+                  ? `Status code: ${fail.response.status}`
+                  : 'Unknown error';
+                hotToast('error', `Something went wrong: ${errorMessage}`);
+              }
+            },
+          ),
+        );
+      } catch (error) {
+        setLoading(false);
+        hotToast('error', `Something went wrong: ${String(error)}`);
+      }
     },
   });
 
@@ -105,12 +121,12 @@ const Signup = ({ login }) => {
               )}
               fullWidth
               helperText={formik.touched.firstname && formik.errors.firstname}
-              label="firstname"
+              label="First Name"
               margin="normal"
               name="firstname"
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
-              type="firstname"
+              type="text"
               value={formik.values.firstname}
               variant="outlined"
             />
@@ -118,16 +134,15 @@ const Signup = ({ login }) => {
               error={Boolean(formik.touched.lastname && formik.errors.lastname)}
               fullWidth
               helperText={formik.touched.lastname && formik.errors.lastname}
-              label="lastname"
+              label="Last Name"
               margin="normal"
               name="lastname"
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
-              type="firstname"
+              type="text"
               value={formik.values.lastname}
               variant="outlined"
             />
-
             <TextField
               error={Boolean(formik.touched.email && formik.errors.email)}
               fullWidth
@@ -141,7 +156,6 @@ const Signup = ({ login }) => {
               value={formik.values.email}
               variant="outlined"
             />
-
             <TextField
               error={Boolean(formik.touched.password && formik.errors.password)}
               fullWidth
@@ -174,7 +188,7 @@ const Signup = ({ login }) => {
 
             <Grid container>
               <Grid item xs={6}>
-                <GoogleSignInBtn>Sign in With Google</GoogleSignInBtn>
+                <GoogleSignInBtn />
               </Grid>
               <Grid item xs={6}>
                 <FacebookSignInBtn></FacebookSignInBtn>
@@ -193,7 +207,7 @@ const Signup = ({ login }) => {
                 </Grid>
                 <Grid item>
                   <Typography color="textSecondary" variant="body2">
-                    <Button onClick={() => login()}>Log in</Button>
+                    <Button onClick={login}>Log in</Button>
                   </Typography>
                 </Grid>
               </Grid>

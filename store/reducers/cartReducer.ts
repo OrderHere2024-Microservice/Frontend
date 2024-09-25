@@ -1,7 +1,7 @@
 import * as Action from '../actionTypes';
 import { CartState } from '@store/types';
 
-interface AddToCartPayload {
+export interface AddToCartPayload {
   dishId: number;
   dishName: string;
   quantity: number;
@@ -10,7 +10,7 @@ interface AddToCartPayload {
   imageUrl?: string;
 }
 
-interface RemoveFromCartPayload {
+export interface RemoveFromCartPayload {
   dishId: number;
 }
 

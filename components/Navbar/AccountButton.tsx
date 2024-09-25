@@ -11,17 +11,16 @@ import {
   registerSignDialog,
   loginSignDialog,
 } from '@store/actions/signAction';
-import { useSession } from 'next-auth/react';
 import { getUserProfile } from '@services/Profile';
+import { RootState } from '@store/store';
 
-const AccountButton = ({ isLogin }) => {
+const AccountButton = ({ isLogin }: { isLogin: boolean }) => {
   const anchorRef = useRef(null);
   const [openPopover, setOpenPopover] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState('headImgUrl');
-  const { data: session } = useSession();
 
   //state to manage signIn dialog
-  const { isOpen, content } = useSelector((state) => state.sign);
+  const { isOpen, content } = useSelector((state: RootState) => state.sign);
   const dispatch = useDispatch();
 
   const handleButtonClick = () => {
@@ -38,7 +37,7 @@ const AccountButton = ({ isLogin }) => {
         return;
       }
       const response = await getUserProfile();
-      setAvatarUrl(response.data.avatarUrl);
+      setAvatarUrl((response.data as { avatarUrl: string }).avatarUrl);
     } catch (error) {
       console.log(error);
     }
@@ -46,7 +45,7 @@ const AccountButton = ({ isLogin }) => {
 
   useEffect(() => {
     if (isLogin) {
-      fetchProfile();
+      fetchProfile().catch((error) => console.error(error));
     }
   }, [isLogin]);
 

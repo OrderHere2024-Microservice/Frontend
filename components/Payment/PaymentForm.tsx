@@ -12,18 +12,24 @@ import * as Action from '@store/actionTypes';
 import { useMutation } from '@apollo/client';
 import { SEND_PAYMENT_RESULT } from '@services/Payment';
 
-const PaymentForm = ({ paymentId, orderId }) => {
+const PaymentForm = ({
+  paymentId,
+  orderId,
+}: {
+  paymentId: number;
+  orderId: number;
+}) => {
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const [message, setMessage] = useState(null);
+  const [message, setMessage] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
 
   const [sendPayResult] = useMutation(SEND_PAYMENT_RESULT);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!stripe || !elements) {
@@ -50,7 +56,7 @@ const PaymentForm = ({ paymentId, orderId }) => {
           paymentResultDto,
         },
       });
-      router.push('/pay/failure');
+      await router.push('/pay/failure');
     } else {
       dispatch({ type: Action.CLEAR_CART });
       const paymentResultDto = {
@@ -62,12 +68,12 @@ const PaymentForm = ({ paymentId, orderId }) => {
           paymentResultDto,
         },
       });
-      router.push(`/pay/success?orderId=${orderId}`);
+      await router.push(`/pay/success?orderId=${orderId}`);
     }
   };
 
   const paymentElementOptions = {
-    layout: 'tabs',
+    layout: 'tabs' as const,
   };
 
   return (
@@ -99,7 +105,16 @@ const PaymentForm = ({ paymentId, orderId }) => {
           Please select your payment options
         </Typography>
       </Box>
-      <form className={styles.form} id="payment-form" onSubmit={handleSubmit}>
+      <form
+        className={styles.form}
+        id="payment-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit(e).catch((error) => {
+            console.error('Error submitting payment:', error);
+          });
+        }}
+      >
         <PaymentElement id="payment-element" options={paymentElementOptions} />
         <Button
           type={'submit'}

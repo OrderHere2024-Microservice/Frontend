@@ -9,50 +9,68 @@ import {
   Popover,
   Typography,
 } from '@mui/material';
-
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
-import { useSelector } from 'react-redux';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { useSession } from 'next-auth/react';
 import HistoryIcon from '@mui/icons-material/History';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { logoutAction } from '@store/actions/signAction';
 import { signOut } from 'next-auth/react';
-import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { jwtInfo } from '@utils/jwtInfo';
 import { getUserProfile } from '@services/Profile';
+import { RootState } from '@store/store';
 
-const AccountPopover = (props) => {
-  const { anchorEl, onClose, open, ...other } = props;
+const AccountPopover = ({
+  anchorEl,
+  onClose,
+  open,
+  ...other
+}: {
+  anchorEl: HTMLElement | null;
+  onClose: () => void;
+  open: boolean;
+}) => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const { data: session } = useSession();
-  const [username, setUsername] = useState(null);
-  const [avatarUrl, setAvatarUrl] = useState('headImgUrl');
+  const [username, setUsername] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string>('headImgUrl');
 
-  const { token } = useSelector((state) => state.sign);
-  const { userRole } = jwtInfo(token);
-  const { isLogin } = useSelector((state) => state.sign);
+  const { data: session } = useSession();
+
+  const { token } = useSelector((state: RootState) => state.sign);
+  const { userRole } = jwtInfo(token as string);
+  const { isLogin } = useSelector((state: RootState) => state.sign);
 
   const handleLogout = async () => {
     await signOut({ redirect: false });
     dispatch(logoutAction());
     onClose();
-    router.push('/');
+    await router.push('/');
   };
 
   const fetchProfile = async () => {
-    const response = await getUserProfile();
-    setUsername(response.data.username);
-    setAvatarUrl(response.data.avatarUrl);
+    try {
+      const response = await getUserProfile();
+      const data = response.data as {
+        username: string;
+        avatarUrl: string;
+      };
+      setUsername(data.username);
+      setAvatarUrl(data.avatarUrl);
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    }
   };
 
   useEffect(() => {
     if (isLogin) {
-      fetchProfile();
+      fetchProfile().catch((error) =>
+        console.error('Error fetching profile:', error),
+      );
     }
-  }, [session]);
+  }, [session, isLogin]);
 
   return (
     <Popover
@@ -63,17 +81,11 @@ const AccountPopover = (props) => {
       }}
       keepMounted
       onClose={onClose}
-      open={!!open}
-      PaperProps={{ sx: { width: 300 } }}
+      open={open}
       transitionDuration={0}
       {...other}
     >
-      <NextLink
-        href={{
-          pathname: `/profile`,
-        }}
-        passHref
-      >
+      <NextLink href="/profile" passHref>
         <Box
           sx={{
             alignItems: 'center',
@@ -89,7 +101,6 @@ const AccountPopover = (props) => {
               width: 40,
             }}
           />
-
           <Box
             sx={{
               ml: 1,
@@ -104,7 +115,7 @@ const AccountPopover = (props) => {
       </NextLink>
       <Divider />
       <Box sx={{ my: 1 }}>
-        {userRole !== 'ROLE_driver' ? (
+        {userRole !== 'ROLE_driver' && (
           <NextLink href="/order-management" passHref>
             <MenuItem>
               <ListItemIcon>
@@ -121,7 +132,7 @@ const AccountPopover = (props) => {
               />
             </MenuItem>
           </NextLink>
-        ) : null}
+        )}
         <Divider />
         <NextLink href="/profile" passHref>
           <MenuItem component="a">
@@ -135,7 +146,13 @@ const AccountPopover = (props) => {
         </NextLink>
         <Divider />
         <NextLink href="/" passHref>
-          <MenuItem onClick={handleLogout}>
+          <MenuItem
+            onClick={() => {
+              handleLogout().catch((error) =>
+                console.error('Error during logout:', error),
+              );
+            }}
+          >
             <ListItemIcon>
               <LogoutIcon fontSize="small" />
             </ListItemIcon>

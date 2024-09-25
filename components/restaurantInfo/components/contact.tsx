@@ -8,7 +8,11 @@ import dynamic from 'next/dynamic';
 
 const ContactMap = dynamic(() => import('./ContactMap'), { ssr: false });
 
-const Contact = ({ data }) => {
+const Contact = ({
+  data,
+}: {
+  data: { contactNumber: string; email: string; address: string };
+}) => {
   return (
     <Box sx={{ mt: 4, width: '30%' }}>
       <Typography variant="h5" component="h3" sx={{ marginBottom: 2 }}>

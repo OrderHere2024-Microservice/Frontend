@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { GoogleMap, LoadScriptNext, MarkerF } from '@react-google-maps/api';
 
-const ContactMap = ({ address }) => {
-  const [position, setPosition] = useState(null);
+const ContactMap = ({ address }: { address: string }) => {
+  const [position, setPosition] = useState<{
+    lat: number;
+    lng: number;
+  } | null>();
   const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
@@ -12,14 +15,19 @@ const ContactMap = ({ address }) => {
       )}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&sensor=false`,
     )
       .then((response) => response.json())
-      .then((data) => {
-        if (data.status === 'OK') {
-          const location = data.results[0].geometry.location;
-          setPosition({ lat: location.lat, lng: location.lng });
-        } else {
-          console.error('Error from Google Maps API:', data.status);
-        }
-      })
+      .then(
+        (data: {
+          status: string;
+          results: { geometry: { location: { lat: number; lng: number } } }[];
+        }) => {
+          if (data.status === 'OK') {
+            const location = data.results[0].geometry.location;
+            setPosition({ lat: location.lat, lng: location.lng });
+          } else {
+            console.error('Error from Google Maps API:', data.status);
+          }
+        },
+      )
       .catch((error) => {
         console.error('Error in fetching coordinates:', error);
       });
@@ -31,7 +39,7 @@ const ContactMap = ({ address }) => {
 
   return (
     <LoadScriptNext
-      googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+      googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}
     >
       <GoogleMap
         onLoad={() => setMapLoaded(true)}
