@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import Image from 'next/image';
-import Router, { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import ForgetPassword from './ForgetPassword';
 import ResetPassword from './ResetPassword';
 import { useFormik } from 'formik';
@@ -18,27 +18,37 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { closeSignDialog } from '@store/actions/signAction';
 import hotToast from '@utils/hotToast';
 import GoogleSignInBtn from './UI/GoogleSignInBtn';
 import FacebookSignInBtn from './UI/FacebookSignInBtn';
-import { getSession, signIn, useSession } from 'next-auth/react';
+import { getSession, signIn } from 'next-auth/react';
 import { getCsrfToken } from 'next-auth/react';
 import { loginSuccess } from '@store/actions/httpAction';
 import { saveState, store } from '@store/store';
 
-const Login = ({ register }) => {
-  /** state */
+interface LoginProps {
+  register: () => void;
+}
+
+const Login: React.FC<LoginProps> = ({ register }) => {
   const [isLoading, setLoading] = useState(false);
-  const [csrfValue, setCsrfValue] = useState();
-  const { data: session, error } = useSession();
+  const [csrfValue, setCsrfValue] = useState<string | undefined>();
+  const [isRememberMeChecked, setIsRememberMeChecked] = useState(false);
+  const [emailForReset, setEmailForReset] = useState('');
+  const [isForgetPasswordModalOpen, setIsForgetPasswordModalOpen] =
+    useState(false);
+  const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] =
+    useState(false);
+
   const router = useRouter();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    getCsrfToken().then(setCsrfValue);
+    getCsrfToken()
+      .then((token) => setCsrfValue(token))
+      .catch((error) => console.error('Failed to get CSRF token', error));
   }, []);
 
-  const dispatch = useDispatch();
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -50,57 +60,59 @@ const Login = ({ register }) => {
         .max(255)
         .required('Email is required'),
       password: Yup.string()
-        .min(6, 'must be at least 6 characters long')
+        .min(6, 'Must be at least 6 characters long')
         .max(16)
         .required('Password is required'),
     }),
     onSubmit: async (values) => {
+      setLoading(true);
       const { email, password } = values;
-      signIn('credentials', {
-        redirect: false,
-        email: email,
-        password: password,
-        callbackUrl: '/',
-      })
-        .then((response) => {
-          if (response.ok) {
-            hotToast('success', 'login success');
-            getSession().then((session) => {
-              if (session) {
-                const jwtToken = session.token.user.jwt;
-                dispatch(loginSuccess(jwtToken));
-              }
-            });
-          } else {
-            hotToast('error', 'Invalid Email or Password');
-            console.error('login fail');
+
+      try {
+        const response = await signIn('credentials', {
+          redirect: false,
+          email,
+          password,
+          callbackUrl: '/',
+        });
+
+        if (response?.ok) {
+          hotToast('success', 'Login successful');
+          const session = await getSession();
+          if (session) {
+            const jwtToken = session.token?.user?.jwt as string;
+            const a = session.token;
+            console.log('a:', a);
+
+            console.log('JWT Token:', jwtToken);
+            dispatch(loginSuccess(jwtToken));
           }
-        })
-        .catch((error) => {
+          await router.push('/');
+        } else {
           hotToast('error', 'Invalid Email or Password');
-          console.error('login fail', error);
-        })
-        .then(() => saveState(store.getState()));
+        }
+      } catch (error) {
+        hotToast('error', 'Login failed');
+        console.error('Login failed', error);
+      } finally {
+        setLoading(false);
+        saveState(store.getState());
+      }
     },
   });
 
-  //set state for Remember me Checkbox and event handler
-  const [isRememberMeChecked, setIsRememberMeChecked] = useState(false);
-  const handleRememberMeChange = (event) => {
+  const handleRememberMeChange = (event: ChangeEvent<HTMLInputElement>) => {
     setIsRememberMeChecked(event.target.checked);
   };
-
-  const [emailForReset, setEmailForReset] = useState('');
-  const [isForgetPasswordModalOpen, setIsForgetPasswordModalOpen] =
-    useState(false);
-  const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] =
-    useState(false);
 
   const handleOpenForgetPasswordModal = () => {
     setIsForgetPasswordModalOpen(true);
   };
 
-  const handleCloseForgetPasswordModal = (emailSent, userEmail) => {
+  const handleCloseForgetPasswordModal = (
+    emailSent: boolean,
+    userEmail: string,
+  ) => {
     setIsForgetPasswordModalOpen(false);
     if (emailSent) {
       setEmailForReset(userEmail);
@@ -124,7 +136,7 @@ const Login = ({ register }) => {
         <input name="csrfToken" type="hidden" defaultValue={csrfValue} />
         <form onSubmit={formik.handleSubmit}>
           <Typography align="center">
-            <Image src="/logo.png" height="55" width="55" alt="logo" />
+            <Image src="/logo.png" height={55} width={55} alt="logo" />
           </Typography>
           <Typography color="textPrimary" variant="h4" align="center">
             WELCOME BACK, LOG IN
@@ -135,7 +147,7 @@ const Login = ({ register }) => {
             variant="body2"
             align="center"
           >
-            Sign in to your account and make recharges. payments and bookings
+            Sign in to your account and make recharges, payments, and bookings
             faster
           </Typography>
           <Box sx={{ my: 4 }}>
@@ -186,7 +198,7 @@ const Login = ({ register }) => {
                     open={isForgetPasswordModalOpen}
                     onClose={() => setIsForgetPasswordModalOpen(false)}
                     onEmailSent={(emailSent, userEmail) =>
-                      handleCloseForgetPasswordModal(emailSent, userEmail)
+                      handleCloseForgetPasswordModal(emailSent, userEmail!)
                     }
                   />
                   <ResetPassword
@@ -215,13 +227,12 @@ const Login = ({ register }) => {
               <Divider> OR </Divider>
             </Box>
 
-            {/* place to contain Google Login and Facebook Login  */}
             <Grid container spacing={2} justifyContent={'space-between'}>
               <Grid item xs={6}>
-                <GoogleSignInBtn>Sign in With Google</GoogleSignInBtn>
+                <GoogleSignInBtn />
               </Grid>
               <Grid item xs={6}>
-                <FacebookSignInBtn></FacebookSignInBtn>
+                <FacebookSignInBtn />
               </Grid>
             </Grid>
 
@@ -233,11 +244,11 @@ const Login = ({ register }) => {
                 justifyContent="center"
               >
                 <Grid item>
-                  <Typography>Don't have an account?</Typography>
+                  <Typography>Don&apos;t have an account?</Typography>
                 </Grid>
                 <Grid item>
                   <Typography color="textSecondary" variant="body2">
-                    <Button onClick={() => register()}>Sign Up</Button>
+                    <Button onClick={register}>Sign Up</Button>
                   </Typography>
                 </Grid>
               </Grid>
