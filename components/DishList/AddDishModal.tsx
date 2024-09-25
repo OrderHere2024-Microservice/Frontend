@@ -16,21 +16,12 @@ import { useQuery } from '@apollo/client';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { GET_CATEGORIES_BY_RESTAURANT } from '@services/Category';
 import { CategoryGetDto } from '@interfaces/CategoryDTOs';
+import { DishCreateDto } from '@interfaces/DishDTOs';
 
 interface AddDishModalProps {
   open: boolean;
   handleClose: () => void;
-  handleSubmit: (newDishData: DishFormData) => void;
-}
-
-interface DishFormData {
-  dishName: string;
-  description: string;
-  price: number;
-  restaurantId: number;
-  availability: boolean;
-  imageFile: File | null;
-  categoryId: number;
+  handleSubmit: (newDishData: DishCreateDto) => void;
 }
 
 const AddDishModal = ({
@@ -38,13 +29,13 @@ const AddDishModal = ({
   handleClose,
   handleSubmit,
 }: AddDishModalProps) => {
-  const [newDish, setNewDish] = useState<DishFormData>({
+  const [newDish, setNewDish] = useState<DishCreateDto>({
     dishName: '',
     description: '',
     price: 0.0,
     restaurantId: 1,
     availability: true,
-    imageFile: null,
+    imageFile: undefined,
     categoryId: 0,
   });
 
@@ -79,7 +70,7 @@ const AddDishModal = ({
 
   const handleDeleteFile = () => {
     setImageName('');
-    setNewDish({ ...newDish, imageFile: null });
+    setNewDish({ ...newDish, imageFile: undefined });
   };
 
   if (loading) return <p>Loading categories...</p>;

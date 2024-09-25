@@ -2,8 +2,8 @@ export interface DishCreateDto {
   dishName: string;
   description: string;
   price: number;
-  imageUrl: string;
-  imageFile: File;
+  imageUrl?: string;
+  imageFile?: File;
   restaurantId: number;
   availability: boolean;
   categoryId: number;
