@@ -57,7 +57,7 @@ interface DishPopupProps {
   onClose: () => void;
 }
 
-const DishPopup: React.FC<DishPopupProps> = ({
+const DishPopup = ({
   dishId,
   dishName,
   description,
@@ -65,7 +65,7 @@ const DishPopup: React.FC<DishPopupProps> = ({
   imageUrl,
   open,
   onClose,
-}) => {
+}: DishPopupProps) => {
   const client = useApolloClient();
   const router = useRouter();
   const { token } = useSelector((state: RootState) => state.sign);

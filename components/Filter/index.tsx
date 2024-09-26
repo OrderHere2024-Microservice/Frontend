@@ -14,7 +14,7 @@ const pricingFilterStyle = {
   marginBottom: '20px',
 };
 
-const PricingFilter: React.FC = () => {
+const PricingFilter = () => {
   const dispatch = useDispatch();
   const [priceRange, setPriceRange] = useState({ min: 0, max: 100 });
   const [values, setValues] = useState<number[]>([0, 100]);
