@@ -59,4 +59,3 @@ export const UPDATE_RESTAURANT = gql`
     }
   }
 `;
-
