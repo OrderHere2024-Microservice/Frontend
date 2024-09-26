@@ -9,47 +9,74 @@ import {
   Button,
 } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { useQuery } from '@apollo/client';
-import { GET_ALL_ORDERS } from '@services/orderService';
-import OrderPopUp from './ListPopUp';
-import * as Action from '@store/actionTypes';
 import { useDispatch, useSelector } from 'react-redux';
+import { useQuery } from '@apollo/client';
+import { GET_USER_ORDERS, GET_ALL_ORDERS } from '@services/orderService';
+import OrderPopUp from './OrderPopUp';
+import * as Action from '@store/actionTypes';
+import { RootState } from '@store/store';
 import { jwtInfo } from '@utils/jwtInfo';
+import { OrderGetDTO } from '@interfaces/OrderDTOs';
 
-const ListDetail = () => {
-  const [displayOrders, setDisplayOrders] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+const OrderDetail = () => {
+  const [displayOrders, setDisplayOrders] = useState<OrderGetDTO[]>([]);
+  const [open, setOpen] = useState<boolean>(false);
+  const [selectedOrder, setSelectedOrder] = useState<OrderGetDTO | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const ordersPerPage = 10;
-  const dispatch = useDispatch();
-  const orders = useSelector((state) => state.order.orders);
-  const status = useSelector((state) => state.order.status);
-  const sorted = useSelector((state) => state.order.sortedOrder);
-  const searchText = useSelector((state) => state.order.searchText);
-  const { token } = useSelector((state) => state.sign);
-  const { userRole } = jwtInfo(token);
 
-  const { data, loading, error } = useQuery(GET_ALL_ORDERS, {
-    skip: userRole !== 'ROLE_driver',
+  const dispatch = useDispatch();
+  const orders = useSelector((state: RootState) => state.order.orders);
+  const options = useSelector((state: RootState) => state.order.options);
+  const status = useSelector((state: RootState) => state.order.status);
+  const sorted = useSelector((state: RootState) => state.order.sortedOrder);
+  const searchText = useSelector((state: RootState) => state.order.searchText);
+  const { token } = useSelector((state: RootState) => state.sign);
+  const { userRole } = jwtInfo(token || '');
+
+  const {
+    data: userData,
+    loading: userLoading,
+    error: userError,
+  } = useQuery<{ getUserOrders: OrderGetDTO[] }>(GET_USER_ORDERS, {
+    skip: userRole === 'ROLE_sys_admin',
+  });
+
+  const {
+    data: allOrdersData,
+    loading: allOrdersLoading,
+    error: allOrdersError,
+  } = useQuery<{ getAllOrders: OrderGetDTO[] }>(GET_ALL_ORDERS, {
+    skip: userRole !== 'ROLE_sys_admin',
   });
 
   useEffect(() => {
-    if (data && data.getAllOrders) {
-      dispatch({ type: Action.FETCH_ORDERS, payload: data.getAllOrders });
-      console.log('All orders:', data.getAllOrders);
+    if (
+      userRole === 'ROLE_sys_admin' &&
+      allOrdersData &&
+      allOrdersData.getAllOrders
+    ) {
+      dispatch({
+        type: Action.FETCH_ORDERS,
+        payload: allOrdersData.getAllOrders,
+      });
+    } else if (userData && userData.getUserOrders) {
+      dispatch({ type: Action.FETCH_ORDERS, payload: userData.getUserOrders });
     }
-  }, [data, dispatch]);
+    dispatch({ type: Action.SET_SEARCH_TEXT, payload: '' });
+  }, [dispatch, userRole, allOrdersData, userData]);
 
   useEffect(() => {
-    let updatedOrders = orders.filter(
-      (order) => order.orderType === 'delivery',
-    );
+    let updatedOrders = [...orders];
 
-    if (status) {
-      updatedOrders = updatedOrders.filter(
-        (order) => status[order.orderStatus] ?? true,
-      );
+    if (options && status) {
+      updatedOrders = updatedOrders.filter((order: OrderGetDTO) => {
+        const orderTypeIsValid =
+          options[order.orderType as keyof typeof options] ?? true;
+        const orderStatusIsValid =
+          status[order.orderStatus as keyof typeof status] ?? true;
+        return orderTypeIsValid && orderStatusIsValid;
+      });
     }
 
     switch (sorted) {
@@ -64,12 +91,16 @@ const ListDetail = () => {
         break;
       case 'orderDateNTO':
         updatedOrders.sort(
-          (a, b) => new Date(b.updatedTime) - new Date(a.updatedTime),
+          (a, b) =>
+            new Date(b.updatedTime).getTime() -
+            new Date(a.updatedTime).getTime(),
         );
         break;
       case 'orderDateOTN':
         updatedOrders.sort(
-          (a, b) => new Date(a.updatedTime) - new Date(b.updatedTime),
+          (a, b) =>
+            new Date(a.updatedTime).getTime() -
+            new Date(b.updatedTime).getTime(),
         );
         break;
       default:
@@ -79,7 +110,10 @@ const ListDetail = () => {
     if (searchText) {
       updatedOrders = updatedOrders.filter((order) => {
         let matchesSearch = true;
-        if (!isNaN(parseFloat(searchText)) && isFinite(searchText)) {
+        if (
+          !isNaN(parseFloat(searchText)) &&
+          isFinite(parseFloat(searchText))
+        ) {
           matchesSearch =
             order.orderId.toString().includes(searchText) ||
             order.totalPrice.toString().includes(searchText);
@@ -101,13 +135,12 @@ const ListDetail = () => {
     );
 
     setDisplayOrders(currentOrders);
-  }, [currentPage, orders, status, sorted, searchText]);
+  }, [currentPage, orders, options, status, sorted, searchText]);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
   const pageCount = Math.ceil(orders.length / ordersPerPage);
 
-  const handleClickOpen = (order) => {
-    console.log('Opening dialog for order', order);
+  const handleClickOpen = (order: OrderGetDTO) => {
     setSelectedOrder(order);
     setOpen(true);
   };
@@ -116,7 +149,7 @@ const ListDetail = () => {
     setOpen(false);
   };
 
-  const convertTime = (utc) => {
+  const convertTime = (utc: string) => {
     const date = new Date(utc);
     const melbourneTime = new Intl.DateTimeFormat('en-AU', {
       timeZone: 'Australia/Melbourne',
@@ -131,7 +164,10 @@ const ListDetail = () => {
     return melbourneTime;
   };
 
-  const handleOrderStatusUpdate = (updatedOrderId, newStatus) => {
+  const handleOrderStatusUpdate = (
+    updatedOrderId: number,
+    newStatus: string,
+  ) => {
     setDisplayOrders((currentDisplayOrders) =>
       currentDisplayOrders.map((order) =>
         order.orderId === updatedOrderId
@@ -141,8 +177,11 @@ const ListDetail = () => {
     );
   };
 
-  if (loading) return <p>Loading orders...</p>;
-  if (error) return <p>Error fetching orders</p>;
+  if (userRole === 'ROLE_sys_admin' && allOrdersLoading)
+    return <p>Loading all orders...</p>;
+  if (userRole !== 'ROLE_sys_admin' && userLoading)
+    return <p>Loading user orders...</p>;
+  if (allOrdersError || userError) return <p>Order not found</p>;
 
   return (
     <Container>
@@ -189,7 +228,7 @@ const ListDetail = () => {
       <OrderPopUp
         open={open}
         onClose={handleClose}
-        order={selectedOrder}
+        order={selectedOrder!}
         time={selectedOrder ? convertTime(selectedOrder.updatedTime) : ''}
         onOrderStatusUpdate={handleOrderStatusUpdate}
       />
@@ -204,4 +243,4 @@ const ListDetail = () => {
   );
 };
 
-export default ListDetail;
+export default OrderDetail;

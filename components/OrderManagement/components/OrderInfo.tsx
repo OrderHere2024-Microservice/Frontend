@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import { useDispatch } from 'react-redux';
 import {
   Container,
@@ -16,10 +16,34 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import * as Action from '@store/actionTypes';
+import { SelectChangeEvent } from '@mui/material';
 
-const ListInfo = () => {
+interface CheckedStatus {
+  pending: boolean;
+  preparing: boolean;
+  finished: boolean;
+  in_transit: boolean;
+  delayed: boolean;
+  delivered: boolean;
+  cancelled: boolean;
+}
+
+interface CheckedOptions {
+  delivery: boolean;
+  dine_in: boolean;
+  pickup: boolean;
+}
+
+const OrderInfo = () => {
   const dispatch = useDispatch();
-  const [checkedStatus, setCheckedStatus] = useState({
+
+  const [checked, setChecked] = useState<CheckedOptions>({
+    delivery: true,
+    dine_in: true,
+    pickup: true,
+  });
+
+  const [checkedStatus, setCheckedStatus] = useState<CheckedStatus>({
     pending: true,
     preparing: true,
     finished: true,
@@ -28,15 +52,25 @@ const ListInfo = () => {
     delivered: true,
     cancelled: true,
   });
-  const [sortValue, setSortValue] = useState('');
-  const [searchText, setSearchText] = useState('');
+
+  const [sortValue, setSortValue] = useState<string>('');
+  const [searchText, setSearchText] = useState<string>('');
 
   useEffect(() => {
     setSearchText('');
     dispatch({ type: Action.SET_SEARCH_TEXT, payload: '' });
-  }, []);
+  }, [dispatch]);
 
-  const handleChangeStatus = (event) => {
+  const handleChangeOptions = (event: ChangeEvent<HTMLInputElement>) => {
+    const newOptions = {
+      ...checked,
+      [event.target.name]: event.target.checked,
+    };
+    setChecked(newOptions);
+    dispatch({ type: Action.SET_ORDER_OPTION, payload: newOptions });
+  };
+
+  const handleChangeStatus = (event: ChangeEvent<HTMLInputElement>) => {
     const newStatus = {
       ...checkedStatus,
       [event.target.name]: event.target.checked,
@@ -45,19 +79,21 @@ const ListInfo = () => {
     dispatch({ type: Action.SET_ORDER_STATUS, payload: newStatus });
   };
 
-  const handleSortChange = (event) => {
+  const handleSortChange = (event: SelectChangeEvent<string>) => {
     const newSort = event.target.value;
     setSortValue(newSort);
     dispatch({ type: Action.SET_SORTED_ORDER, payload: newSort });
   };
 
-  const handleSearchChange = (event) => {
-    setSearchText(event.target.value);
-    dispatch({ type: Action.SET_SEARCH_TEXT, payload: event.target.value });
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setSearchText(value);
+    dispatch({ type: Action.SET_SEARCH_TEXT, payload: value });
   };
 
   return (
     <Container sx={{ width: 'auto', fontFamily: 'Gothic A1', ml: 0 }}>
+      {/* Search Box */}
       <Box
         my={2}
         sx={{ border: '1px solid #D9D9D9', borderRadius: '3px', p: 1 }}
@@ -86,6 +122,8 @@ const ListInfo = () => {
           }}
         />
       </Box>
+
+      {/* Sorting Options */}
       <Box my={2}>
         <FormControl
           fullWidth
@@ -126,6 +164,70 @@ const ListInfo = () => {
           </Select>
         </FormControl>
       </Box>
+
+      {/* Ordering Options */}
+      <Box
+        my={2}
+        sx={{
+          border: '1px solid #D9D9D9',
+          borderRadius: '3px',
+          paddingBlock: 1,
+          pl: 2,
+        }}
+      >
+        <Typography sx={{ color: 'black', fontSize: '1.3rem' }}>
+          ORDERING OPTIONS
+        </Typography>
+        <FormGroup>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={checked.delivery}
+                onChange={handleChangeOptions}
+                name="delivery"
+                sx={{
+                  '&.Mui-checked': {
+                    color: '#1976d2',
+                  },
+                }}
+              />
+            }
+            label="Delivery"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={checked.dine_in}
+                onChange={handleChangeOptions}
+                name="dine_in"
+                sx={{
+                  '&.Mui-checked': {
+                    color: '#1976d2',
+                  },
+                }}
+              />
+            }
+            label="Dine In"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={checked.pickup}
+                onChange={handleChangeOptions}
+                name="pickup"
+                sx={{
+                  '&.Mui-checked': {
+                    color: '#1976d2',
+                  },
+                }}
+              />
+            }
+            label="Pick Up"
+          />
+        </FormGroup>
+      </Box>
+
+      {/* Order Status */}
       <Box
         my={2}
         sx={{
@@ -250,4 +352,4 @@ const ListInfo = () => {
   );
 };
 
-export default ListInfo;
+export default OrderInfo;

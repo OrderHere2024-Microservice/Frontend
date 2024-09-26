@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -9,8 +9,6 @@ import {
   Divider,
   Grid,
   Button,
-  Select,
-  MenuItem,
 } from '@mui/material';
 import { useMutation, useQuery } from '@apollo/client';
 import { UPDATE_ORDER_STATUS, DELETE_ORDER } from '@services/orderService';
@@ -19,56 +17,47 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import * as Action from '@store/actionTypes';
 import { useDispatch, useSelector } from 'react-redux';
 import { jwtInfo } from '@utils/jwtInfo';
+import { RootState } from '@store/store';
 import dynamic from 'next/dynamic';
+import { OrderGetDTO } from '@interfaces/OrderDTOs';
+import { OrderDishDTO } from '@interfaces/OrderDishDTO';
 
 const ListMap = dynamic(() => import('./ListMap'), { ssr: false });
 
-const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
+interface ListPopUpProps {
+  open: boolean;
+  onClose: () => void;
+  order: OrderGetDTO;
+  time: string;
+  onOrderStatusUpdate: (orderId: number, newStatus: string) => void;
+}
+
+const ListPopUp = ({
+  open,
+  onClose,
+  order,
+  time,
+  onOrderStatusUpdate,
+}: ListPopUpProps) => {
   const dispatch = useDispatch();
-  const { token } = useSelector((state) => state.sign);
-  const { userRole } = jwtInfo(token);
+  const { token } = useSelector((state: RootState) => state.sign);
+  const { userRole } = jwtInfo(token || '');
 
-  const [address, setAddress] = useState('');
-  const [originalStatus, setOriginalStatus] = useState('');
-  const [isEditMode, setEditMode] = useState(true);
-  const [statusValue, setStatusValue] = useState('');
-  const [distance, setDistance] = useState('');
-  const [duration, setDuration] = useState('');
+  const [isEditMode, setEditMode] = useState<boolean>(true);
+  const [distance, setDistance] = useState<string>('');
+  const [duration, setDuration] = useState<string>('');
 
-  const {
-    data: restaurantData,
-    loading: restaurantLoading,
-    error: restaurantError,
-  } = useQuery(GET_RESTAURANT_ADDRESS, {
+  const { data: restaurantData } = useQuery<{
+    getRestaurantById: { address: string };
+  }>(GET_RESTAURANT_ADDRESS, {
     variables: { restaurantId: 1 },
   });
 
   const [updateOrderStatusMutation] = useMutation(UPDATE_ORDER_STATUS);
   const [deleteOrderMutation] = useMutation(DELETE_ORDER);
 
-  useEffect(() => {
-    if (restaurantData && restaurantData.getRestaurantById) {
-      setAddress(restaurantData.getRestaurantById.address);
-    }
-  }, [restaurantData]);
-
   const handleClose = () => {
-    if (isEditMode) {
-      setStatusValue(originalStatus);
-    }
     onClose();
-  };
-
-  const toggleEditMode = () => {
-    if (!isEditMode) {
-      setOriginalStatus(order.orderStatus);
-      setStatusValue(order.orderStatus);
-    }
-    setEditMode(!isEditMode);
-  };
-
-  const handleStatusChange = (event) => {
-    setStatusValue(event.target.value);
   };
 
   const handleEditStatusSubmit = async () => {
@@ -76,7 +65,7 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
       const response = await updateOrderStatusMutation({
         variables: {
           updateOrderStatusDTO: {
-            orderId: parseInt(order.orderId),
+            orderId: order.orderId,
             orderStatus: 'delivered',
           },
         },
@@ -86,7 +75,6 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
           type: Action.UPDATE_ORDER_STATUS,
           payload: { orderId: order.orderId, orderStatus: 'delivered' },
         });
-        setOriginalStatus('delivered');
         onClose();
         onOrderStatusUpdate(order.orderId, 'delivered');
         setEditMode(false);
@@ -97,36 +85,31 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
   };
 
   const handleRejectedOrder = async () => {
-    const orderId = parseInt(order.orderId);
+    const orderId = order.orderId;
     try {
       const response = await deleteOrderMutation({
         variables: {
-          deleteOrderDTO: {
-            orderId: orderId,
-          },
+          deleteOrderDTO: { orderId },
         },
       });
       if (response) {
         dispatch({ type: Action.DELETE_ORDER, payload: orderId });
         onClose();
-        console.log('Success delete order #', order.orderId);
       }
     } catch (error) {
       console.error('Error deleting order:', error);
     }
   };
 
-  const handleDistanceAndDuration = (distance, duration) => {
+  const handleDistanceAndDuration = (distance: string, duration: string) => {
     setDistance(distance);
     setDuration(duration);
   };
 
-  const convertToMelbourneTime = (utcTimestamp) => {
+  const convertToMelbourneTime = (utcTimestamp: string) => {
     if (!utcTimestamp) return 'Null';
-
     const date = new Date(utcTimestamp);
-    if (isNaN(date)) return 'Null';
-
+    if (isNaN(date.getTime())) return 'Null';
     return date.toLocaleString('en-AU', {
       timeZone: 'Australia/Melbourne',
       year: 'numeric',
@@ -263,7 +246,7 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
                   address={
                     order.orderType === 'delivery'
                       ? order.address
-                      : restaurantData?.getRestaurantById?.address
+                      : restaurantData?.getRestaurantById?.address || ''
                   }
                   onDistanceAndDuration={handleDistanceAndDuration}
                 />
@@ -298,7 +281,7 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
               </Grid>
             </Box>
             <Divider />
-            {order.dishes.map((dish) => (
+            {order.dishes.map((dish: OrderDishDTO) => (
               <Box
                 key={dish.dishName}
                 sx={{
@@ -339,8 +322,20 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
           isEditMode ? (
             <>
               <Button onClick={handleClose}>Exit</Button>
-              <Button onClick={handleRejectedOrder}>Reject Order</Button>
-              <Button onClick={handleEditStatusSubmit}>Delivered</Button>
+              <Button
+                onClick={() => {
+                  void handleRejectedOrder();
+                }}
+              >
+                Reject Order
+              </Button>
+              <Button
+                onClick={() => {
+                  void handleEditStatusSubmit();
+                }}
+              >
+                Delivered
+              </Button>
             </>
           ) : (
             <Button onClick={handleClose}>Close</Button>
@@ -348,7 +343,13 @@ const ListPopUp = ({ open, onClose, order, time, onOrderStatusUpdate }) => {
         ) : (
           <>
             <Button onClick={handleClose}>Close</Button>
-            <Button onClick={handleEditStatusSubmit}>Save</Button>
+            <Button
+              onClick={() => {
+                void handleEditStatusSubmit();
+              }}
+            >
+              Save
+            </Button>
           </>
         )}
       </DialogActions>

@@ -323,6 +323,7 @@ const CheckList = () => {
       >
         <ButtonBase
           onClick={() => {
+            // these catch blocks are not necessary, they should be changed to void handleCheckout()
             handleCheckout().catch((error) => {
               console.error('Error checking out:', error);
             });

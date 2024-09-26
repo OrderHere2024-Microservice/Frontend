@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useRouter } from 'next/router';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogActions from '@mui/material/DialogActions';
 import {
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
   Box,
   Typography,
-  ListItemText,
   IconButton,
   Button,
   List,
@@ -23,6 +22,7 @@ import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material';
 import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
 import HighlightOffRoundedIcon from '@mui/icons-material/HighlightOffRounded';
 import InsertPhotoOutlinedIcon from '@mui/icons-material/InsertPhotoOutlined';
+import { useApolloClient, useQuery, useMutation } from '@apollo/client';
 import {
   GET_INGREDIENTS_BY_DISH_ID,
   GET_INGREDIENT_BY_ID,
@@ -30,13 +30,32 @@ import {
   UPDATE_INGREDIENT,
   DELETE_INGREDIENT,
 } from '@services/Ingredient';
-import { useApolloClient } from '@apollo/client';
-import { useDispatch, useSelector } from 'react-redux';
-import * as Action from '@store/actionTypes';
+import { RootState } from '@store/store';
+import { useSelector } from 'react-redux';
 import { updateDishes } from '@services/Dish';
 import { jwtInfo } from '@utils/jwtInfo';
-import { useQuery, useMutation } from '@apollo/client';
 import styles from './DishPopup.module.css';
+import {
+  GetIngredientDTO,
+  PostIngredientDTO,
+} from '@interfaces/IngredientDTOs';
+import { DishUpdateDto } from '@interfaces/DishDTOs';
+
+interface IngredientDetail {
+  id: number;
+  name: string;
+  isNew?: boolean;
+}
+
+interface DishPopupProps {
+  dishId: number;
+  dishName: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+  open: boolean;
+  onClose: () => void;
+}
 
 const DishPopup = ({
   dishId,
@@ -46,55 +65,65 @@ const DishPopup = ({
   imageUrl,
   open,
   onClose,
-}) => {
+}: DishPopupProps) => {
   const client = useApolloClient();
-  const [ingredientDetails, setIngredientDetails] = useState([]);
-  const dispatch = useDispatch();
-  const cartItems = useSelector((state) => state.cart.items);
-  const item = cartItems.find((item) => item.dishId === dishId);
-  const quantity = item ? item.quantity : 0;
+  const router = useRouter();
+  const { token } = useSelector((state: RootState) => state.sign);
+  const { userRole } = jwtInfo(token as string);
+
+  const [ingredientDetails, setIngredientDetails] = useState<
+    IngredientDetail[]
+  >([]);
+  const [tempIngredientDetails, setTempIngredientDetails] = useState<
+    IngredientDetail[]
+  >([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [tempIngredientDetails, setTempIngredientDetails] = useState([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedIngredientId, setSelectedIngredientId] = useState(null);
-  const [tempUnselectedIngredients, setTempUnselectedIngredients] = useState(
-    new Set(),
-  );
-  const [newDish, setNewDish] = useState({
+  const [selectedIngredientId, setSelectedIngredientId] = useState<
+    number | null
+  >(null);
+
+  // Will use tempUnselectedIngredients for the future when we support ingredients on orders
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [tempUnselectedIngredients, setTempUnselectedIngredients] = useState<
+    Set<string>
+  >(new Set());
+
+  const [newDish, setNewDish] = useState<DishUpdateDto>({
     dishId: dishId,
     dishName: dishName,
     description: description,
     price: price,
+    imageUrl: imageUrl,
     restaurantId: 1,
     availability: true,
-    imageFile: null,
+    imageFile: undefined,
   });
-  const router = useRouter();
-  const { token } = useSelector((state) => state.sign);
-  const { userRole } = jwtInfo(token);
-  const [isAddedToCart, setIsAddedToCart] = React.useState(false);
 
-  const { data: dishData } = useQuery(GET_INGREDIENTS_BY_DISH_ID, {
+  const { data: dishData } = useQuery<{
+    findIngredientsByDishID: GetIngredientDTO[];
+  }>(GET_INGREDIENTS_BY_DISH_ID, {
     variables: { dishID: dishId },
   });
 
-  const [createIngredient] = useMutation(CREATE_INGREDIENT);
+  const [createIngredient] = useMutation<
+    { createLinkIngredientDish: number },
+    { postIngredientDTO: PostIngredientDTO }
+  >(CREATE_INGREDIENT);
   const [updateIngredient] = useMutation(UPDATE_INGREDIENT);
   const [deleteIngredient] = useMutation(DELETE_INGREDIENT);
 
   useEffect(() => {
     if (dishData && dishData.findIngredientsByDishID) {
       const ingredientPromises = dishData.findIngredientsByDishID.map(
-        (dishIngredient) => {
-          return getIngredientById(dishIngredient.ingredientId);
-        },
+        (dishIngredient) => getIngredientById(dishIngredient.ingredientId),
       );
       Promise.all(ingredientPromises)
         .then((ingredientsResponses) => {
           const details = ingredientsResponses.map((ingredientResponse) => ({
-            id: ingredientResponse.data.getIngredientById.ingredientId,
-            name: ingredientResponse.data.getIngredientById.name,
+            id: ingredientResponse!.data.getIngredientById.ingredientId,
+            name: ingredientResponse!.data.getIngredientById.name,
           }));
           setIngredientDetails(details);
           setTempIngredientDetails(details);
@@ -103,7 +132,19 @@ const DishPopup = ({
     }
   }, [dishData, dishId]);
 
-  const getIngredientById = async (ingredientId) => {
+  const getIngredientById = async (
+    ingredientId: number,
+  ): Promise<
+    | {
+        data: {
+          getIngredientById: {
+            ingredientId: number;
+            name: string;
+          };
+        };
+      }
+    | undefined
+  > => {
     try {
       const response = await client.query({
         query: GET_INGREDIENT_BY_ID,
@@ -112,44 +153,17 @@ const DishPopup = ({
       return response;
     } catch (error) {
       console.error('Error fetching ingredient by ID:', error);
-      return null;
+      return undefined;
     }
   };
 
-  const handleDishChange = (e) => {
+  const handleDishChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, files } = e.target;
-    if (name === 'imageFile') {
+    if (name === 'imageFile' && files) {
       setNewDish({ ...newDish, imageFile: files[0] });
     } else {
       setNewDish({ ...newDish, [name]: value });
     }
-  };
-
-  const decrementQuantity = () => {
-    if (quantity > 1) {
-      dispatch({ type: Action.DECREASE_ITEM, payload: { dishId } });
-    } else if (quantity === 1) {
-      dispatch({ type: Action.REMOVE_FROM_CART, payload: { dishId } });
-    }
-    dispatch({ type: Action.CALCULATE_TOTAL_PRICE });
-  };
-
-  const handleAddToCart = () => {
-    setIsAddedToCart(true);
-    if (quantity === 0) {
-      const itemPayload = {
-        dishId,
-        dishName,
-        description,
-        price,
-        imageUrl,
-        quantity: 1,
-      };
-      dispatch({ type: Action.ADD_TO_CART, payload: itemPayload });
-    } else {
-      dispatch({ type: Action.INCREASE_ITEM, payload: { dishId } });
-    }
-    dispatch({ type: Action.CALCULATE_TOTAL_PRICE });
   };
 
   const toggleCollapse = () => {
@@ -163,7 +177,10 @@ const DishPopup = ({
     setIsEditMode(!isEditMode);
   };
 
-  const handleIngredientChange = (event, index) => {
+  const handleIngredientChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    index: number,
+  ) => {
     const newName = event.target.value;
     const capitalizedNewName =
       newName.charAt(0).toUpperCase() + newName.slice(1);
@@ -183,7 +200,7 @@ const DishPopup = ({
       alert('Ingredient names cannot be empty.');
       return;
     }
-    let updatedIngredients = [...tempIngredientDetails];
+    const updatedIngredients = [...tempIngredientDetails];
     for (let i = 0; i < tempIngredientDetails.length; i++) {
       const ingredient = tempIngredientDetails[i];
       try {
@@ -200,7 +217,7 @@ const DishPopup = ({
           });
           updatedIngredients[i] = {
             ...ingredient,
-            id: response.data.createLinkIngredientDish,
+            id: response.data!.createLinkIngredientDish,
             isNew: false,
           };
         } else {
@@ -223,7 +240,7 @@ const DishPopup = ({
   };
 
   const addNewIngredient = () => {
-    const newIngredientDetail = {
+    const newIngredientDetail: IngredientDetail = {
       id: Date.now(),
       name: '',
       isNew: true,
@@ -234,11 +251,11 @@ const DishPopup = ({
     ]);
   };
 
-  const deleteIngredientItem = async (dishId, ingredientId) => {
+  const deleteIngredientItem = async (dishId: number, ingredientId: number) => {
     const ingredientToDelete = tempIngredientDetails.find(
       (ingredient) => ingredient.id === ingredientId,
     );
-    if (!ingredientToDelete.name.trim() || ingredientToDelete.isNew) {
+    if (!ingredientToDelete?.name.trim() || ingredientToDelete.isNew) {
       const updatedIngredients = tempIngredientDetails.filter(
         (ingredient) => ingredient.id !== ingredientId,
       );
@@ -264,7 +281,7 @@ const DishPopup = ({
     }
   };
 
-  const handleCheckboxChange = (ingredientName, isChecked) => {
+  const handleCheckboxChange = (ingredientName: string, isChecked: boolean) => {
     setTempUnselectedIngredients((prev) => {
       const newUnselected = new Set(prev);
       if (isChecked) {
@@ -276,10 +293,10 @@ const DishPopup = ({
     });
   };
 
-  const handleEditDishSubmit = async (newDishData) => {
+  const handleEditDishSubmit = async (newDishData: typeof newDish) => {
     try {
       await updateDishes(newDishData);
-      router.push('/');
+      await router.push('/');
     } catch (error) {
       console.error('Error updating dish:', error);
     }
@@ -313,7 +330,7 @@ const DishPopup = ({
       <DialogContent
         sx={{ padding: 0, overflowY: 'auto', backgroundColor: '#f4f4f4' }}
       >
-        {isEditMode && userRole == 'ROLE_sys_admin' ? (
+        {isEditMode && userRole === 'ROLE_sys_admin' ? (
           <Box position="relative" display="inline-block">
             <img width="500px" height="auto" src={imageUrl} alt={dishName} />
             <Box
@@ -331,7 +348,7 @@ const DishPopup = ({
               }}
             >
               <Input
-                accept="image/*"
+                inputProps={{ accept: 'image/*' }}
                 style={{ display: 'none' }}
                 id="icon-button-file"
                 type="file"
@@ -354,15 +371,8 @@ const DishPopup = ({
         ) : (
           <img width="500px" height="auto" src={imageUrl} alt={dishName} />
         )}
-        <DialogContentText
-          className={styles.dishTitle}
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          {isEditMode && userRole == 'ROLE_sys_admin' ? (
+        <DialogContentText className={styles.dishTitle}>
+          {isEditMode && userRole === 'ROLE_sys_admin' ? (
             <TextField
               fullWidth
               sx={{ mt: 2, mr: 3 }}
@@ -375,7 +385,7 @@ const DishPopup = ({
           ) : (
             <Typography variant="h5">{dishName}</Typography>
           )}
-          {userRole == 'ROLE_sys_admin' && (
+          {userRole === 'ROLE_sys_admin' && (
             <Button
               onClick={toggleEditMode}
               variant="contained"
@@ -393,15 +403,8 @@ const DishPopup = ({
           )}
         </DialogContentText>
 
-        <DialogContentText
-          className={styles.dishPrice}
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          {isEditMode && userRole == 'ROLE_sys_admin' ? (
+        <DialogContentText className={styles.dishPrice}>
+          {isEditMode && userRole === 'ROLE_sys_admin' ? (
             <TextField
               fullWidth
               sx={{ mt: 2, mr: 3 }}
@@ -419,7 +422,7 @@ const DishPopup = ({
         </DialogContentText>
 
         <DialogContentText className={styles.dishIngredients}>
-          {isEditMode && userRole == 'ROLE_sys_admin' ? (
+          {isEditMode && userRole === 'ROLE_sys_admin' ? (
             <TextField
               fullWidth
               sx={{ mt: 2 }}
@@ -434,6 +437,7 @@ const DishPopup = ({
             <Typography>{description}</Typography>
           )}
         </DialogContentText>
+
         <Box
           sx={{
             display: 'flex',
@@ -442,9 +446,13 @@ const DishPopup = ({
             marginY: 2,
           }}
         >
-          {isEditMode && userRole == 'ROLE_sys_admin' && (
+          {isEditMode && userRole === 'ROLE_sys_admin' && (
             <Button
-              onClick={() => handleEditDishSubmit(newDish)}
+              onClick={() => {
+                handleEditDishSubmit(newDish).catch((error) => {
+                  console.error('Error updating dish:', error);
+                });
+              }}
               variant="contained"
               sx={{
                 color: '#f4f4f4',
@@ -461,7 +469,7 @@ const DishPopup = ({
           )}
         </Box>
 
-        <DialogContentText sx={{ overflowY: 'auto' }}>
+        <DialogContentText>
           <Box
             sx={{
               backgroundColor: '#ededed',
@@ -475,7 +483,7 @@ const DishPopup = ({
             onClick={toggleCollapse}
           >
             <Typography
-              variant="Ingredients"
+              variant="h6"
               sx={{ ml: 4, color: 'black', fontSize: '1.2em', fontWeight: 600 }}
             >
               Ingredients,{' '}
@@ -485,20 +493,17 @@ const DishPopup = ({
               {isCollapsed ? <AddIcon /> : <RemoveIcon />}
             </IconButton>
           </Box>
-          <Collapse
-            in={!isCollapsed}
-            sx={{ ml: 2, color: '#666', marginBlock: 1, fontWeight: 400 }}
-          >
+          <Collapse in={!isCollapsed}>
             <List>
               {tempIngredientDetails.map((ingredient, index) => (
                 <ListItem
+                  key={ingredient.id}
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
                     width: '100%',
                     fontSize: 17,
                   }}
-                  key={ingredient.id}
                 >
                   <Box
                     sx={{
@@ -508,7 +513,7 @@ const DishPopup = ({
                       alignItems: 'center',
                     }}
                   >
-                    {isEditMode && userRole == 'ROLE_sys_admin' ? (
+                    {isEditMode && userRole === 'ROLE_sys_admin' ? (
                       <Box
                         sx={{
                           width: '100%',
@@ -523,11 +528,16 @@ const DishPopup = ({
                           onChange={(e) => handleIngredientChange(e, index)}
                           sx={{ flexGrow: 1 }}
                         />
-
                         <HighlightOffRoundedIcon
                           onClick={() => {
                             if (!ingredient.name.trim() || ingredient.isNew) {
-                              deleteIngredientItem(dishId, ingredient.id);
+                              deleteIngredientItem(dishId, ingredient.id).catch(
+                                (error) =>
+                                  console.error(
+                                    'Error deleting ingredient:',
+                                    error,
+                                  ),
+                              );
                             } else {
                               setSelectedIngredientId(ingredient.id);
                               setDeleteDialogOpen(true);
@@ -544,13 +554,12 @@ const DishPopup = ({
                           open={deleteDialogOpen}
                           keepMounted
                           onClose={() => setDeleteDialogOpen(false)}
-                          aria-describedby="alert-dialog-slide-description"
                         >
                           <DialogTitle>
                             {'Delete ingredient permanently'}
                           </DialogTitle>
                           <DialogContent>
-                            <DialogContentText id="alert-dialog-slide-description">
+                            <DialogContentText>
                               If you confirm to delete this ingredient, it will
                               be permanently deleted. Do you want to delete it
                               right now?
@@ -561,12 +570,17 @@ const DishPopup = ({
                               No
                             </Button>
                             <Button
-                              onClick={() =>
+                              onClick={() => {
                                 deleteIngredientItem(
                                   dishId,
-                                  selectedIngredientId,
-                                )
-                              }
+                                  selectedIngredientId!,
+                                ).catch((error) => {
+                                  console.error(
+                                    'Error deleting ingredient:',
+                                    error,
+                                  );
+                                });
+                              }}
                             >
                               Yes
                             </Button>
@@ -585,16 +599,14 @@ const DishPopup = ({
                       }
                       sx={{
                         color: 'primary.main',
-                        '&.Mui-checked': {
-                          color: 'primary.main',
-                        },
+                        '&.Mui-checked': { color: 'primary.main' },
                       }}
                     />
                   </Box>
                 </ListItem>
               ))}
             </List>
-            {isEditMode && userRole == 'ROLE_sys_admin' ? (
+            {isEditMode && userRole === 'ROLE_sys_admin' ? (
               <Box>
                 <Box
                   onClick={addNewIngredient}
@@ -608,16 +620,18 @@ const DishPopup = ({
                     justifyContent: 'center',
                     alignItems: 'center',
                     cursor: 'pointer',
-                    '&:hover': {
-                      backgroundColor: 'rgba(128, 128, 128, 0.25)',
-                    },
+                    '&:hover': { backgroundColor: 'rgba(128, 128, 128, 0.25)' },
                   }}
                 >
                   <AddCircleRoundedIcon style={{ fontSize: 40 }} />
                 </Box>
-
                 <Button
-                  onClick={() => saveIngredients()}
+                  // onClick={async () => await saveIngredients()}
+                  onClick={() => {
+                    saveIngredients().catch((error) => {
+                      console.error('Error saving ingredients:', error);
+                    });
+                  }}
                   variant="contained"
                   sx={{
                     backgroundColor: 'primary.main',
@@ -638,96 +652,7 @@ const DishPopup = ({
             ) : null}
           </Collapse>
         </DialogContentText>
-        <hr style={{ width: '100%' }} />
       </DialogContent>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-          padding: '20px',
-          backgroundColor: '#f4f4f4',
-          borderTop: '1px solid #E0E0E0',
-        }}
-      >
-        {quantity > 0 && (
-          <Box
-            sx={{
-              mr: 14,
-              backgroundColor: 'primary.main',
-              fontSize: '25px',
-              width: '230px',
-              height: '50px',
-              color: '#fff',
-              borderRadius: '10px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <div>{price * quantity}</div>
-          </Box>
-        )}
-        {quantity > 0 ? (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              mr: 4,
-              border: '1.5px solid #1976d2',
-              borderRadius: '10px',
-              width: '200px',
-              height: '45px',
-              justifyContent: 'space-between',
-              padding: '0 8px',
-            }}
-          >
-            <IconButton
-              onClick={decrementQuantity}
-              sx={{ color: 'primary.main' }}
-              disabled={quantity === 0}
-            >
-              <RemoveIcon />
-            </IconButton>
-            <ListItemText
-              primary={quantity}
-              primaryTypographyProps={{ fontWeight: 600 }}
-              style={{ paddingLeft: '25%' }}
-            />
-            <IconButton
-              onClick={handleAddToCart}
-              sx={{ color: 'primary.main' }}
-            >
-              <AddIcon />
-            </IconButton>
-          </Box>
-        ) : (
-          <DialogActions style={{ padding: 0 }}>
-            <Button
-              sx={{
-                mr: 4,
-                backgroundColor: 'primary.main',
-                fontSize: '25px',
-                width: '200px',
-                height: '45px',
-                color: '#fff',
-                borderRadius: '10px',
-                '&:hover': {
-                  backgroundColor: 'primary.main',
-                  opacity: 0.6,
-                  transition: '0.3s',
-                },
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-              onClick={handleAddToCart}
-            >
-              <div>Add</div>
-            </Button>
-          </DialogActions>
-        )}
-      </Box>
     </Dialog>
   );
 };

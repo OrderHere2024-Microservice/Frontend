@@ -37,7 +37,7 @@ interface Profile {
   address: string;
 }
 
-const ProfileForm: React.FC = () => {
+const ProfileForm = () => {
   const [editMode, setEditMode] = useState(false);
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);

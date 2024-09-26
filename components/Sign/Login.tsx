@@ -30,7 +30,7 @@ interface LoginProps {
   register: () => void;
 }
 
-const Login: React.FC<LoginProps> = ({ register }) => {
+const Login = ({ register }: LoginProps) => {
   const [isLoading, setLoading] = useState(false);
   const [csrfValue, setCsrfValue] = useState<string | undefined>();
   const [isRememberMeChecked, setIsRememberMeChecked] = useState(false);

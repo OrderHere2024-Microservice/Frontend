@@ -30,7 +30,7 @@ export interface DishUpdateDto {
   description: string;
   price: number;
   imageUrl: string;
-  imageFile: File;
+  imageFile?: File;
   restaurantId: number;
   availability: boolean;
 }
