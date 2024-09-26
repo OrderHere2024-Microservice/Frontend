@@ -67,7 +67,9 @@ const SuccessPage = () => {
         >
           Thank You
         </Typography>
-        <OrderDetail orderId={orderId} />
+        {orderId && !Array.isArray(orderId) && (
+          <OrderDetail orderId={parseInt(orderId, 10)} />
+        )}
         <Link href="/" passHref>
           <Button
             variant="contained"
