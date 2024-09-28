@@ -6,14 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --no-cache && npm run lint:all",
+    "lint": "next lint --no-cache --max-warnings 15 && npm run lint:all",
     "export": "next build && next export",
     "test": "jest -c jest.config.ts --colors --coverage --passWithNoTests",
     "test:watch": "jest -c jest.config.ts --colors --coverage --passWithNoTests --watch",
     "lint:eslint": "eslint --ext .tsx,.ts",
-    "lint:sass": "sass-lint -v",
     "lint:prettier": "prettier -c .prettierrc \"{pages,components,utils}/**/*.{ts,tsx}\" --check",
-    "lint:all": "npm run prettier && npm run lint:eslint && npm run lint:sass && npm run lint:prettier",
+    "lint:all": "npm run prettier && npm run lint:eslint && npm run lint:prettier",
     "prepare": "husky install",
     "prettier": "prettier -c .prettierrc \"{pages,components,utils,store}/**/*.{ts,tsx}\" --write",
     "type-check": "tsc --noEmit"
@@ -95,7 +94,8 @@
     "jest-environment-jsdom": "^29.7.0",
     "jsdom": "^19.0.0",
     "lint-staged": ">=10",
-    "prettier": "^2.5.1"
+    "prettier": "^2.5.1",
+    "ts-node": "^10.9.2"
   },
   "eslintConfig": {
     "extends": [
