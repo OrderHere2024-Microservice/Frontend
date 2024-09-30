@@ -18,21 +18,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-
       - name: Install dependencies
         run: npm install
-
       - name: Build the Next.js app
         run: npm run build
-
       - name: Export static files
         run: npm run export
-
       - name: configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
