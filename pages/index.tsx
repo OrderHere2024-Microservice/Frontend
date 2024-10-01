@@ -54,6 +54,7 @@ const Index = () => {
         <p>Error when fetching dishes: {dishesError.message}</p>
         <div>ENV IS: {process.env.NEXTAUTH_SECRET}</div>
         <div>PUBLIC BACKEND URL IS: {process.env.NEXT_PUBLIC_BACKEND_URL}</div>
+        <div>PUBLIC SECRET IS: {process.env.NEXT_PUBLIC_SECRET}</div>
       </>
     );
   if (categoriesError)
