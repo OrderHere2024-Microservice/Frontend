@@ -14,7 +14,6 @@ interface JWTBody {
 }
 
 export const authOptions: NextAuthOptions = {
-  debug: true,
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -72,6 +71,8 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.FACEBOOK_SECRET || '',
     }),
   ],
+
+  secret: process.env.NEXTAUTH_SECRET,
 
   callbacks: {
     jwt({ token, user, account }): Promise<JWT> {
