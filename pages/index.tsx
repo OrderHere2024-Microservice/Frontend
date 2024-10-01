@@ -50,10 +50,10 @@ const Index = () => {
   if (dishesLoading || categoriesLoading) return <p>Loading...</p>;
   if (dishesError)
     return (
-      <p>
-        Error when fetching dishes: {dishesError.message}{' '}
-        {process.env.NEXTAUTH_SECRET}
-      </p>
+      <>
+        <p>Error when fetching dishes: {dishesError.message}</p>
+        <div>ENV IS: {process.env.NEXTAUTH_SECRET}</div>
+      </>
     );
   if (categoriesError)
     return <p>Error loading categories: {categoriesError.message}</p>;
