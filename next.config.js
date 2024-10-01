@@ -1,13 +1,8 @@
 const path = require('path');
-const removeImports = require('next-remove-imports')();
 
-module.exports = removeImports({
+module.exports = {
   reactStrictMode: true,
-  sassOptions: {
+  sassOptions: { 
     includePaths: [path.join(__dirname, 'styles')],
   },
-  images: {
-    unoptimized: true,
-  },
-  output: 'export',
-});
+}
