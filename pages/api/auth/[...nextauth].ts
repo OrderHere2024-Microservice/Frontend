@@ -72,7 +72,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
 
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: '6f3b3b3b-6b3b-4b3b-8b3b-3b3b3b3b3b3b',
 
   callbacks: {
     jwt({ token, user, account }): Promise<JWT> {
