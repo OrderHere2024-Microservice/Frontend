@@ -48,7 +48,7 @@ const Index = () => {
   }, [dishesData]);
 
   if (dishesLoading || categoriesLoading) return <p>Loading...</p>;
-  if (dishesError) return <p>Error fetching dishes: {dishesError.message}</p>;
+  if (dishesError) return <p>Error when fetching dishes: {dishesError.message}</p>;
   if (categoriesError)
     return <p>Error loading categories: {categoriesError.message}</p>;
 
