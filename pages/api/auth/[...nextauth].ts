@@ -14,7 +14,6 @@ interface JWTBody {
 }
 
 export const authOptions: NextAuthOptions = {
-  secret: process.env.AUTH_SECRET,
   debug: true,
   providers: [
     CredentialsProvider({
