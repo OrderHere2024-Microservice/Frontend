@@ -9,7 +9,7 @@ import {
   Popover,
   Typography,
 } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useSession } from 'next-auth/react';
@@ -18,9 +18,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { logoutAction } from '@store/actions/signAction';
 import { signOut } from 'next-auth/react';
 import { useEffect, useState } from 'react';
-import { jwtInfo } from '@utils/jwtInfo';
 import { getUserProfile } from '@services/Profile';
-import { RootState } from '@store/store';
 
 const AccountPopover = ({
   anchorEl,
@@ -39,9 +37,9 @@ const AccountPopover = ({
 
   const { data: session } = useSession();
 
-  const { token } = useSelector((state: RootState) => state.sign);
-  const { userRole } = jwtInfo(token as string);
-  const { isLogin } = useSelector((state: RootState) => state.sign);
+  const userRole = session?.token?.roles?.[0] ?? 'Role_visitor';
+
+  const isLogin = !!session;
 
   const handleLogout = async () => {
     await signOut({ callbackUrl: '/' });
@@ -108,7 +106,7 @@ const AccountPopover = ({
           >
             <Typography variant="body1">{username}</Typography>
             <Typography color="textSecondary" variant="body2">
-              {userRole ? userRole.slice(5) : 'Role_visitor'}
+              {userRole}
             </Typography>
           </Box>
         </Box>

@@ -1,6 +1,14 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import KeycloakProvider from 'next-auth/providers/keycloak';
 
+interface DecodedJWT {
+  resource_access?: {
+    [clientId: string]: {
+      roles: string[];
+    };
+  };
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     KeycloakProvider({
@@ -24,11 +32,28 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.user = user;
       }
+
+      if (token.accessToken) {
+        try {
+          const decodedToken: DecodedJWT = JSON.parse(
+            Buffer.from(token.accessToken.split('.')[1], 'base64').toString(),
+          ) as DecodedJWT;
+          const roles =
+            decodedToken?.resource_access?.['orderhere-mono']?.roles;
+          if (roles) {
+            token.roles = roles; // Add roles to the JWT
+          }
+        } catch (error) {
+          console.error('Failed to decode JWT:', error);
+        }
+      }
+
       return token;
     },
     session({ session, token }) {
       session.user = token.user;
       session.token = token;
+
       return session;
     },
   },
