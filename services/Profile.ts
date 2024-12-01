@@ -1,5 +1,5 @@
 import { UserProfileUpdateDTO } from '@interfaces/UserDTOs';
-import http from '@utils/axios';
+import http from 'lib/axios';
 
 export const updateUserProfile = (userData: UserProfileUpdateDTO) =>
   http(`/v1/public/users/profile`, {

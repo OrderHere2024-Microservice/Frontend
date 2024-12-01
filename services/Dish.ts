@@ -1,4 +1,4 @@
-import http from '@utils/axios';
+import http from 'lib/axios';
 import { gql } from '@apollo/client';
 import { DishCreateDto, DishUpdateDto } from '@interfaces/DishDTOs';
 

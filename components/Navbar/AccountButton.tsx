@@ -1,18 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Avatar, Box, ButtonBase } from '@mui/material';
 import AccountPopover from './AccountPopover';
-import { useSelector, useDispatch } from 'react-redux';
-import SignDialog from '../Sign/SignDialog';
-import Login from '../Sign/Login';
-import Signup from '../Sign/Signup';
-import {
-  openSignDialog,
-  closeSignDialog,
-  registerSignDialog,
-  loginSignDialog,
-} from '@store/actions/signAction';
+import { signIn } from 'next-auth/react';
 import { getUserProfile } from '@services/Profile';
-import { RootState } from '@store/store';
 
 const AccountButton = ({ isLogin }: { isLogin: boolean }) => {
   const anchorRef = useRef(null);
@@ -20,12 +10,9 @@ const AccountButton = ({ isLogin }: { isLogin: boolean }) => {
   const [avatarUrl, setAvatarUrl] = useState('headImgUrl');
 
   //state to manage signIn dialog
-  const { isOpen, content } = useSelector((state: RootState) => state.sign);
-  const dispatch = useDispatch();
-
   const handleButtonClick = () => {
     if (!isLogin) {
-      dispatch(openSignDialog());
+      signIn('keycloak').catch((error) => console.error(error));
     } else {
       setOpenPopover(isLogin);
     }
@@ -51,17 +38,6 @@ const AccountButton = ({ isLogin }: { isLogin: boolean }) => {
 
   return (
     <>
-      {/* Open the SignIn Dialog is isLogin is false  */}
-      {isOpen && (
-        <SignDialog isOpen={isOpen} onClose={() => dispatch(closeSignDialog())}>
-          {content === 'login' ? (
-            <Login register={() => dispatch(registerSignDialog())} />
-          ) : (
-            <Signup login={() => dispatch(loginSignDialog())} />
-          )}
-        </SignDialog>
-      )}
-
       {/* Open the AccountPopover Dialog is isLogin is true  */}
       {isLogin && (
         <AccountPopover

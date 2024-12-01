@@ -20,13 +20,11 @@ import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { useEffect, useState, ChangeEvent } from 'react';
-import { loginWithOauthProviderAction } from '@store/actions/httpAction';
+import { ChangeEvent } from 'react';
 import * as Action from '@store/actionTypes';
 import { jwtInfo } from '@utils/jwtInfo';
 import { RootState } from '@store/store';
 import { Theme } from '@mui/material';
-import { JWT } from 'next-auth/jwt';
 
 // Reverted styles for the Navbar
 export const styleNew = {
@@ -67,11 +65,9 @@ const Navbar = () => {
   const mobileDevice = useMediaQuery(theme.breakpoints.down('md'));
 
   // Get user login state and cart items count from Redux
-  const isLogin = useSelector((state: RootState) => state.sign.isLogin);
   const totalItems = useSelector((state: RootState) => state.cart.totalItems);
 
   // For handling session token and user role
-  const [sessionToken, setSessionToken] = useState<JWT | undefined>(undefined);
   const { token } = useSelector((state: RootState) => state.sign);
   const { userRole } = jwtInfo(token as string);
 
@@ -79,44 +75,12 @@ const Navbar = () => {
   const { data: session } = useSession();
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (session && session.token) {
-      setSessionToken(session.token);
-    }
-  }, [session]);
-
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     dispatch({
       type: Action.SET_SEARCH_TERM,
       payload: event.target.value,
     });
   };
-
-  // Log in user using OAuth when session changes
-  useEffect(() => {
-    if (session && session.token && session.token.account && !isLogin) {
-      const { provider, providerAccountId } = session.token.account;
-      const { name, email, image } = session.token.user || {};
-
-      if (provider === 'credentials') return;
-
-      dispatch(
-        loginWithOauthProviderAction(
-          provider,
-          providerAccountId,
-          email || '',
-          name || '',
-          image || '',
-          () => {
-            console.log('Login success');
-          },
-          () => {
-            console.log('Login failed:');
-          },
-        ),
-      );
-    }
-  }, [sessionToken, isLogin]);
 
   return (
     <NavbarRoot theme={theme}>
@@ -222,7 +186,7 @@ const Navbar = () => {
           <Box sx={{ flexGrow: 0.725 }} />
         )}
 
-        <AccountButton isLogin={isLogin} />
+        <AccountButton isLogin={!!session} />
 
         <Link href="/cart" passHref>
           <ButtonBase sx={{ padding: '10px', color: 'black' }}>

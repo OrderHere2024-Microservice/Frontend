@@ -44,7 +44,7 @@ const AccountPopover = ({
   const { isLogin } = useSelector((state: RootState) => state.sign);
 
   const handleLogout = async () => {
-    await signOut({ redirect: false });
+    await signOut({ callbackUrl: '/' });
     dispatch(logoutAction());
     onClose();
     await router.push('/');

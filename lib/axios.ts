@@ -3,15 +3,17 @@ import { store, RootState } from '@store/store';
 import { logoutAction } from '../store/actions/signAction';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
+import { getSession } from 'next-auth/react';
 
-const backendHttpInstance = () => {
+const backendHttpInstance = async () => {
+  const session = await getSession();
+
   const axiosInstance = axios.create();
   axiosInstance.defaults.baseURL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-  const state: RootState = store.getState();
-  axiosInstance.defaults.headers.common.Authorization = state.sign.token
-    ? state.sign.token
-    : '';
+  const token = session?.token?.accessToken;
+
+  axiosInstance.defaults.headers.common.Authorization = `Bearer ${token}`;
 
   axiosInstance.interceptors.response.use(
     (config) => config,
@@ -38,8 +40,8 @@ const backendHttpInstance = () => {
   return axiosInstance;
 };
 
-const http = (endpoint: string, config: AxiosRequestConfig) => {
-  const axiosInstance = backendHttpInstance();
+const http = async (endpoint: string, config: AxiosRequestConfig) => {
+  const axiosInstance = await backendHttpInstance();
   return axiosInstance(endpoint, { ...config });
 };
 
