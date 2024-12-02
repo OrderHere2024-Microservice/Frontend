@@ -30,16 +30,14 @@ import {
   UPDATE_INGREDIENT,
   DELETE_INGREDIENT,
 } from '@services/Ingredient';
-import { RootState } from '@store/store';
-import { useSelector } from 'react-redux';
 import { updateDishes } from '@services/Dish';
-import { jwtInfo } from '@utils/jwtInfo';
 import styles from './DishPopup.module.css';
 import {
   GetIngredientDTO,
   PostIngredientDTO,
 } from '@interfaces/IngredientDTOs';
 import { DishUpdateDto } from '@interfaces/DishDTOs';
+import { useSession } from 'next-auth/react';
 
 interface IngredientDetail {
   id: number;
@@ -68,8 +66,8 @@ const DishPopup = ({
 }: DishPopupProps) => {
   const client = useApolloClient();
   const router = useRouter();
-  const { token } = useSelector((state: RootState) => state.sign);
-  const { userRole } = jwtInfo(token as string);
+  const { data: session } = useSession();
+  const userRole = session?.token?.roles?.[0].slice(5) ?? 'visitor';
 
   const [ingredientDetails, setIngredientDetails] = useState<
     IngredientDetail[]
@@ -330,7 +328,7 @@ const DishPopup = ({
       <DialogContent
         sx={{ padding: 0, overflowY: 'auto', backgroundColor: '#f4f4f4' }}
       >
-        {isEditMode && userRole === 'ROLE_sys_admin' ? (
+        {isEditMode && userRole === 'sys_admin' ? (
           <Box position="relative" display="inline-block">
             <img width="500px" height="auto" src={imageUrl} alt={dishName} />
             <Box
@@ -372,7 +370,7 @@ const DishPopup = ({
           <img width="500px" height="auto" src={imageUrl} alt={dishName} />
         )}
         <DialogContentText className={styles.dishTitle}>
-          {isEditMode && userRole === 'ROLE_sys_admin' ? (
+          {isEditMode && userRole === 'sys_admin' ? (
             <TextField
               fullWidth
               sx={{ mt: 2, mr: 3 }}
@@ -385,7 +383,7 @@ const DishPopup = ({
           ) : (
             <Typography variant="h5">{dishName}</Typography>
           )}
-          {userRole === 'ROLE_sys_admin' && (
+          {userRole === 'sys_admin' && (
             <Button
               onClick={toggleEditMode}
               variant="contained"
@@ -404,7 +402,7 @@ const DishPopup = ({
         </DialogContentText>
 
         <DialogContentText className={styles.dishPrice}>
-          {isEditMode && userRole === 'ROLE_sys_admin' ? (
+          {isEditMode && userRole === 'sys_admin' ? (
             <TextField
               fullWidth
               sx={{ mt: 2, mr: 3 }}
@@ -422,7 +420,7 @@ const DishPopup = ({
         </DialogContentText>
 
         <DialogContentText className={styles.dishIngredients}>
-          {isEditMode && userRole === 'ROLE_sys_admin' ? (
+          {isEditMode && userRole === 'sys_admin' ? (
             <TextField
               fullWidth
               sx={{ mt: 2 }}
@@ -446,7 +444,7 @@ const DishPopup = ({
             marginY: 2,
           }}
         >
-          {isEditMode && userRole === 'ROLE_sys_admin' && (
+          {isEditMode && userRole === 'sys_admin' && (
             <Button
               onClick={() => {
                 handleEditDishSubmit(newDish).catch((error) => {
@@ -513,7 +511,7 @@ const DishPopup = ({
                       alignItems: 'center',
                     }}
                   >
-                    {isEditMode && userRole === 'ROLE_sys_admin' ? (
+                    {isEditMode && userRole === 'sys_admin' ? (
                       <Box
                         sx={{
                           width: '100%',
@@ -606,7 +604,7 @@ const DishPopup = ({
                 </ListItem>
               ))}
             </List>
-            {isEditMode && userRole === 'ROLE_sys_admin' ? (
+            {isEditMode && userRole === 'sys_admin' ? (
               <Box>
                 <Box
                   onClick={addNewIngredient}

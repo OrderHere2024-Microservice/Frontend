@@ -16,11 +16,10 @@ import { useMutation, useQuery } from '@apollo/client';
 import { UPDATE_ORDER_STATUS, DELETE_ORDER } from '@services/orderService';
 import { GET_RESTAURANT_ADDRESS } from '@services/Restaurant';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import { useSession } from 'next-auth/react';
 import * as Action from '@store/actionTypes';
-import { useDispatch, useSelector } from 'react-redux';
-import { jwtInfo } from '@utils/jwtInfo';
+import { useDispatch } from 'react-redux';
 import dynamic from 'next/dynamic';
-import { RootState } from '@store/store';
 import { OrderGetDTO } from '@interfaces/OrderDTOs';
 import { SelectChangeEvent } from '@mui/material';
 
@@ -45,14 +44,15 @@ const OrderPopUp = ({
   onOrderStatusUpdate,
 }: OrderPopUpProps) => {
   const dispatch = useDispatch();
-  const { token } = useSelector((state: RootState) => state.sign);
-  const { userRole } = jwtInfo(token || '');
 
   const [originalStatus, setOriginalStatus] = useState<string>('');
   const [isEditMode, setEditMode] = useState<boolean>(false);
   const [statusValue, setStatusValue] = useState<string>(
     order?.orderStatus || '',
   );
+
+  const { data: session } = useSession();
+  const userRole = session?.token?.roles?.[0].slice(5) ?? 'visitor';
 
   const [updateOrderStatusMutation] = useMutation(UPDATE_ORDER_STATUS);
   const [deleteOrderMutation] = useMutation(DELETE_ORDER);
@@ -345,7 +345,7 @@ const OrderPopUp = ({
         )}
       </DialogContent>
       <DialogActions>
-        {userRole === 'ROLE_sys_admin' ? (
+        {userRole === 'sys_admin' ? (
           isEditMode ? (
             <>
               <Button onClick={toggleEditMode}>Exit</Button>

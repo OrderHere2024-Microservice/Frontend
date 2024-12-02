@@ -22,7 +22,6 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { ChangeEvent } from 'react';
 import * as Action from '@store/actionTypes';
-import { jwtInfo } from '@utils/jwtInfo';
 import { RootState } from '@store/store';
 import { Theme } from '@mui/material';
 
@@ -67,12 +66,12 @@ const Navbar = () => {
   // Get user login state and cart items count from Redux
   const totalItems = useSelector((state: RootState) => state.cart.totalItems);
 
-  // For handling session token and user role
-  const { token } = useSelector((state: RootState) => state.sign);
-  const { userRole } = jwtInfo(token as string);
-
   // Handle user session from next-auth
   const { data: session } = useSession();
+
+  // For handling session token and user role
+  const userRole = session?.token?.roles?.[0].slice(5) ?? 'visitor';
+
   const dispatch = useDispatch();
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -134,7 +133,7 @@ const Navbar = () => {
               Home
             </Button>
           </Link>
-          {userRole !== 'ROLE_driver' ? (
+          {userRole !== 'driver' ? (
             <Link href="/restaurant/1" passHref>
               <Button
                 sx={{

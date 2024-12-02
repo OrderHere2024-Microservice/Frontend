@@ -37,8 +37,7 @@ const AccountPopover = ({
 
   const { data: session } = useSession();
 
-  const userRole = session?.token?.roles?.[0] ?? 'Role_visitor';
-
+  const userRole = session?.token?.roles?.[0].slice(5) ?? 'visitor';
   const isLogin = !!session;
 
   const handleLogout = async () => {
@@ -113,7 +112,7 @@ const AccountPopover = ({
       </NextLink>
       <Divider />
       <Box sx={{ my: 1 }}>
-        {userRole !== 'ROLE_driver' && (
+        {userRole !== 'driver' && (
           <NextLink href="/order-management" passHref>
             <MenuItem>
               <ListItemIcon>
@@ -122,7 +121,7 @@ const AccountPopover = ({
               <ListItemText
                 primary={
                   <Typography variant="body1">
-                    {userRole === 'ROLE_sys_admin'
+                    {userRole === 'sys_admin'
                       ? 'Order Management'
                       : 'Order History'}
                   </Typography>

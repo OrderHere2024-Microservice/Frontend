@@ -7,18 +7,16 @@ import Contact from '@components/restaurantInfo/components/contact';
 import OpeningHours from '@components/restaurantInfo/components/openingHours';
 import { EditRestaurantModal } from '@components/restaurantInfo/EditRestaurantModal';
 import { useQuery } from '@apollo/client';
+import { useSession } from 'next-auth/react';
 import { GET_RESTAURANT_INFO } from '@services/Restaurant';
-import { jwtInfo } from '@utils/jwtInfo';
-import { useSelector } from 'react-redux';
-import { RootState } from '@store/store';
 import { RestaurantGetDTO } from '@interfaces/RestaurantDTOs';
 
 const RestaurantInfoPage = () => {
   const router = useRouter();
   const { restaurantId } = router.query;
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const { token } = useSelector((state: RootState) => state.sign);
-  const { userRole } = jwtInfo(token || '');
+  const { data: session } = useSession();
+  const userRole = session?.token?.roles?.[0].slice(5) ?? 'visitor';
 
   const { loading, error, data, refetch } = useQuery<
     { getRestaurantById: RestaurantGetDTO },
@@ -54,7 +52,7 @@ const RestaurantInfoPage = () => {
   return (
     <Box sx={{ width: '100%' }}>
       <RestaurantInfoHeader />
-      {userRole === 'ROLE_sys_admin' && (
+      {userRole === 'sys_admin' && (
         <Box sx={{ display: 'flex', justifyContent: 'space-around' }}>
           <Button
             variant="contained"

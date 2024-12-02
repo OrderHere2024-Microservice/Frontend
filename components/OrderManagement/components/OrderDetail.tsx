@@ -13,9 +13,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useQuery } from '@apollo/client';
 import { GET_USER_ORDERS, GET_ALL_ORDERS } from '@services/orderService';
 import OrderPopUp from './OrderPopUp';
+import { useSession } from 'next-auth/react';
 import * as Action from '@store/actionTypes';
 import { RootState } from '@store/store';
-import { jwtInfo } from '@utils/jwtInfo';
 import { OrderGetDTO } from '@interfaces/OrderDTOs';
 
 const OrderDetail = () => {
@@ -31,15 +31,15 @@ const OrderDetail = () => {
   const status = useSelector((state: RootState) => state.order.status);
   const sorted = useSelector((state: RootState) => state.order.sortedOrder);
   const searchText = useSelector((state: RootState) => state.order.searchText);
-  const { token } = useSelector((state: RootState) => state.sign);
-  const { userRole } = jwtInfo(token || '');
+  const { data: session } = useSession();
+  const userRole = session?.token?.roles?.[0].slice(5) ?? 'visitor';
 
   const {
     data: userData,
     loading: userLoading,
     error: userError,
   } = useQuery<{ getUserOrders: OrderGetDTO[] }>(GET_USER_ORDERS, {
-    skip: userRole === 'ROLE_sys_admin',
+    skip: userRole === 'sys_admin',
   });
 
   const {
@@ -47,12 +47,12 @@ const OrderDetail = () => {
     loading: allOrdersLoading,
     error: allOrdersError,
   } = useQuery<{ getAllOrders: OrderGetDTO[] }>(GET_ALL_ORDERS, {
-    skip: userRole !== 'ROLE_sys_admin',
+    skip: userRole !== 'sys_admin',
   });
 
   useEffect(() => {
     if (
-      userRole === 'ROLE_sys_admin' &&
+      userRole === 'sys_admin' &&
       allOrdersData &&
       allOrdersData.getAllOrders
     ) {
@@ -177,9 +177,9 @@ const OrderDetail = () => {
     );
   };
 
-  if (userRole === 'ROLE_sys_admin' && allOrdersLoading)
+  if (userRole === 'sys_admin' && allOrdersLoading)
     return <p>Loading all orders...</p>;
-  if (userRole !== 'ROLE_sys_admin' && userLoading)
+  if (userRole !== 'sys_admin' && userLoading)
     return <p>Loading user orders...</p>;
   if (allOrdersError || userError) return <p>Order not found</p>;
 

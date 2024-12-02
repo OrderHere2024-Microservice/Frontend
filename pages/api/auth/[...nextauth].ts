@@ -41,7 +41,7 @@ export const authOptions: NextAuthOptions = {
           const roles =
             decodedToken?.resource_access?.['orderhere-mono']?.roles;
           if (roles) {
-            token.roles = roles; // Add roles to the JWT
+            token.roles = roles;
           }
         } catch (error) {
           console.error('Failed to decode JWT:', error);
