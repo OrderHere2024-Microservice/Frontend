@@ -38,15 +38,6 @@ const AccountButton = ({ isLogin }: { isLogin: boolean }) => {
 
   return (
     <>
-      {/* Open the AccountPopover Dialog is isLogin is true  */}
-      {isLogin && (
-        <AccountPopover
-          anchorEl={anchorRef.current}
-          onClose={() => setOpenPopover(false)}
-          open={openPopover}
-        />
-      )}
-
       <Box
         component={ButtonBase}
         onClick={() => handleButtonClick()}
