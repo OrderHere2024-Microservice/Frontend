@@ -1,10 +1,6 @@
 import { createStore, applyMiddleware, combineReducers } from 'redux';
 import { composeWithDevTools } from '@redux-devtools/extension';
 import thunk from 'redux-thunk';
-import { persistStore, persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
-
-import signReducer from './reducers/signReducer';
 import cartReducer from './reducers/cartReducer';
 import deliveryReducer from './reducers/deliveryReducer';
 import filterReducer from './reducers/filterReducer';
@@ -13,16 +9,7 @@ import pickupReducer from './reducers/pickupReducer';
 import orderReducer from './reducers/orderReducer';
 import dishesReducer from './reducers/dishReducer';
 
-const signPersistConfig = {
-  key: 'sign',
-  storage,
-  whitelist: ['isLogin', 'token'],
-};
-
-const persistedSignReducer = persistReducer(signPersistConfig, signReducer);
-
 const rootReducer = combineReducers({
-  sign: persistedSignReducer,
   cart: cartReducer,
   delivery: deliveryReducer,
   dinein: dineInReducer,
@@ -58,6 +45,4 @@ const store = createStore(
   composeWithDevTools(applyMiddleware(thunk)),
 );
 
-const persistor = persistStore(store);
-
-export { store, persistor };
+export { store };

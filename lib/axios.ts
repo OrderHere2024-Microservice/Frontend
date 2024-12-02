@@ -1,8 +1,4 @@
 import axios, { AxiosRequestConfig, AxiosError } from 'axios';
-import { store, RootState } from '@store/store';
-import { logoutAction } from '../store/actions/signAction';
-import { ThunkDispatch } from 'redux-thunk';
-import { AnyAction } from 'redux';
 import { getSession } from 'next-auth/react';
 
 const backendHttpInstance = async () => {
@@ -19,20 +15,6 @@ const backendHttpInstance = async () => {
     (config) => config,
     (error: AxiosError) => {
       error && console.log(error.response);
-
-      // jwt expired or invalid
-      if (
-        error &&
-        error.response &&
-        (error.response.status === 401 ||
-          error.response.status === 405 ||
-          error.response.status === 403)
-      ) {
-        (store.dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
-          logoutAction(),
-        );
-        return '';
-      }
 
       return Promise.reject(error);
     },

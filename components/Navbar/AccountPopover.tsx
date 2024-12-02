@@ -9,13 +9,11 @@ import {
   Popover,
   Typography,
 } from '@mui/material';
-import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useSession } from 'next-auth/react';
 import HistoryIcon from '@mui/icons-material/History';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { logoutAction } from '@store/actions/signAction';
 import { signOut } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { getUserProfile } from '@services/Profile';
@@ -30,7 +28,6 @@ const AccountPopover = ({
   onClose: () => void;
   open: boolean;
 }) => {
-  const dispatch = useDispatch();
   const router = useRouter();
   const [username, setUsername] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string>('headImgUrl');
@@ -59,14 +56,12 @@ const AccountPopover = ({
           console.log('Keycloak logout complete');
 
           await signOut({ redirect: false });
-          dispatch(logoutAction());
           onClose();
           await router.push('/');
         })();
       }, 500);
     } else {
       await signOut({ redirect: false });
-      dispatch(logoutAction());
       onClose();
       await router.push('/');
     }
