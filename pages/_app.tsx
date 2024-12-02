@@ -55,27 +55,27 @@ const MyApp = ({ Component, pageProps }: MyAppProps) => {
         strategy="beforeInteractive"
       />
       <ReduxProvider store={store}>
-          <SessionProvider session={pageProps.session}>
-            <ThemeProvider theme={createTheme()}>
-              <CssBaseline />
-              <Head>
-                <title>OrderHere</title>
-                <meta
-                  name="viewport"
-                  content="initial-scale=1, width=device-width"
-                />
-              </Head>
-              <NextNProgress />
-              <Layout>
-                <NextClientOnly>
-                  <Toaster position="top-center" reverseOrder={false} />
-                  <Navbar />
-                </NextClientOnly>
-                {isLoading ? <Loading /> : <Component {...pageProps} />}
-              </Layout>
-              <Footer />
-            </ThemeProvider>
-          </SessionProvider>
+        <SessionProvider session={pageProps.session}>
+          <ThemeProvider theme={createTheme()}>
+            <CssBaseline />
+            <Head>
+              <title>OrderHere</title>
+              <meta
+                name="viewport"
+                content="initial-scale=1, width=device-width"
+              />
+            </Head>
+            <NextNProgress />
+            <Layout>
+              <NextClientOnly>
+                <Toaster position="top-center" reverseOrder={false} />
+                <Navbar />
+              </NextClientOnly>
+              {isLoading ? <Loading /> : <Component {...pageProps} />}
+            </Layout>
+            <Footer />
+          </ThemeProvider>
+        </SessionProvider>
       </ReduxProvider>
     </ApolloProvider>
   );
