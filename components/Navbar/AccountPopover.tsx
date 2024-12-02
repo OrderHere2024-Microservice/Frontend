@@ -65,7 +65,6 @@ const AccountPopover = ({
         })();
       }, 500);
     } else {
-      console.error('ID token not found. Redirecting to home page.');
       await signOut({ redirect: false });
       dispatch(logoutAction());
       onClose();
