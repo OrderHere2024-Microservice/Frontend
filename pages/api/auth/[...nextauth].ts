@@ -1,5 +1,7 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import KeycloakProvider from 'next-auth/providers/keycloak';
+import axios from 'axios';
+import { JWT } from 'next-auth/jwt';
 
 interface DecodedJWT {
   resource_access?: {
@@ -7,6 +9,12 @@ interface DecodedJWT {
       roles: string[];
     };
   };
+}
+
+interface KeycloakTokenResponse {
+  access_token: string;
+  refresh_token?: string;
+  expires_in: number;
 }
 
 export const authOptions: NextAuthOptions = {
@@ -25,9 +33,11 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXT_PUBLIC_SECRET,
 
   callbacks: {
-    jwt({ token, user, account }) {
+    async jwt({ token, user, account }) {
       if (account) {
         token.accessToken = account.access_token;
+        token.refreshToken = account.refresh_token;
+        token.accessTokenExpires = account.expires_at;
       }
       if (user) {
         token.user = user;
@@ -48,7 +58,11 @@ export const authOptions: NextAuthOptions = {
         }
       }
 
-      return token;
+      if (Date.now() < token.accessTokenExpires!) {
+        return token;
+      }
+
+      return await refreshAccessToken(token);
     },
     session({ session, token }) {
       session.user = token.user;
@@ -58,5 +72,43 @@ export const authOptions: NextAuthOptions = {
     },
   },
 };
+
+async function refreshAccessToken(token: JWT): Promise<JWT> {
+  console.log('Refreshing access token:', token);
+  try {
+    const response = await axios.post(
+      `${
+        process.env.NEXT_PUBLIC_KEYCLOAK_ISSUER ||
+        'http://localhost:7080/realms/orderhere'
+      }/protocol/openid-connect/token`,
+      new URLSearchParams({
+        client_id:
+          process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID || 'orderhere-mono',
+        client_secret:
+          process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_SECRET ||
+          'L6gR02XEqhM1IRtr0IPiOAe2T08H4sfo',
+        grant_type: 'refresh_token',
+        refresh_token: token.refreshToken!,
+      }),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
+    );
+
+    const refreshedTokens = response.data as KeycloakTokenResponse;
+
+    return {
+      ...token,
+      accessToken: refreshedTokens.access_token,
+      refreshToken: refreshedTokens.refresh_token || token.refreshToken,
+      accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
+    };
+  } catch (error) {
+    console.error('Error refreshing access token:', error);
+
+    return {
+      ...token,
+      error: 'RefreshTokenError',
+    };
+  }
+}
 
 export default NextAuth(authOptions);

@@ -5,6 +5,10 @@ declare module 'next-auth' {
   interface Session {
     token?: JWT;
   }
+
+  interface Account {
+    expires_in?: number;
+  }
 }
 
 declare module 'next-auth/jwt' {
@@ -15,6 +19,9 @@ declare module 'next-auth/jwt' {
       providerAccountId: string;
     };
     accessToken?: string;
+    refreshToken?: string;
+    accessTokenExpires?: number;
     roles?: string[];
+    error?: string;
   }
 }
