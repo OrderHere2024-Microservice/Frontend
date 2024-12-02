@@ -14,6 +14,7 @@ interface DecodedJWT {
 interface KeycloakTokenResponse {
   access_token: string;
   refresh_token?: string;
+  id_token?: string;
   expires_in: number;
 }
 
@@ -35,6 +36,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user, account }) {
       if (account) {
+        token.idToken = account.id_token;
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
         token.accessTokenExpires = account.expires_at;
@@ -67,14 +69,12 @@ export const authOptions: NextAuthOptions = {
     session({ session, token }) {
       session.user = token.user;
       session.token = token;
-
       return session;
     },
   },
 };
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
-  console.log('Refreshing access token:', token);
   try {
     const response = await axios.post(
       `${
@@ -99,6 +99,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       ...token,
       accessToken: refreshedTokens.access_token,
       refreshToken: refreshedTokens.refresh_token || token.refreshToken,
+      idToken: refreshedTokens.id_token || token.idToken,
       accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
     };
   } catch (error) {

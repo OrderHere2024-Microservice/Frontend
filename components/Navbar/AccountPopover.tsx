@@ -39,12 +39,38 @@ const AccountPopover = ({
 
   const userRole = session?.token?.roles?.[0].slice(5) ?? 'visitor';
   const isLogin = !!session;
+  const idToken = session?.token?.idToken;
 
   const handleLogout = async () => {
-    await signOut({ callbackUrl: '/' });
-    dispatch(logoutAction());
-    onClose();
-    await router.push('/');
+    if (idToken) {
+      const logoutUrl = `${
+        process.env.NEXT_PUBLIC_KEYCLOAK_ISSUER ||
+        'http://localhost:7080/realms/orderhere'
+      }/protocol/openid-connect/logout?id_token_hint=${idToken}`;
+
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = logoutUrl;
+
+      document.body.appendChild(iframe);
+
+      setTimeout(() => {
+        void (async () => {
+          console.log('Keycloak logout complete');
+
+          await signOut({ redirect: false });
+          dispatch(logoutAction());
+          onClose();
+          await router.push('/');
+        })();
+      }, 500);
+    } else {
+      console.error('ID token not found. Redirecting to home page.');
+      await signOut({ redirect: false });
+      dispatch(logoutAction());
+      onClose();
+      await router.push('/');
+    }
   };
 
   const fetchProfile = async () => {
