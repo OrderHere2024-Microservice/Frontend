@@ -52,7 +52,7 @@ const OrderPopUp = ({
   );
 
   const { data: session } = useSession();
-  const userRole = session?.token?.roles?.[0].slice(5) ?? 'visitor';
+  const userRole = session?.token?.roles?.[0].slice(5) ?? 'customer';
 
   const [updateOrderStatusMutation] = useMutation(UPDATE_ORDER_STATUS);
   const [deleteOrderMutation] = useMutation(DELETE_ORDER);

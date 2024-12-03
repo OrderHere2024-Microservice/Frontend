@@ -67,7 +67,7 @@ const DishPopup = ({
   const client = useApolloClient();
   const router = useRouter();
   const { data: session } = useSession();
-  const userRole = session?.token?.roles?.[0].slice(5) ?? 'visitor';
+  const userRole = session?.token?.roles?.[0].slice(5) ?? 'customer';
 
   const [ingredientDetails, setIngredientDetails] = useState<
     IngredientDetail[]

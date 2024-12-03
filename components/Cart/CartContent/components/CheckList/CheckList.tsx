@@ -7,6 +7,8 @@ import { useRouter } from 'next/router';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import { useSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { useMutation } from '@apollo/client';
 import { PLACE_ORDER } from '@services/orderService';
 import { RootState } from '@store/store';
@@ -64,11 +66,19 @@ const CheckList = () => {
     animation: showWarningShake ? 'shake 0.5s' : 'none',
   };
 
+  const { data: session } = useSession();
+  const isLogin = !!session;
+
   const handleClearCart = () => {
     dispatch({ type: Action.CLEAR_CART });
     dispatch({ type: Action.CALCULATE_TOTAL_PRICE });
   };
   const handleCheckout = async () => {
+    if (!isLogin) {
+      await signIn('keycloak');
+      return;
+    }
+
     let orderData: {
       restaurantId: number;
       orderStatus: string;
@@ -323,10 +333,7 @@ const CheckList = () => {
       >
         <ButtonBase
           onClick={() => {
-            // these catch blocks are not necessary, they should be changed to void handleCheckout()
-            handleCheckout().catch((error) => {
-              console.error('Error checking out:', error);
-            });
+            void handleCheckout();
           }}
           sx={{ backgroundColor: 'primary.main', width: '100%', height: 40 }}
         >

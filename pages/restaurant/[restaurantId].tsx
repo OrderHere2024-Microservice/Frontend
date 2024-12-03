@@ -16,7 +16,7 @@ const RestaurantInfoPage = () => {
   const { restaurantId } = router.query;
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { data: session } = useSession();
-  const userRole = session?.token?.roles?.[0].slice(5) ?? 'visitor';
+  const userRole = session?.token?.roles?.[0].slice(5) ?? 'customer';
 
   const { loading, error, data, refetch } = useQuery<
     { getRestaurantById: RestaurantGetDTO },

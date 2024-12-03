@@ -12,7 +12,7 @@ const AccountButton = ({ isLogin }: { isLogin: boolean }) => {
   //state to manage signIn dialog
   const handleButtonClick = () => {
     if (!isLogin) {
-      signIn('keycloak').catch((error) => console.error(error));
+      void signIn('keycloak');
     } else {
       setOpenPopover(isLogin);
     }

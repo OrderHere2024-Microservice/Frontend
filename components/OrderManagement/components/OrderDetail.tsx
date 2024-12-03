@@ -32,7 +32,7 @@ const OrderDetail = () => {
   const sorted = useSelector((state: RootState) => state.order.sortedOrder);
   const searchText = useSelector((state: RootState) => state.order.searchText);
   const { data: session } = useSession();
-  const userRole = session?.token?.roles?.[0].slice(5) ?? 'visitor';
+  const userRole = session?.token?.roles?.[0].slice(5) ?? 'customer';
 
   const {
     data: userData,

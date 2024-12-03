@@ -15,7 +15,7 @@ import { CategoryGetDto } from '@interfaces/CategoryDTOs';
 const Index = () => {
   const [dishes, setDishes] = useState<DishGetDto[]>([]);
   const { data: session } = useSession();
-  const userRole = session?.token?.roles?.[0].slice(5) ?? 'visitor';
+  const userRole = session?.token?.roles?.[0].slice(5) ?? 'customer';
 
   const {
     loading: dishesLoading,

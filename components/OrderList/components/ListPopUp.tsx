@@ -45,7 +45,7 @@ const ListPopUp = ({
   const [duration, setDuration] = useState<string>('');
 
   const { data: session } = useSession();
-  const userRole = session?.token?.roles?.[0].slice(5) ?? 'visitor';
+  const userRole = session?.token?.roles?.[0].slice(5) ?? 'customer';
 
   const { data: restaurantData } = useQuery<{
     getRestaurantById: { address: string };

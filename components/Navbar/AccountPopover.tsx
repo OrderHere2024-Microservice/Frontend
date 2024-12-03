@@ -34,7 +34,7 @@ const AccountPopover = ({
 
   const { data: session } = useSession();
 
-  const userRole = session?.token?.roles?.[0].slice(5) ?? 'visitor';
+  const userRole = session?.token?.roles?.[0].slice(5) ?? 'customer';
   const isLogin = !!session;
   const idToken = session?.token?.idToken;
 

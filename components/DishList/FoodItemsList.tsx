@@ -28,7 +28,7 @@ const FoodItemsList = ({ dishes: initialDishes }: FoodItemsListProps) => {
   const [dishAdditionCount, setDishAdditionCount] = useState(0);
 
   const { data: session } = useSession();
-  const userRole = session?.token?.roles?.[0].slice(5) ?? 'visitor';
+  const userRole = session?.token?.roles?.[0].slice(5) ?? 'customer';
 
   const { searchTerm, category } = useSelector(
     (state: RootState) => state.dish,
