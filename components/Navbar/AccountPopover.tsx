@@ -53,8 +53,6 @@ const AccountPopover = ({
 
       setTimeout(() => {
         void (async () => {
-          console.log('Keycloak logout complete');
-
           await signOut({ redirect: false });
           onClose();
           await router.push('/');
