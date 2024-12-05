@@ -7,11 +7,22 @@ import {
 } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
 import { useMemo } from 'react';
-import { store } from '../store/store';
 import { setContext } from '@apollo/client/link/context';
 import createUploadLink from 'apollo-upload-client/createUploadLink.mjs';
+import { getSession } from 'next-auth/react';
+import { Session } from 'next-auth';
 
 let apolloClient: ApolloClient<NormalizedCacheObject> | undefined;
+
+let session: Session | null = null;
+
+void (async () => {
+  try {
+    session = await getSession();
+  } catch (error) {
+    console.error('Error fetching session:', error);
+  }
+})();
 
 const errorLink: ApolloLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
@@ -41,11 +52,11 @@ const uploadLink: ApolloLink = createUploadLink({
 
 const authLink: ApolloLink = setContext(
   (_, { headers }: { headers?: Record<string, string> }) => {
-    const token = store.getState().sign.token;
+    const token = session?.token?.accessToken;
     return {
       headers: {
         ...headers,
-        Authorization: token ? `${token}` : '',
+        Authorization: token ? `Bearer ${token}` : '',
       },
     };
   },

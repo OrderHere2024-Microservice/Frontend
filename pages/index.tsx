@@ -6,18 +6,16 @@ import Carousel from '@components/Carousel/Carousel';
 import Category from '@components/Category/Category';
 import { GET_DISHES } from '@services/Dish';
 import { GET_CATEGORIES_BY_RESTAURANT } from '@services/Category';
-import { jwtInfo } from '@utils/jwtInfo';
 import OrderList from '@components/OrderList/index';
-import { useSelector } from 'react-redux';
-import { RootState } from '@store/store';
+import { useSession } from 'next-auth/react';
 import { DishGetDto } from '@interfaces/DishDTOs';
 import { PagingDto } from '@interfaces/PagingDTO';
 import { CategoryGetDto } from '@interfaces/CategoryDTOs';
 
 const Index = () => {
   const [dishes, setDishes] = useState<DishGetDto[]>([]);
-  const { token } = useSelector((state: RootState) => state.sign);
-  const { userRole } = jwtInfo(token || '');
+  const { data: session } = useSession();
+  const userRole = session?.token?.roles?.[0].slice(5) ?? 'customer';
 
   const {
     loading: dishesLoading,
@@ -55,7 +53,7 @@ const Index = () => {
 
   return (
     <>
-      {userRole === 'ROLE_driver' ? (
+      {userRole === 'driver' ? (
         <OrderList />
       ) : (
         <ThreeColumnsLayout noFooter={false}>

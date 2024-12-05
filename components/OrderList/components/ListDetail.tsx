@@ -15,8 +15,8 @@ import OrderPopUp from './ListPopUp';
 import * as Action from '@store/actionTypes';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@store/store';
-import { jwtInfo } from '@utils/jwtInfo';
 import { OrderGetDTO } from '@interfaces/OrderDTOs';
+import { useSession } from 'next-auth/react';
 
 const ListDetail = () => {
   const [displayOrders, setDisplayOrders] = useState<OrderGetDTO[]>([]);
@@ -30,13 +30,12 @@ const ListDetail = () => {
   const status = useSelector((state: RootState) => state.order.status);
   const sorted = useSelector((state: RootState) => state.order.sortedOrder);
   const searchText = useSelector((state: RootState) => state.order.searchText);
-  const { token } = useSelector((state: RootState) => state.sign);
-  const { userRole } = jwtInfo(token || '');
-
+  const { data: session } = useSession();
+  const userRole = session?.token?.roles?.[0].slice(5) ?? 'customer';
   const { data, loading, error } = useQuery<{ getAllOrders: OrderGetDTO[] }>(
     GET_ALL_ORDERS,
     {
-      skip: userRole !== 'ROLE_driver',
+      skip: userRole !== 'driver',
     },
   );
 
