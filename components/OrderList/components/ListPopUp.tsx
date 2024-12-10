@@ -15,9 +15,8 @@ import { UPDATE_ORDER_STATUS, DELETE_ORDER } from '@services/orderService';
 import { GET_RESTAURANT_ADDRESS } from '@services/Restaurant';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import * as Action from '@store/actionTypes';
-import { useDispatch, useSelector } from 'react-redux';
-import { jwtInfo } from '@utils/jwtInfo';
-import { RootState } from '@store/store';
+import { useDispatch } from 'react-redux';
+import { useSession } from 'next-auth/react';
 import dynamic from 'next/dynamic';
 import { OrderGetDTO } from '@interfaces/OrderDTOs';
 import { OrderDishDTO } from '@interfaces/OrderDishDTO';
@@ -40,12 +39,13 @@ const ListPopUp = ({
   onOrderStatusUpdate,
 }: ListPopUpProps) => {
   const dispatch = useDispatch();
-  const { token } = useSelector((state: RootState) => state.sign);
-  const { userRole } = jwtInfo(token || '');
 
   const [isEditMode, setEditMode] = useState<boolean>(true);
   const [distance, setDistance] = useState<string>('');
   const [duration, setDuration] = useState<string>('');
+
+  const { data: session } = useSession();
+  const userRole = session?.token?.roles?.[0].slice(5) ?? 'customer';
 
   const { data: restaurantData } = useQuery<{
     getRestaurantById: { address: string };
@@ -318,7 +318,7 @@ const ListPopUp = ({
         )}
       </DialogContent>
       <DialogActions>
-        {userRole === 'ROLE_driver' ? (
+        {userRole === 'driver' ? (
           isEditMode ? (
             <>
               <Button onClick={handleClose}>Exit</Button>

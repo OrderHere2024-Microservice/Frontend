@@ -13,7 +13,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import * as Action from '@store/actionTypes';
 import DishPopup from '../DishPopUp/DishPopUp';
 import RatingStars from './RatingStars';
-import { jwtInfo } from '@utils/jwtInfo';
 import { RootState } from '@store/store';
 
 interface FoodItemProps {
@@ -24,6 +23,7 @@ interface FoodItemProps {
   imageUrl: string;
   rating: number;
   onRemoveDish: (dishId: number) => void;
+  userRole?: string;
 }
 
 const FoodItem = ({
@@ -34,6 +34,7 @@ const FoodItem = ({
   imageUrl,
   rating,
   onRemoveDish,
+  userRole,
 }: FoodItemProps) => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state: RootState) => state.cart.items);
@@ -41,9 +42,6 @@ const FoodItem = ({
   const quantity = item ? item.quantity : 0;
   const [popupOpen, setPopupOpen] = useState(false);
   const [isAddedToCart, setIsAddedToCart] = useState(false);
-
-  const { token } = useSelector((state: RootState) => state.sign);
-  const { userRole } = jwtInfo(token as string);
 
   useEffect(() => {
     if (quantity === 0) {
@@ -102,7 +100,7 @@ const FoodItem = ({
           height: '200px',
         }}
       >
-        {userRole === 'ROLE_sys_admin' && (
+        {userRole === 'sys_admin' && (
           <IconButton
             onClick={() => onRemoveDish(dishId)}
             sx={{

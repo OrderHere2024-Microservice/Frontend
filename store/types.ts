@@ -1,13 +1,3 @@
-export interface SignState {
-  isOpen: boolean;
-  content: string;
-  isLogin: boolean;
-  token?: string;
-  passwordResetStatus?: string;
-  message?: string;
-  error?: string;
-}
-
 export interface CartItem {
   dishId: number;
   dishName: string;

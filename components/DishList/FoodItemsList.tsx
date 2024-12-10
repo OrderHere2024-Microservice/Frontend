@@ -10,11 +10,11 @@ import {
   addDishSuccess,
   addDishError,
 } from '@store/actions/dishAction';
-import { jwtInfo } from '@utils/jwtInfo';
 import { postDishes, DELETE_DISH } from '@services/Dish';
 import { RootState } from '@store/store';
 import { DishGetDto } from '@interfaces/DishDTOs';
 import { DishCreateDto } from '@interfaces/DishDTOs';
+import { useSession } from 'next-auth/react';
 
 interface FoodItemsListProps {
   dishes: DishGetDto[];
@@ -27,14 +27,15 @@ const FoodItemsList = ({ dishes: initialDishes }: FoodItemsListProps) => {
   const [isAddDishModalOpen, setAddDishModalOpen] = useState(false);
   const [dishAdditionCount, setDishAdditionCount] = useState(0);
 
+  const { data: session } = useSession();
+  const userRole = session?.token?.roles?.[0].slice(5) ?? 'customer';
+
   const { searchTerm, category } = useSelector(
     (state: RootState) => state.dish,
   );
   const priceRange = useSelector((state: RootState) => state.filter.priceRange);
-  const { token } = useSelector((state: RootState) => state.sign);
   const dispatch = useDispatch();
   const router = useRouter();
-  const { userRole } = jwtInfo(token || '');
 
   const [deleteDishMutation] = useMutation<{ deleteDish: boolean }>(
     DELETE_DISH,
@@ -159,10 +160,11 @@ const FoodItemsList = ({ dishes: initialDishes }: FoodItemsListProps) => {
               }
             });
           }}
+          userRole={userRole}
         />
       ))}
 
-      {userRole === 'ROLE_sys_admin' && (
+      {userRole === 'sys_admin' && (
         <>
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <Button
