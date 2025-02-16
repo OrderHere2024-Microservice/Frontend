@@ -15,10 +15,14 @@ export const postDishes = (dishData: DishCreateDto) => {
     formData.append('imageFile', dishData.imageFile, dishData.imageFile.name);
   }
 
-  return http(`/v1/public/dish`, {
-    method: 'POST',
-    data: formData,
-  });
+  return http(
+    `/v1/public/dish`,
+    {
+      method: 'POST',
+      data: formData,
+    },
+    process.env.NEXT_PUBLIC_DISH_SERVICE_URL,
+  );
 };
 
 export const updateDishes = (dishData: DishUpdateDto) => {
@@ -35,10 +39,14 @@ export const updateDishes = (dishData: DishUpdateDto) => {
     formData.append('imageFile', dishData.imageFile, dishData.imageFile.name);
   }
 
-  return http(`/v1/public/dish`, {
-    method: 'PUT',
-    data: formData,
-  });
+  return http(
+    `/v1/public/dish`,
+    {
+      method: 'PUT',
+      data: formData,
+    },
+    process.env.NEXT_PUBLIC_DISH_SERVICE_URL,
+  );
 };
 
 export const GET_DISHES_PRICE_FILTER = gql`
