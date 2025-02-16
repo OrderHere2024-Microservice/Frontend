@@ -5,11 +5,10 @@ const backendHttpInstance = async (overrideUrl?: string) => {
   const session = await getSession();
 
   const axiosInstance = axios.create();
-  axiosInstance.defaults.baseURL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-  if (overrideUrl) {
-    axiosInstance.defaults.baseURL = overrideUrl;
-  }
+  axiosInstance.defaults.baseURL =
+    overrideUrl || process.env.NEXT_PUBLIC_BACKEND_URL;
+
   const token = session?.token?.accessToken;
 
   axiosInstance.defaults.headers.common.Authorization = `Bearer ${token}`;
