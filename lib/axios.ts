@@ -1,11 +1,13 @@
 import axios, { AxiosRequestConfig, AxiosError } from 'axios';
 import { getSession } from 'next-auth/react';
 
-const backendHttpInstance = async () => {
+const backendHttpInstance = async (overrideUrl?: string) => {
   const session = await getSession();
 
   const axiosInstance = axios.create();
-  axiosInstance.defaults.baseURL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+  axiosInstance.defaults.baseURL =
+    overrideUrl || process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const token = session?.token?.accessToken;
 
@@ -22,8 +24,12 @@ const backendHttpInstance = async () => {
   return axiosInstance;
 };
 
-const http = async (endpoint: string, config: AxiosRequestConfig) => {
-  const axiosInstance = await backendHttpInstance();
+const http = async (
+  endpoint: string,
+  config: AxiosRequestConfig,
+  overrideUrl?: string,
+) => {
+  const axiosInstance = await backendHttpInstance(overrideUrl);
   return axiosInstance(endpoint, { ...config });
 };
 
