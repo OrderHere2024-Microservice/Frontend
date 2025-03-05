@@ -3,4 +3,5 @@ export interface OrderDishDTO {
   dishName: string;
   dishQuantity: number;
   dishPrice: number;
+  isDeleted?: boolean;
 }

@@ -17,6 +17,7 @@ export const GET_USER_ORDERS = gql`
         dishName
         dishQuantity
         dishPrice
+        isDeleted
       }
       username
       orderStatus
@@ -44,6 +45,7 @@ export const GET_ALL_ORDERS = gql`
         dishName
         dishQuantity
         dishPrice
+        isDeleted
       }
       username
       orderStatus
@@ -71,6 +73,7 @@ export const GET_ORDER_BY_ID = gql`
         dishName
         dishQuantity
         dishPrice
+        isDeleted
       }
       username
       orderStatus
