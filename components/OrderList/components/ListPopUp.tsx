@@ -293,7 +293,8 @@ const ListPopUp = ({
                 }}
               >
                 <Typography variant="h6">
-                  {dish.dishName} x {dish.dishQuantity}
+                  {dish.dishName} x {dish.dishQuantity}{' '}
+                  {dish.isDeleted && '(Deleted in Menu)'}
                 </Typography>
                 <Typography variant="h6">
                   {dish.dishQuantity * dish.dishPrice}
